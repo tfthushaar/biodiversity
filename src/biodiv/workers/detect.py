@@ -54,19 +54,20 @@ class DetectStats:
 
 
 def ensure_model_version(
-    conn: psycopg.Connection, name: str, source: str, metrics: dict | None = None
+    conn: psycopg.Connection, name: str, source: str, metrics: dict | None = None,
+    task: str = "detector",
 ) -> int:
     return conn.execute(
         """
         insert into model_versions (name, task, weights_uri, metrics)
-        values (%s, 'detector', %s, %s::jsonb)
+        values (%s, %s, %s, %s::jsonb)
         on conflict (name, task) do update
           set weights_uri = excluded.weights_uri,
               metrics = case when excluded.metrics = '{}'::jsonb
                              then model_versions.metrics else excluded.metrics end
         returning id
         """,
-        (name, source, json.dumps(metrics or {})),
+        (name, task, source, json.dumps(metrics or {})),
     ).fetchone()[0]
 
 
@@ -83,9 +84,13 @@ def summarise_metrics(report: dict) -> dict:
         "animal_image_level_at_0.5": {
             k: pick(animal, 0.5).get(k) for k in ("precision", "recall", "f1", "false_alarm_rate")
         },
+        "image_level_by_threshold": [
+            {k: r.get(k) for k in ("threshold", "precision", "recall", "false_alarm_rate")}
+            for r in animal
+        ],
         "images_per_second_4_threads": report.get("timing", {}).get("images_per_second_4_threads"),
-        "caveat": "false_alarm_rate is an upper bound: many 'empty' frames contain partial or "
-                  "close-up animals. See docs/models.md.",
+        "caveat": "The share of empty photos flagged is an upper bound: many 'empty' frames "
+                  "contain partial or close-up animals the label missed. See docs/models.md.",
     }
 
 

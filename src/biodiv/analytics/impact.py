@@ -133,20 +133,21 @@ def cooccurrence(conn: psycopg.Connection, zone_slug: str) -> LayerResult:
         if richness is not None:
             usable.append((c["invasive"] / c["all"], richness, c["invasive"]))
 
-    base = {"cells_total": len(cells), "cells_usable": len(usable), "cell_degrees": CELL_DEGREES,
-            "richness_compared_at": RAREFY_TO}
     with_invasives = sum(1 for _, _, inv in usable if inv > 0)
+    base = {"cells_total": len(cells), "cells_usable": len(usable), "cell_degrees": CELL_DEGREES,
+            "richness_compared_at": RAREFY_TO, "cells_with_invasives": with_invasives,
+            "required_cells": MIN_CELLS, "required_invasive_cells": MIN_INVASIVE_CELLS}
     needs = (f"at least {MIN_CELLS} grid cells with {RAREFY_TO}+ native records, of which "
              f"{MIN_INVASIVE_CELLS}+ also hold invasive records")
     if len(usable) < MIN_CELLS:
         return LayerResult("cooccurrence", "insufficient",
                            f"only {len(usable)} usable grid cells (need {MIN_CELLS})", needs,
-                           detail={**base, "cells_with_invasives": with_invasives})
+                           detail=base)
     if with_invasives < MIN_INVASIVE_CELLS:
         return LayerResult("cooccurrence", "insufficient",
                            f"invasive records appear in only {with_invasives} usable cells "
                            f"(need {MIN_INVASIVE_CELLS}), so there is nothing to compare", needs,
-                           detail={**base, "cells_with_invasives": with_invasives})
+                           detail=base)
 
     share, richness = [u[0] for u in usable], [u[1] for u in usable]
     rho = spearman(share, richness)
@@ -154,7 +155,7 @@ def cooccurrence(conn: psycopg.Connection, zone_slug: str) -> LayerResult:
         return LayerResult("cooccurrence", "insufficient", "no variation to correlate", needs,
                            detail=base)
     return LayerResult("cooccurrence", "ok", caution=CAUTION_COOCCURRENCE, detail={
-        **base, "cells_with_invasives": with_invasives, "spearman_rho": rho,
+        **base, "spearman_rho": rho,
         "ci95": bootstrap_interval(share, richness)})
 
 
@@ -183,7 +184,9 @@ def trend(conn: psycopg.Connection, zone_slug: str) -> LayerResult:
     total_invasive = sum(r[2] for r in years)
     usable = [r for r in years if r[1] >= MIN_RECORDS_PER_YEAR]
     detail = {"years_with_data": len(years), "usable_years": len(usable),
-              "invasive_records": total_invasive}
+              "invasive_records": total_invasive, "required_years": MIN_YEARS,
+              "required_invasive_records": MIN_INVASIVE_RECORDS,
+              "required_records_per_year": MIN_RECORDS_PER_YEAR}
 
     if len(usable) < MIN_YEARS:
         return LayerResult("trend", "insufficient",

@@ -27,7 +27,6 @@ def anon(ingest_db_url):
         "select st_buffer(geom, 1) from zones",  # heavy geometry work on attacker input
         "select st_union(geom) from zones",
         "select st_astext(geom) from zones",
-        "select * from spatial_ref_sys",
         "select refresh_rollups()",
         "select ensure_detection_partition(2099)",
         "select restrict_postgis_functions()",
@@ -55,6 +54,19 @@ def test_anonymous_visitors_cannot_reach_these(anon, sql):
 def test_anonymous_visitors_cannot_write(anon, sql):
     with pytest.raises(psycopg.errors.InsufficientPrivilege):
         anon.execute(sql)
+
+
+def test_geometry_columns_can_be_read_as_json_by_the_public(anon):
+    """Regression: locking down spatial_ref_sys once broke every public read of a geometry
+    column, because PostGIS looks up the coordinate system whenever it serialises one."""
+    row = anon.execute("select row_to_json(z) from (select slug, geom from zones limit 1) z"
+                       ).fetchone()[0]
+    assert row["slug"] and row["geom"]
+    anon.execute("select to_jsonb(m) from media_items m limit 1").fetchall()
+
+
+def test_the_public_sees_only_the_wgs84_definition(anon):
+    assert [r[0] for r in anon.execute("select srid from spatial_ref_sys")] == [4326]
 
 
 def test_the_dashboards_own_data_is_readable(anon):

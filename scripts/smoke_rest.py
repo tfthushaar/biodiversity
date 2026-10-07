@@ -45,6 +45,10 @@ def main() -> int:
 
     # What the dashboard needs.
     readable("/zones?select=slug,name&order=id", "zones", nonempty=True)
+    # A whole row INCLUDING its geometry. Converting geometry to JSON reads PostGIS's
+    # spatial_ref_sys, which an over-eager lockdown once broke; selecting only plain columns
+    # (as this script used to) could not notice.
+    readable("/zones?limit=1", "a full zone row, geometry included", nonempty=True)
     readable("/species?select=scientific_name&limit=1", "species")
     readable("/alerts?select=*,zones(slug),species(scientific_name)&limit=1", "alerts with joins")
     readable("/mitigation_playbooks?select=method,source_quotes&limit=1", "mitigation playbooks")
@@ -70,7 +74,9 @@ def main() -> int:
     refused("GET", "/rpc/postgis_full_version", "read PostGIS library versions")
     refused("GET", "/detections_2011?limit=1", "read a partition directly")
     refused("GET", "/schema_migrations?limit=1", "read migration bookkeeping")
-    refused("GET", "/spatial_ref_sys?limit=1", "read PostGIS reference tables")
+    srs = client.get("/spatial_ref_sys", params={"select": "srid"})
+    only_wgs84 = srs.status_code == 200 and {r["srid"] for r in srs.json()} <= {4326}
+    check(only_wgs84, f"sees at most the WGS84 row of spatial_ref_sys (HTTP {srs.status_code})")
 
     width = max(len(w) for _, w in results)
     for ok, what in results:

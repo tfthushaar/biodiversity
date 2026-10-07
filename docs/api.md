@@ -35,7 +35,8 @@ Checked by `tests/test_public_surface.py` (the database rules) and `scripts/smok
 
 - write, update or delete anything;
 - call internal functions (`refresh_rollups`, `ensure_detection_partition`);
-- read partitions directly, migration bookkeeping, or PostGIS reference tables;
+- read partitions directly or migration bookkeeping, or see more of PostGIS's coordinate-system
+  table than the one definition (WGS84) that geometry serialisation needs (migration 0014);
 - **call PostGIS functions.** This was a real hole found by testing the HTTP path: PostGIS puts
   about a thousand functions in `public`, Postgres makes new functions callable by everyone, and
   the REST API publishes them. An unauthenticated request to `/rpc/postgis_full_version` returned
@@ -49,7 +50,7 @@ Checked by `tests/test_public_surface.py` (the database rules) and `scripts/smok
 python scripts/smoke_rest.py https://YOUR-REF.supabase.co/rest/v1 --key YOUR_ANON_KEY
 ```
 
-Use the **anon** key, never the service-role key. 21 checks; non-zero exit on any failure.
+Use the **anon** key, never the service-role key. 22 checks; non-zero exit on any failure.
 
 ### Run the same stack locally
 

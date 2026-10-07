@@ -36,8 +36,9 @@ pip install -e ".[dev]"
 pytest && ruff check .
 uvicorn biodiv.api.main:app --reload                  # http://localhost:8000/docs
 
-# Dashboard
+# Dashboard (reads the REST API on :3000; see docs/dashboard.md)
 cd web && npm install && npm run dev
+npm test && npm run build
 ```
 
 Copy `.env.example` to `.env` for local configuration. Never commit real keys.
