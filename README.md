@@ -54,6 +54,11 @@ python -m biodiv.workers.ingest --source gbif                     # museum/herba
 python -m biodiv.workers.detect --model data/models/MDV6-mit-yolov9-c.onnx   # find animals in images
 ```
 
+Species are named by small trained heads on a shared DINOv2 backbone: an invasive-plant classifier
+(10 invasives plus native look-alikes, with an explicit "unknown") and a camera-trap animal
+classifier. Both run on CPU, and both come with honest, reproducible measurements of how often
+they are wrong; see the classifier section of [docs/models.md](docs/models.md).
+
 The detector is MegaDetector V6 (MIT) converted to ONNX and run on CPU. How it was made, how it
 was verified against the reference implementation, and how accurate it is, including the
 mistakes made while measuring that: [docs/models.md](docs/models.md).

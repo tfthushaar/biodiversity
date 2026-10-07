@@ -1,0 +1,1278 @@
+{
+  "task": "plants",
+  "classes": [
+    "Lantana camara",
+    "Senna spectabilis",
+    "Chromolaena odorata",
+    "Prosopis juliflora",
+    "Parthenium hysterophorus",
+    "Opuntia stricta",
+    "Tridax procumbens",
+    "Mikania micrantha",
+    "Ageratina adenophora",
+    "Eichhornia crassipes",
+    "Cassia fistula",
+    "Grangea maderaspatana",
+    "Coccinia grandis",
+    "Ipomoea pes-caprae",
+    "other_plant"
+  ],
+  "kinds": {
+    "Lantana camara": "invasive",
+    "Senna spectabilis": "invasive",
+    "Chromolaena odorata": "invasive",
+    "Prosopis juliflora": "invasive",
+    "Parthenium hysterophorus": "invasive",
+    "Opuntia stricta": "invasive",
+    "Tridax procumbens": "invasive",
+    "Mikania micrantha": "invasive",
+    "Ageratina adenophora": "invasive",
+    "Eichhornia crassipes": "invasive",
+    "Cassia fistula": "native_lookalike",
+    "Grangea maderaspatana": "native_lookalike",
+    "Coccinia grandis": "native_lookalike",
+    "Ipomoea pes-caprae": "native_lookalike",
+    "other_plant": "other"
+  },
+  "split": "by observer",
+  "chosen": {
+    "C": 100.0,
+    "temperature": 1.0799875825254983,
+    "threshold": 0.76
+  },
+  "test_top1_without_threshold": 0.8933901918976546,
+  "majority_class_baseline": 0.19402985074626866,
+  "threshold_tradeoff_on_test": [
+    {
+      "threshold": 0.3,
+      "answered": 0.997867803837953,
+      "accuracy_when_answered": 0.8931623931623932,
+      "invasives_named": {
+        "count": 244,
+        "of": 265,
+        "rate": 0.9207547169811321,
+        "ci95": [
+          0.8819,
+          0.9476
+        ]
+      },
+      "non_target_called_invasive": {
+        "native_lookalike": {
+          "count": 1,
+          "of": 113,
+          "rate": 0.008849557522123894,
+          "ci95": [
+            0.0016,
+            0.0484
+          ]
+        },
+        "other": {
+          "count": 19,
+          "of": 91,
+          "rate": 0.2087912087912088,
+          "ci95": [
+            0.1379,
+            0.3032
+          ]
+        }
+      }
+    },
+    {
+      "threshold": 0.5,
+      "answered": 0.9381663113006397,
+      "accuracy_when_answered": 0.9272727272727272,
+      "invasives_named": {
+        "count": 243,
+        "of": 265,
+        "rate": 0.9169811320754717,
+        "ci95": [
+          0.8775,
+          0.9445
+        ]
+      },
+      "non_target_called_invasive": {
+        "native_lookalike": {
+          "count": 0,
+          "of": 113,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.0329
+          ]
+        },
+        "other": {
+          "count": 13,
+          "of": 91,
+          "rate": 0.14285714285714285,
+          "ci95": [
+            0.0854,
+            0.2292
+          ]
+        }
+      }
+    },
+    {
+      "threshold": 0.6,
+      "answered": 0.8912579957356077,
+      "accuracy_when_answered": 0.9401913875598086,
+      "invasives_named": {
+        "count": 236,
+        "of": 265,
+        "rate": 0.8905660377358491,
+        "ci95": [
+          0.8473,
+          0.9227
+        ]
+      },
+      "non_target_called_invasive": {
+        "native_lookalike": {
+          "count": 0,
+          "of": 113,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.0329
+          ]
+        },
+        "other": {
+          "count": 9,
+          "of": 91,
+          "rate": 0.0989010989010989,
+          "ci95": [
+            0.0529,
+            0.1774
+          ]
+        }
+      }
+    },
+    {
+      "threshold": 0.7,
+      "answered": 0.837953091684435,
+      "accuracy_when_answered": 0.9592875318066157,
+      "invasives_named": {
+        "count": 228,
+        "of": 265,
+        "rate": 0.8603773584905661,
+        "ci95": [
+          0.8135,
+          0.897
+        ]
+      },
+      "non_target_called_invasive": {
+        "native_lookalike": {
+          "count": 0,
+          "of": 113,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.0329
+          ]
+        },
+        "other": {
+          "count": 6,
+          "of": 91,
+          "rate": 0.06593406593406594,
+          "ci95": [
+            0.0306,
+            0.1365
+          ]
+        }
+      }
+    },
+    {
+      "threshold": 0.76,
+      "answered": 0.8123667377398721,
+      "accuracy_when_answered": 0.9658792650918635,
+      "invasives_named": {
+        "count": 225,
+        "of": 265,
+        "rate": 0.8490566037735849,
+        "ci95": [
+          0.801,
+          0.8872
+        ]
+      },
+      "non_target_called_invasive": {
+        "native_lookalike": {
+          "count": 0,
+          "of": 113,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.0329
+          ]
+        },
+        "other": {
+          "count": 6,
+          "of": 91,
+          "rate": 0.06593406593406594,
+          "ci95": [
+            0.0306,
+            0.1365
+          ]
+        }
+      }
+    },
+    {
+      "threshold": 0.8,
+      "answered": 0.7825159914712153,
+      "accuracy_when_answered": 0.9700272479564033,
+      "invasives_named": {
+        "count": 219,
+        "of": 265,
+        "rate": 0.8264150943396227,
+        "ci95": [
+          0.7762,
+          0.8673
+        ]
+      },
+      "non_target_called_invasive": {
+        "native_lookalike": {
+          "count": 0,
+          "of": 113,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.0329
+          ]
+        },
+        "other": {
+          "count": 4,
+          "of": 91,
+          "rate": 0.04395604395604396,
+          "ci95": [
+            0.0172,
+            0.1076
+          ]
+        }
+      }
+    },
+    {
+      "threshold": 0.9,
+      "answered": 0.6844349680170576,
+      "accuracy_when_answered": 0.9781931464174455,
+      "invasives_named": {
+        "count": 195,
+        "of": 265,
+        "rate": 0.7358490566037735,
+        "ci95": [
+          0.6797,
+          0.7853
+        ]
+      },
+      "non_target_called_invasive": {
+        "native_lookalike": {
+          "count": 0,
+          "of": 113,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.0329
+          ]
+        },
+        "other": {
+          "count": 3,
+          "of": 91,
+          "rate": 0.03296703296703297,
+          "ci95": [
+            0.0113,
+            0.0925
+          ]
+        }
+      }
+    },
+    {
+      "threshold": 0.95,
+      "answered": 0.5863539445628998,
+      "accuracy_when_answered": 0.9927272727272727,
+      "invasives_named": {
+        "count": 173,
+        "of": 265,
+        "rate": 0.6528301886792452,
+        "ci95": [
+          0.5937,
+          0.7076
+        ]
+      },
+      "non_target_called_invasive": {
+        "native_lookalike": {
+          "count": 0,
+          "of": 113,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.0329
+          ]
+        },
+        "other": {
+          "count": 1,
+          "of": 91,
+          "rate": 0.01098901098901099,
+          "ci95": [
+            0.0019,
+            0.0597
+          ]
+        }
+      }
+    }
+  ],
+  "results": {
+    "validation": {
+      "split": "validation",
+      "photos": 469,
+      "top1_accuracy": 0.8017057569296375,
+      "answered": 0.8251599147121536,
+      "accuracy_when_answered": 0.9715762273901809,
+      "per_class": {
+        "Lantana camara": {
+          "support": 40,
+          "precision": 0.9714285714285714,
+          "recall": 0.85,
+          "f1": 0.9066666666666667
+        },
+        "Senna spectabilis": {
+          "support": 29,
+          "precision": 0.9565217391304348,
+          "recall": 0.7586206896551724,
+          "f1": 0.8461538461538461
+        },
+        "Chromolaena odorata": {
+          "support": 16,
+          "precision": 0.9285714285714286,
+          "recall": 0.8125,
+          "f1": 0.8666666666666666
+        },
+        "Prosopis juliflora": {
+          "support": 26,
+          "precision": 1.0,
+          "recall": 0.8076923076923077,
+          "f1": 0.8936170212765957
+        },
+        "Parthenium hysterophorus": {
+          "support": 28,
+          "precision": 1.0,
+          "recall": 0.9642857142857143,
+          "f1": 0.9818181818181818
+        },
+        "Opuntia stricta": {
+          "support": 29,
+          "precision": 1.0,
+          "recall": 0.9310344827586207,
+          "f1": 0.9642857142857143
+        },
+        "Tridax procumbens": {
+          "support": 27,
+          "precision": 1.0,
+          "recall": 0.8888888888888888,
+          "f1": 0.9411764705882353
+        },
+        "Mikania micrantha": {
+          "support": 15,
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.7499999999999999
+        },
+        "Ageratina adenophora": {
+          "support": 30,
+          "precision": 0.9615384615384616,
+          "recall": 0.8333333333333334,
+          "f1": 0.8928571428571429
+        },
+        "Eichhornia crassipes": {
+          "support": 26,
+          "precision": 1.0,
+          "recall": 0.9230769230769231,
+          "f1": 0.9600000000000001
+        },
+        "Cassia fistula": {
+          "support": 35,
+          "precision": 0.9117647058823529,
+          "recall": 0.8857142857142857,
+          "f1": 0.8985507246376812
+        },
+        "Grangea maderaspatana": {
+          "support": 25,
+          "precision": 1.0,
+          "recall": 0.92,
+          "f1": 0.9583333333333334
+        },
+        "Coccinia grandis": {
+          "support": 38,
+          "precision": 1.0,
+          "recall": 0.8421052631578947,
+          "f1": 0.9142857142857143
+        },
+        "Ipomoea pes-caprae": {
+          "support": 27,
+          "precision": 0.96,
+          "recall": 0.8888888888888888,
+          "f1": 0.923076923076923
+        },
+        "other_plant": {
+          "support": 78,
+          "precision": 0.9302325581395349,
+          "recall": 0.5128205128205128,
+          "f1": 0.6611570247933884
+        }
+      },
+      "dangerous_errors": {
+        "count": 3,
+        "of": 203,
+        "rate": 0.014778325123152709,
+        "ci95": [
+          0.005,
+          0.0425
+        ]
+      },
+      "dangerous_errors_by_kind": {
+        "native_lookalike": {
+          "count": 1,
+          "of": 125,
+          "rate": 0.008,
+          "ci95": [
+            0.0014,
+            0.0439
+          ]
+        },
+        "other": {
+          "count": 2,
+          "of": 78,
+          "rate": 0.02564102564102564,
+          "ci95": [
+            0.0071,
+            0.0888
+          ]
+        }
+      },
+      "invasives_correctly_named": {
+        "count": 226,
+        "of": 266,
+        "rate": 0.849624060150376,
+        "ci95": [
+          0.8017,
+          0.8876
+        ]
+      },
+      "calibration_error": 0.021888929796907722,
+      "confusion": [
+        [
+          34,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          22,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          6
+        ],
+        [
+          0,
+          0,
+          13,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          21,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          27,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          27,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          24,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          9,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          6
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          25,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          24,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          31,
+          0,
+          0,
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          23,
+          0,
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          32,
+          0,
+          1,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          24,
+          0,
+          3
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          2,
+          0,
+          0,
+          1,
+          40,
+          33
+        ]
+      ]
+    },
+    "test": {
+      "split": "test",
+      "photos": 469,
+      "top1_accuracy": 0.7846481876332623,
+      "answered": 0.8123667377398721,
+      "accuracy_when_answered": 0.9658792650918635,
+      "per_class": {
+        "Lantana camara": {
+          "support": 29,
+          "precision": 1.0,
+          "recall": 0.9310344827586207,
+          "f1": 0.9642857142857143
+        },
+        "Senna spectabilis": {
+          "support": 30,
+          "precision": 1.0,
+          "recall": 0.7,
+          "f1": 0.8235294117647058
+        },
+        "Chromolaena odorata": {
+          "support": 19,
+          "precision": 1.0,
+          "recall": 0.7368421052631579,
+          "f1": 0.8484848484848484
+        },
+        "Prosopis juliflora": {
+          "support": 29,
+          "precision": 0.896551724137931,
+          "recall": 0.896551724137931,
+          "f1": 0.896551724137931
+        },
+        "Parthenium hysterophorus": {
+          "support": 22,
+          "precision": 1.0,
+          "recall": 0.8636363636363636,
+          "f1": 0.9268292682926829
+        },
+        "Opuntia stricta": {
+          "support": 23,
+          "precision": 1.0,
+          "recall": 0.9565217391304348,
+          "f1": 0.9777777777777777
+        },
+        "Tridax procumbens": {
+          "support": 24,
+          "precision": 1.0,
+          "recall": 0.7916666666666666,
+          "f1": 0.8837209302325582
+        },
+        "Mikania micrantha": {
+          "support": 21,
+          "precision": 0.9375,
+          "recall": 0.7142857142857143,
+          "f1": 0.8108108108108109
+        },
+        "Ageratina adenophora": {
+          "support": 41,
+          "precision": 0.95,
+          "recall": 0.926829268292683,
+          "f1": 0.9382716049382716
+        },
+        "Eichhornia crassipes": {
+          "support": 27,
+          "precision": 1.0,
+          "recall": 0.8888888888888888,
+          "f1": 0.9411764705882353
+        },
+        "Cassia fistula": {
+          "support": 26,
+          "precision": 1.0,
+          "recall": 0.8076923076923077,
+          "f1": 0.8936170212765957
+        },
+        "Grangea maderaspatana": {
+          "support": 38,
+          "precision": 1.0,
+          "recall": 0.9473684210526315,
+          "f1": 0.972972972972973
+        },
+        "Coccinia grandis": {
+          "support": 27,
+          "precision": 0.88,
+          "recall": 0.8148148148148148,
+          "f1": 0.8461538461538461
+        },
+        "Ipomoea pes-caprae": {
+          "support": 22,
+          "precision": 1.0,
+          "recall": 0.8636363636363636,
+          "f1": 0.9268292682926829
+        },
+        "other_plant": {
+          "support": 91,
+          "precision": 0.9183673469387755,
+          "recall": 0.4945054945054945,
+          "f1": 0.6428571428571429
+        }
+      },
+      "dangerous_errors": {
+        "count": 6,
+        "of": 204,
+        "rate": 0.029411764705882353,
+        "ci95": [
+          0.0135,
+          0.0627
+        ]
+      },
+      "dangerous_errors_by_kind": {
+        "native_lookalike": {
+          "count": 0,
+          "of": 113,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.0329
+          ]
+        },
+        "other": {
+          "count": 6,
+          "of": 91,
+          "rate": 0.06593406593406594,
+          "ci95": [
+            0.0306,
+            0.1365
+          ]
+        }
+      },
+      "invasives_correctly_named": {
+        "count": 225,
+        "of": 265,
+        "rate": 0.8490566037735849,
+        "ci95": [
+          0.801,
+          0.8872
+        ]
+      },
+      "calibration_error": 0.021933757901324895,
+      "confusion": [
+        [
+          27,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          21,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          9
+        ],
+        [
+          0,
+          0,
+          14,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          26,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          19,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          22,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          19,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          15,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          38,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          24,
+          0,
+          0,
+          0,
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          21,
+          0,
+          0,
+          0,
+          2,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          36,
+          0,
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          22,
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          19,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          1,
+          2,
+          0,
+          0,
+          0,
+          3,
+          0,
+          45,
+          37
+        ]
+      ]
+    },
+    "test_india_only": {
+      "split": "test_india_only",
+      "photos": 238,
+      "top1_accuracy": 0.7857142857142857,
+      "answered": 0.8025210084033614,
+      "accuracy_when_answered": 0.9790575916230366,
+      "per_class": {
+        "Lantana camara": {
+          "support": 12,
+          "precision": 1.0,
+          "recall": 0.9166666666666666,
+          "f1": 0.9565217391304348
+        },
+        "Senna spectabilis": {
+          "support": 9,
+          "precision": 1.0,
+          "recall": 0.7777777777777778,
+          "f1": 0.8750000000000001
+        },
+        "Chromolaena odorata": {
+          "support": 8,
+          "precision": 1.0,
+          "recall": 0.875,
+          "f1": 0.9333333333333333
+        },
+        "Prosopis juliflora": {
+          "support": 20,
+          "precision": 1.0,
+          "recall": 0.9,
+          "f1": 0.9473684210526316
+        },
+        "Parthenium hysterophorus": {
+          "support": 12,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "Opuntia stricta": {
+          "support": 16,
+          "precision": 1.0,
+          "recall": 0.9375,
+          "f1": 0.967741935483871
+        },
+        "Tridax procumbens": {
+          "support": 13,
+          "precision": 1.0,
+          "recall": 0.7692307692307693,
+          "f1": 0.8695652173913044
+        },
+        "Mikania micrantha": {
+          "support": 4,
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571428571428571
+        },
+        "Ageratina adenophora": {
+          "support": 12,
+          "precision": 1.0,
+          "recall": 0.9166666666666666,
+          "f1": 0.9565217391304348
+        },
+        "Eichhornia crassipes": {
+          "support": 12,
+          "precision": 1.0,
+          "recall": 0.8333333333333334,
+          "f1": 0.9090909090909091
+        },
+        "Cassia fistula": {
+          "support": 20,
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571428571428571
+        },
+        "Grangea maderaspatana": {
+          "support": 26,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "Coccinia grandis": {
+          "support": 18,
+          "precision": 0.9444444444444444,
+          "recall": 0.9444444444444444,
+          "f1": 0.9444444444444444
+        },
+        "Ipomoea pes-caprae": {
+          "support": 9,
+          "precision": 1.0,
+          "recall": 0.6666666666666666,
+          "f1": 0.8
+        },
+        "other_plant": {
+          "support": 47,
+          "precision": 0.8636363636363636,
+          "recall": 0.40425531914893614,
+          "f1": 0.5507246376811594
+        }
+      },
+      "dangerous_errors": {
+        "count": 0,
+        "of": 120,
+        "rate": 0.0,
+        "ci95": [
+          0.0,
+          0.031
+        ]
+      },
+      "dangerous_errors_by_kind": {
+        "native_lookalike": {
+          "count": 0,
+          "of": 73,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.05
+          ]
+        },
+        "other": {
+          "count": 0,
+          "of": 47,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.0756
+          ]
+        }
+      },
+      "invasives_correctly_named": {
+        "count": 104,
+        "of": 118,
+        "rate": 0.8813559322033898,
+        "ci95": [
+          0.8107,
+          0.928
+        ]
+      }
+    }
+  }
+}

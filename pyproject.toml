@@ -20,6 +20,7 @@ dependencies = [
 
 [project.optional-dependencies]
 inference = ["onnxruntime>=1.18", "numpy>=1.26", "Pillow>=10"]
+train = ["scikit-learn>=1.4", "biodiv[inference]"]
 dev = ["pytest>=8", "pytest-asyncio>=0.23", "respx>=0.21", "ruff>=0.5", "biodiv[inference]"]
 
 [tool.setuptools.packages.find]

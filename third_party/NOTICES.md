@@ -57,7 +57,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-## Caltech Camera Traps (evaluation images and test fixtures)
+## DINOv2 ViT-S/14 backbone
+
+Meta Platforms, Inc. and affiliates. Weights via `timm`:
+<https://huggingface.co/timm/vit_small_patch14_dinov2.lvd142m>. Apache License 2.0
+(<https://www.apache.org/licenses/LICENSE-2.0>). A converted ONNX copy is used for inference.
+
+## Training photos for the plant classifier
+
+iNaturalist photos licensed CC0, CC BY, CC BY-NC, CC BY-SA or CC BY-NC-SA, used only to train a
+model; the photos themselves are not redistributed. Each photo's observation id, URL and licence
+are listed in `docs/training/plants_manifest.jsonl`, so every contributor can be credited by
+following the link. Photographer identities are deliberately not stored.
+
+## Caltech Camera Traps (evaluation images, classifier training crops and test fixtures)
 
 Beery, S., Van Horn, G., Perona, P. *Recognition in Terra Incognita*. ECCV 2018. Hosted by LILA BC:
 <https://lila.science/datasets/caltech-camera-traps>. Community Data License Agreement,

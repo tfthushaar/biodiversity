@@ -1,0 +1,71 @@
+{
+  "source": "Caltech Camera Traps via LILA BC (CDLA-Permissive-1.0)",
+  "classes": [
+    {
+      "name": "bird",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "bobcat",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "cat",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "coyote",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "deer",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "dog",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "fox",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "opossum",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "rabbit",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "raccoon",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "rodent",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "skunk",
+      "kind": "animal",
+      "photos": 220
+    },
+    {
+      "name": "squirrel",
+      "kind": "animal",
+      "photos": 220
+    }
+  ],
+  "note": "Species are North American. This head demonstrates the pipeline on real camera-trap crops; it is not a model of Indian or African fauna."
+}

@@ -1,0 +1,130 @@
+{
+  "classes": [
+    {
+      "name": "Lantana camara",
+      "inat_name": "Lantana camara",
+      "taxon_id": 50333,
+      "kind": "invasive",
+      "common_name": "common lantana",
+      "photos": 140
+    },
+    {
+      "name": "Senna spectabilis",
+      "inat_name": "Senna spectabilis",
+      "taxon_id": 138578,
+      "kind": "invasive",
+      "common_name": "whitebark senna",
+      "photos": 140
+    },
+    {
+      "name": "Chromolaena odorata",
+      "inat_name": "Chromolaena odorata",
+      "taxon_id": 199400,
+      "kind": "invasive",
+      "common_name": "Siam weed",
+      "photos": 140
+    },
+    {
+      "name": "Prosopis juliflora",
+      "inat_name": "Neltuma juliflora",
+      "taxon_id": 1493141,
+      "kind": "invasive",
+      "common_name": "mesquite",
+      "photos": 140
+    },
+    {
+      "name": "Parthenium hysterophorus",
+      "inat_name": "Parthenium hysterophorus",
+      "taxon_id": 126424,
+      "kind": "invasive",
+      "common_name": "Santa Maria feverfew",
+      "photos": 140
+    },
+    {
+      "name": "Opuntia stricta",
+      "inat_name": "Opuntia stricta",
+      "taxon_id": 47898,
+      "kind": "invasive",
+      "common_name": "shell mound pricklypear",
+      "photos": 140
+    },
+    {
+      "name": "Tridax procumbens",
+      "inat_name": "Tridax procumbens",
+      "taxon_id": 169944,
+      "kind": "invasive",
+      "common_name": "Tridax Daisy",
+      "photos": 140
+    },
+    {
+      "name": "Mikania micrantha",
+      "inat_name": "Mikania micrantha",
+      "taxon_id": 165389,
+      "kind": "invasive",
+      "common_name": "mile-a-minute",
+      "photos": 140
+    },
+    {
+      "name": "Ageratina adenophora",
+      "inat_name": "Ageratina adenophora",
+      "taxon_id": 64114,
+      "kind": "invasive",
+      "common_name": "Crofton Weed",
+      "photos": 140
+    },
+    {
+      "name": "Eichhornia crassipes",
+      "inat_name": "Pontederia crassipes",
+      "taxon_id": 962637,
+      "kind": "invasive",
+      "common_name": "common water hyacinth",
+      "photos": 140
+    },
+    {
+      "name": "Cassia fistula",
+      "taxon_id": 68679,
+      "kind": "native_lookalike",
+      "common_name": "Golden Shower Tree",
+      "why": "iNaturalist users confuse it with Senna spectabilis (6 identifications); recorded native to India",
+      "photos": 140
+    },
+    {
+      "name": "Grangea maderaspatana",
+      "taxon_id": 121282,
+      "kind": "native_lookalike",
+      "common_name": "Madras carpet",
+      "why": "iNaturalist users confuse it with Parthenium hysterophorus (8 identifications); recorded native to India",
+      "photos": 140
+    },
+    {
+      "name": "Coccinia grandis",
+      "taxon_id": 160766,
+      "kind": "native_lookalike",
+      "common_name": "Ivy gourd",
+      "why": "iNaturalist users confuse it with Mikania micrantha (15 identifications); recorded native to India",
+      "photos": 140
+    },
+    {
+      "name": "Ipomoea pes-caprae",
+      "taxon_id": 60879,
+      "kind": "native_lookalike",
+      "common_name": "Beach Morning Glory",
+      "why": "iNaturalist users confuse it with Pontederia crassipes (7 identifications); recorded native to India",
+      "photos": 140
+    },
+    {
+      "name": "other_plant",
+      "taxon_id": null,
+      "kind": "other",
+      "photos": 385,
+      "why": "random plants from India, none of the classes above"
+    }
+  ],
+  "photo_licenses": [
+    "cc-by",
+    "cc-by-nc",
+    "cc-by-nc-sa",
+    "cc-by-sa",
+    "cc0"
+  ]
+}
