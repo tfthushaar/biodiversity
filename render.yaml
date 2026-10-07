@@ -1,0 +1,18 @@
+# Render Blueprint for the FastAPI service. OPTIONAL: the dashboard reads Supabase's
+# built-in REST/GraphQL APIs directly, so the site works even if this is never deployed.
+# Verify Render's free plan needs no card at signup before relying on it (docs/free-tier-gate.md).
+services:
+  - type: web
+    name: biodiv-api
+    runtime: python
+    plan: free
+    buildCommand: pip install .
+    startCommand: uvicorn biodiv.api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.10"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false

@@ -1,0 +1,33 @@
+# python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+
+# node
+node_modules/
+web/dist/
+web/.vercel/
+
+# secrets / local config  (never commit keys)
+.env
+.env.*
+!.env.example
+
+# data & models are large; weights live on the Hugging Face Hub, not git
+data/
+*.onnx
+*.pt
+*.pth
+*.parquet
+
+# editors / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

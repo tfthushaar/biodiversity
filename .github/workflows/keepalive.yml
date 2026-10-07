@@ -1,0 +1,46 @@
+name: Keep-alive
+
+# Free tiers sleep when idle. This workflow stops that:
+#   - Supabase pauses a project after ~7 days without activity   -> ping daily
+#   - Render spins a free web service down after 15 min idle     -> ping every 10 min,
+#     but only during waking hours so we stay inside the 750 instance-hours/month budget.
+#
+# NOTE: GitHub disables scheduled workflows on a repo with no activity for 60 days.
+# Any commit re-enables them. Check the Actions tab before an evaluation.
+
+on:
+  schedule:
+    - cron: "17 3 * * *"       # daily, 08:47 IST        -> Supabase
+    - cron: "*/10 1-17 * * *"  # 06:30-23:20 IST window  -> Render
+  workflow_dispatch:
+
+jobs:
+  supabase:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '17 3 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::notice::Supabase secrets not set yet; skipping."; exit 0
+          fi
+          # Phase 1 replaces this with a real table query once the schema exists.
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$SUPABASE_URL/rest/v1/" -H "apikey: $SUPABASE_ANON_KEY")
+          echo "Supabase responded HTTP $code"
+          [ "$code" -lt 500 ]
+
+  render:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/10 1-17 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Warm the API
+        env:
+          API_PUBLIC_URL: ${{ secrets.API_PUBLIC_URL }}
+        run: |
+          if [ -z "$API_PUBLIC_URL" ]; then
+            echo "::notice::API_PUBLIC_URL not set yet; skipping."; exit 0
+          fi
+          curl -fsS --max-time 90 "$API_PUBLIC_URL/health"
