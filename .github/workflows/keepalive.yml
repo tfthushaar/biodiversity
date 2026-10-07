@@ -27,10 +27,12 @@ jobs:
           if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
             echo "::notice::Supabase secrets not set yet; skipping."; exit 0
           fi
-          # Phase 1 replaces this with a real table query once the schema exists.
-          code=$(curl -s -o /dev/null -w "%{http_code}" "$SUPABASE_URL/rest/v1/" -H "apikey: $SUPABASE_ANON_KEY")
+          # A real table read, so the project counts as active. The anon key may read `sources`.
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "$SUPABASE_URL/rest/v1/sources?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" -H "Authorization: Bearer $SUPABASE_ANON_KEY")
           echo "Supabase responded HTTP $code"
-          [ "$code" -lt 500 ]
+          [ "$code" = "200" ]
 
   render:
     if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/10 1-17 * * *'

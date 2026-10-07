@@ -42,3 +42,15 @@ you actually create each account. That is the gate.
 | `EBIRD_API_KEY` | key | workers |
 
 The keep-alive workflow skips cleanly while these are unset, so nothing fails in the meantime.
+
+## Applying the database schema to Supabase
+
+```bash
+# DATABASE_URL = Supabase "Session pooler" connection string (IPv4-friendly).
+# The direct connection is IPv6-only on the free plan; verify this against your project.
+python -m biodiv.workers.migrate --seed
+```
+
+Migrations are applied once each and checksummed: editing an already-applied migration is
+refused. Add a new numbered file instead. Row-level security allows the public `anon` key to
+read only; all writes use the service role from workers.
