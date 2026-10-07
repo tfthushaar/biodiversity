@@ -200,3 +200,21 @@ def test_public_key_can_read_but_not_write(conn):
             conn.execute(sql)
         conn.rollback()
         conn.execute("set local role anon")
+
+
+# ------------------------------------------------------------ threat links
+
+
+def test_threat_links_keep_iucn_and_literature_evidence_apart(conn):
+    native = _species(conn, "Panthera pardus")
+    invader = _species(conn, "Lantana camara")
+    base = (
+        "insert into threat_links (native_species_id, invasive_species_id, evidence_source, "
+        "iucn_threat_code, citation) values (%s, %s, %s, %s, 'a citation')"
+    )
+    conn.execute(base, (native, invader, "literature", None))  # no IUCN code needed
+    conn.execute(base, (native, invader, "iucn", "8.1.2"))  # same pair, different evidence
+
+    with pytest.raises(psycopg.errors.CheckViolation):  # an IUCN row must carry its code
+        conn.execute(base, (native, invader, "iucn", None))
+    conn.rollback()
