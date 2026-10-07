@@ -19,7 +19,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-asyncio>=0.23", "respx>=0.21", "ruff>=0.5"]
+inference = ["onnxruntime>=1.18", "numpy>=1.26", "Pillow>=10"]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "respx>=0.21", "ruff>=0.5", "biodiv[inference]"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

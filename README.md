@@ -51,7 +51,12 @@ python -m biodiv.workers.import_griis --resource griis-india      # which specie
 python -m biodiv.workers.import_griis --resource griis_tanzania
 python -m biodiv.workers.ingest --source inaturalist --max 2000   # community observations
 python -m biodiv.workers.ingest --source gbif                     # museum/herbarium specimens
+python -m biodiv.workers.detect --model data/models/MDV6-mit-yolov9-c.onnx   # find animals in images
 ```
+
+The detector is MegaDetector V6 (MIT) converted to ONNX and run on CPU. How it was made, how it
+was verified against the reference implementation, and how accurate it is, including the
+mistakes made while measuring that: [docs/models.md](docs/models.md).
 
 Each run is incremental and idempotent, and polite to the source APIs (rate-limited, retried
 with backoff). Read [docs/data-quality.md](docs/data-quality.md) before interpreting any numbers:

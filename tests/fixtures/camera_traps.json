@@ -1,0 +1,42 @@
+{
+ "vehicle": {
+  "file": "camera_trap_vehicle.jpg",
+  "source_image_id": "587183a7-23d2-11e8-a6a3-ec086b02610b",
+  "location": "120",
+  "gt": [
+   {
+    "label": "vehicle",
+    "category": "car",
+    "box": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   }
+  ]
+ },
+ "animal": {
+  "file": "camera_trap_animal.jpg",
+  "source_image_id": "59b7a967-23d2-11e8-a6a3-ec086b02610b",
+  "location": "63",
+  "gt": [
+   {
+    "label": "animal",
+    "category": "deer",
+    "box": [
+     0.46593673713505,
+     0.092228072235382,
+     0.76518058986401,
+     0.838311880467872
+    ]
+   }
+  ]
+ },
+ "empty": {
+  "file": "camera_trap_empty.jpg",
+  "source_image_id": "59f127f1-23d2-11e8-a6a3-ec086b02610b",
+  "location": "42",
+  "gt": []
+ }
+}

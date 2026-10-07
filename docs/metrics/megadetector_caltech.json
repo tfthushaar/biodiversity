@@ -1,0 +1,220 @@
+{
+  "model": {
+    "name": "MDV6-mit-yolov9-c",
+    "source": "https://zenodo.org/records/15398270 (MegaDetector V6, Microsoft AI for Good Lab)",
+    "license": "MIT",
+    "classes": [
+      "animal",
+      "person",
+      "vehicle"
+    ],
+    "input": "1x3x640x640 float32 RGB 0-1, letterboxed with grey (114) padding",
+    "outputs": {
+      "cls_logits": "(B, N, 3) raw logits",
+      "boxes": "(B, N, 4) x1y1x2y2 in 640px space"
+    },
+    "checkpoint_md5": "d8626ba22fccbd9c520e0deb19d721f7",
+    "onnx_sha256": "9dae0ced1e1a3210ebd6a835303d7a6ffc671f3cd15a51cbcb8adaedc238ddbe",
+    "onnx_bytes": 29068750,
+    "max_abs_diff": {
+      "logits": 0.000152587890625,
+      "boxes": 0.0006103515625
+    }
+  },
+  "dataset": "Caltech Camera Traps via LILA BC (CDLA-Permissive-1.0)",
+  "images": 1000,
+  "image_kinds": {
+    "vehicle": 30,
+    "animal": 720,
+    "empty": 250
+  },
+  "timing": {
+    "images_per_second_all_threads": 10.34,
+    "median_ms_per_image": 96.4,
+    "images_per_second_4_threads": 9.36
+  },
+  "animal_image_level": [
+    {
+      "threshold": 0.1,
+      "tp": 685,
+      "fp": 84,
+      "fn": 35,
+      "tn": 196,
+      "precision": 0.8907672301690507,
+      "recall": 0.9513888888888888,
+      "f1": 0.9200805910006715,
+      "false_alarm_rate": 0.3
+    },
+    {
+      "threshold": 0.2,
+      "tp": 667,
+      "fp": 49,
+      "fn": 53,
+      "tn": 231,
+      "precision": 0.9315642458100558,
+      "recall": 0.9263888888888889,
+      "f1": 0.9289693593314764,
+      "false_alarm_rate": 0.175
+    },
+    {
+      "threshold": 0.3,
+      "tp": 640,
+      "fp": 39,
+      "fn": 80,
+      "tn": 241,
+      "precision": 0.9425625920471281,
+      "recall": 0.8888888888888888,
+      "f1": 0.9149392423159399,
+      "false_alarm_rate": 0.1392857142857143
+    },
+    {
+      "threshold": 0.5,
+      "tp": 566,
+      "fp": 27,
+      "fn": 154,
+      "tn": 253,
+      "precision": 0.954468802698145,
+      "recall": 0.7861111111111111,
+      "f1": 0.8621477532368621,
+      "false_alarm_rate": 0.09642857142857143
+    },
+    {
+      "threshold": 0.7,
+      "tp": 480,
+      "fp": 13,
+      "fn": 240,
+      "tn": 267,
+      "precision": 0.973630831643002,
+      "recall": 0.6666666666666666,
+      "f1": 0.7914262159934049,
+      "false_alarm_rate": 0.04642857142857143
+    },
+    {
+      "threshold": 0.9,
+      "tp": 182,
+      "fp": 4,
+      "fn": 538,
+      "tn": 276,
+      "precision": 0.978494623655914,
+      "recall": 0.25277777777777777,
+      "f1": 0.401766004415011,
+      "false_alarm_rate": 0.014285714285714285
+    }
+  ],
+  "animal_box_level": [
+    {
+      "threshold": 0.2,
+      "iou": 0.5,
+      "tp": 622,
+      "fp": 162,
+      "fn": 145,
+      "precision": 0.7933673469387755,
+      "recall": 0.8109517601043025
+    },
+    {
+      "threshold": 0.5,
+      "iou": 0.5,
+      "tp": 553,
+      "fp": 72,
+      "fn": 214,
+      "precision": 0.8848,
+      "recall": 0.7209908735332464
+    },
+    {
+      "threshold": 0.7,
+      "iou": 0.5,
+      "tp": 484,
+      "fp": 31,
+      "fn": 283,
+      "precision": 0.9398058252427185,
+      "recall": 0.6310299869621904
+    }
+  ],
+  "vehicle_image_level": [
+    {
+      "threshold": 0.2,
+      "tp": 29,
+      "fp": 6,
+      "fn": 1,
+      "tn": 964,
+      "precision": 0.8285714285714286,
+      "recall": 0.9666666666666667,
+      "f1": 0.8923076923076922,
+      "false_alarm_rate": 0.006185567010309278
+    },
+    {
+      "threshold": 0.5,
+      "tp": 29,
+      "fp": 3,
+      "fn": 1,
+      "tn": 967,
+      "precision": 0.90625,
+      "recall": 0.9666666666666667,
+      "f1": 0.9354838709677419,
+      "false_alarm_rate": 0.003092783505154639
+    }
+  ],
+  "animal_recall_by_category": {
+    "opossum": {
+      "images": 145,
+      "recall_at_0.2": 0.903
+    },
+    "raccoon": {
+      "images": 115,
+      "recall_at_0.2": 0.974
+    },
+    "deer": {
+      "images": 80,
+      "recall_at_0.2": 0.963
+    },
+    "coyote": {
+      "images": 74,
+      "recall_at_0.2": 0.919
+    },
+    "rabbit": {
+      "images": 67,
+      "recall_at_0.2": 0.881
+    },
+    "bobcat": {
+      "images": 53,
+      "recall_at_0.2": 0.925
+    },
+    "cat": {
+      "images": 43,
+      "recall_at_0.2": 0.953
+    },
+    "bird": {
+      "images": 38,
+      "recall_at_0.2": 0.816
+    },
+    "rodent": {
+      "images": 27,
+      "recall_at_0.2": 0.926
+    },
+    "dog": {
+      "images": 27,
+      "recall_at_0.2": 1.0
+    },
+    "squirrel": {
+      "images": 24,
+      "recall_at_0.2": 0.875
+    },
+    "skunk": {
+      "images": 16,
+      "recall_at_0.2": 1.0
+    },
+    "fox": {
+      "images": 8,
+      "recall_at_0.2": 1.0
+    },
+    "lizard": {
+      "images": 2,
+      "recall_at_0.2": 0.5
+    },
+    "badger": {
+      "images": 1,
+      "recall_at_0.2": 1.0
+    }
+  },
+  "caveat": "Caltech boxes are annotated for the single labelled species per image, so a correct detection of an extra, unlabelled animal counts as a false positive in box precision."
+}
