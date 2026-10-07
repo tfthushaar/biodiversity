@@ -52,12 +52,20 @@ python -m biodiv.workers.import_griis --resource griis_tanzania
 python -m biodiv.workers.ingest --source inaturalist --max 2000   # community observations
 python -m biodiv.workers.ingest --source gbif                     # museum/herbarium specimens
 python -m biodiv.workers.detect --model data/models/MDV6-mit-yolov9-c.onnx   # find animals in images
+python -m biodiv.workers.seed_knowledge                           # cited impacts and mitigation
+python -m biodiv.workers.analyse                                  # alerts and per-zone report
 ```
 
 Species are named by small trained heads on a shared DINOv2 backbone: an invasive-plant classifier
 (10 invasives plus native look-alikes, with an explicit "unknown") and a camera-trap animal
 classifier. Both run on CPU, and both come with honest, reproducible measurements of how often
 they are wrong; see the classifier section of [docs/models.md](docs/models.md).
+
+What invasive species do to a zone is reported in three layers of decreasing certainty (cited
+findings, co-occurrence, trend). The statistical ones decline to answer when the data is too thin,
+which today it is; the cited knowledge base (impacts and management, every claim backed by a
+verbatim quote that a script re-checks against the live source) is described in
+[docs/impact.md](docs/impact.md).
 
 The detector is MegaDetector V6 (MIT) converted to ONNX and run on CPU. How it was made, how it
 was verified against the reference implementation, and how accurate it is, including the

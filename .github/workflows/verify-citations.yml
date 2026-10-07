@@ -1,0 +1,25 @@
+name: Verify citations
+
+# Every quote in the knowledge base must still appear on the page it cites. Pages get edited,
+# moved or deleted; this notices. A failure means: re-read the source before touching the quote.
+
+on:
+  schedule:
+    - cron: "30 4 * * 1"   # Mondays
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "db/seeds/knowledge.json"
+      - "src/biodiv/knowledge/**"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e .
+      - run: python scripts/verify_citations.py

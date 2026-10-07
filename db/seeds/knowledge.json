@@ -1,0 +1,469 @@
+{
+  "_about": "Curated, cited knowledge about the invasive species in the pilot zones. Rule: no verbatim quote, no row. Every quote is machine-checked against the live source by scripts/verify_citations.py. Descriptions are restatements for readers; the quotes are the evidence. Nothing here is a recommendation to act: it summarises what published sources report, with their caveats.",
+  "verified_on": "2026-10-07",
+  "sources": {
+    "gisd_lantana": {
+      "citation": "Global Invasive Species Database (2026) Species profile: Lantana camara. IUCN SSC Invasive Species Specialist Group.",
+      "url": "https://www.iucngisd.org/gisd/species.php?sc=56",
+      "kind": "page"
+    },
+    "gisd_chromolaena": {
+      "citation": "Global Invasive Species Database (2026) Species profile: Chromolaena odorata. IUCN SSC Invasive Species Specialist Group.",
+      "url": "https://www.iucngisd.org/gisd/species.php?sc=47",
+      "kind": "page"
+    },
+    "gisd_parthenium": {
+      "citation": "Global Invasive Species Database (2026) Species profile: Parthenium hysterophorus. IUCN SSC Invasive Species Specialist Group.",
+      "url": "https://www.iucngisd.org/gisd/species.php?sc=153",
+      "kind": "page"
+    },
+    "gisd_prosopis": {
+      "citation": "Global Invasive Species Database (2026) Species profile: Prosopis juliflora. IUCN SSC Invasive Species Specialist Group.",
+      "url": "https://www.iucngisd.org/gisd/species.php?sc=917",
+      "kind": "page"
+    },
+    "roundglass_senna": {
+      "citation": "Vinayan, P.A. (2021) Gone Rogue: The Golden Shower Turns Invasive in the Western Ghats. Round Glass Sustain, updated 3 November 2021.",
+      "url": "https://roundglasssustain.com/conservation/golden-shower-invasive",
+      "kind": "page"
+    },
+    "mongabay_senna": {
+      "citation": "Menon, A. (2023) Wayanad's soured relationship with Senna. Mongabay-India, 13 November 2023.",
+      "url": "https://india.mongabay.com/2023/11/wayanads-soured-relationship-with-senna/",
+      "fetch_url": "http://web.archive.org/web/20260418194833/https://india.mongabay.com/2023/11/wayanads-soured-relationship-with-senna/",
+      "kind": "page",
+      "note": "Mongabay refuses automated requests, so quotes are verified against an Internet Archive copy of the same article."
+    },
+    "rufford_bandipur": {
+      "citation": "Prasad, A. (2007) Impact of Lantana camara, a Major Invasive Plant, on Wildlife Habitat in Bandipur Tiger Reserve, Southern India. The Rufford Foundation project page.",
+      "url": "https://www.rufford.org/projects/ayesha-prasad/impact-of-lantana-camara-a-major-invasive-plant-on-wildlife-habitat-in-bandipur-tiger-reserve-southern-india/",
+      "kind": "page"
+    },
+    "nerlekar2021": {
+      "citation": "Nerlekar, A.N., Mehta, P., Pokar, J., Bhagwat, S. et al. (2021) Removal or utilization? Testing alternative approaches to the management of an invasive woody legume in an arid Indian grassland. Restoration Ecology.",
+      "url": "https://doi.org/10.1111/rec.13477",
+      "kind": "crossref",
+      "doi": "10.1111/rec.13477"
+    }
+  },
+  "playbooks": [
+    {
+      "species": "Lantana camara",
+      "method": "mechanical",
+      "summary": "Hand-pulling and mechanical clearing suit small infestations; fire is mentioned for large areas. The profile attaches no reference to this statement and stresses that regrowth must be controlled again and again.",
+      "effectiveness": "variable",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "Clearing without follow-up is not a one-off fix: the same profile says repeated control of regrowth is critical.",
+      "failure_cases": null,
+      "region_note": "General global guidance; not specific to India or to forest reserves.",
+      "source": "gisd_lantana",
+      "quotes": [
+        "Mechanical clearing and hand pulling are suitable for small areas and fire can be used over large areas.",
+        "Repeated control of regrowth is critical to success."
+      ]
+    },
+    {
+      "species": "Lantana camara",
+      "method": "biological",
+      "summary": "Biological control agents have reduced the bulk of individual plants, which makes other methods easier, but none of the more than 40 agents trialled has achieved total control.",
+      "effectiveness": "low",
+      "evidence_strength": "moderate",
+      "cost_tier": null,
+      "risks": "Partial success only; agents are not a substitute for other control.",
+      "failure_cases": "None of the over 40 agents trialled gave total control.",
+      "region_note": "Trials reported worldwide in a review (Day et al. 2003, cited by GISD). Outcomes in Indian forests are not documented in this source.",
+      "source": "gisd_lantana",
+      "quotes": [
+        "Biocontrol agents have decreased the volume of individual plants making other control methods considerably easier.",
+        "None of the over 40 agents trialled have resulted in total control but some have been partially successful"
+      ]
+    },
+    {
+      "species": "Lantana camara",
+      "method": "cultural",
+      "summary": "A Rufford-funded project explored turning Lantana into fuel briquettes for indigenous communities as part of forest restoration. The page names the project but reports no outcomes.",
+      "effectiveness": "variable",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "No outcomes are reported, so effectiveness is unknown.",
+      "failure_cases": null,
+      "region_note": "Project page for work in India; outcomes not reported on the page.",
+      "source": "rufford_bandipur",
+      "quotes": [
+        "Forest Restoration meets Community Development - Converting Lantana camara into Fuel Briquettes for Indigenous Communities"
+      ]
+    },
+    {
+      "species": "Senna spectabilis",
+      "method": "mechanical",
+      "summary": "In 2013 the Kerala Forest Department girdled and applied kerosene to the debarked area of 19,500 trees in Wayanad. Months later only a very small share had died completely, and the report called the continued programme counterproductive.",
+      "effectiveness": "low",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "Girdled trees resprouted, and seeds already in the soil germinated.",
+      "failure_cases": "Debarked trees produced many coppice shoots, and the opened canopy let stored seed germinate, so the effort raised density.",
+      "region_note": "Wayanad Wildlife Sanctuary, Kerala. Reported by a journalist from a Kerala Forest Department / Ferns Nature Conservation Society report, not from a controlled study.",
+      "source": "mongabay_senna",
+      "quotes": [
+        "In 2013, the department tried to control its spread by girdling (cutting through the bark all the way around a tree or branch) and applying kerosene in the debarked area of 19,500 trees.",
+        "only a very small percentage of trees had died completely after eight months of the management measure",
+        "Though the girdling method continued in the following years, it was counterproductive as huge amounts of seeds in the soil started regenerating and multiple coppice shoots also started growing from each tree, the report says."
+      ]
+    },
+    {
+      "species": "Senna spectabilis",
+      "method": "mechanical",
+      "summary": "A conservation group in Wayanad reports fully uprooting Senna from 0.6 square km of a 1.3 square km restoration area, with native grass and shrubs returning within about four months. A researcher who mapped the spread disagrees, warning that uprooting large trees en masse on hilly, high-rainfall ground could cause erosion. The experts quoted do not agree on which method is better.",
+      "effectiveness": "moderate",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "Possible soil disturbance and erosion on slopes, raised by one researcher; contested by the practitioner.",
+      "failure_cases": null,
+      "region_note": "Tholpetty range, Wayanad Wildlife Sanctuary. A practitioner's account, not a measured study.",
+      "source": "mongabay_senna",
+      "quotes": [
+        "Senna trees have been removed completely from 0.6 km² using the uprooting method where the entire tree is manually and mechanically uprooted.",
+        "Once the uprooting is done, in four months or so, grass and other native shrubs will regenerate in the areas where Senna has been uprooted.",
+        "Vinayan said that uprooting large Senna trees en masse could disturb the soil and could lead to erosion since Wayanad is a hilly area with high rainfall."
+      ]
+    },
+    {
+      "species": "Senna spectabilis",
+      "method": "integrated",
+      "summary": "An earlier account of the Kerala Forest Department's attempts (uprooting, girdling, cutting, chopping branches and chemicals) reports that none stopped or even limited the spread, and that cutting raised density.",
+      "effectiveness": "low",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "Cut stumps resprout, and opening the overstorey triggers germination of stored seed.",
+      "failure_cases": "Management efforts increased density and spread.",
+      "region_note": "Wayanad Wildlife Sanctuary, Kerala. A conservation article by a researcher who has mapped the spread since 2012, not a controlled study. It groups uprooting with the other methods, whereas the 2023 article reports local success for uprooting; the two accounts differ.",
+      "source": "roundglass_senna",
+      "quotes": [
+        "However, none of the management efforts succeeded in stopping or even limiting the spread of the golden shower tree.",
+        "Instead, multiple coppice shoots started growing from each cut tree stump.",
+        "Thus, the management efforts only resulted in increasing its density and spread."
+      ]
+    },
+    {
+      "species": "Senna spectabilis",
+      "method": "cultural",
+      "summary": "Senna is described as excellent lightweight timber, and a researcher argues that policy changes allowing removal and sale outside the forest would motivate local communities to clear it. This is a proposal, not an evaluated method.",
+      "effectiveness": "variable",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "Depends on policy change that, per the article, has not yet happened; the article reports no results.",
+      "failure_cases": null,
+      "region_note": "Karnataka (MM Hills) and Kerala, as discussed in the article.",
+      "source": "mongabay_senna",
+      "quotes": [
+        "Ravikanth said he is looking forward to policy changes that would legitimise the removal of Senna from the forest area and marketing it outside, so the local community could be enthused to clear the forest of the invasive.",
+        "Senna is excellent timber to make lightweight furniture and other wooden products."
+      ]
+    },
+    {
+      "species": "Chromolaena odorata",
+      "method": "mechanical",
+      "summary": "Slashing with bush-cutters or tractor-drawn implements is common, but slashing alone causes regeneration, so it must be followed by other control.",
+      "effectiveness": "low",
+      "evidence_strength": "moderate",
+      "cost_tier": null,
+      "risks": "Manual weeding is labour intensive; slashing without follow-up regrows.",
+      "failure_cases": "Slashing causes regeneration unless followed by other control methods.",
+      "region_note": "General global guidance from GISD; not specific to India.",
+      "source": "gisd_chromolaena",
+      "quotes": [
+        "Manual slashing and use of bush-cutter or tractor-drawn implements are commonly used methods",
+        "Slashing causes regeneration unless followed by other control methods"
+      ]
+    },
+    {
+      "species": "Chromolaena odorata",
+      "method": "chemical",
+      "summary": "Herbicide applied at the seedling stage or on regrowth has given encouraging results, and triclopyr is reported as the most effective. GISD lists high cost and ecological concerns as problems.",
+      "effectiveness": "moderate",
+      "evidence_strength": "moderate",
+      "cost_tier": "high",
+      "risks": "High cost of chemicals and application, ecological concerns, and non-compatibility with many cropping systems. Herbicide use in a protected reserve needs the park authority's own regulatory approval.",
+      "failure_cases": null,
+      "region_note": "General global guidance from GISD; not specific to India or to protected areas.",
+      "source": "gisd_chromolaena",
+      "quotes": [
+        "Chemical control using herbicides applied at the seedling stage or on regrowth has given encouraging results.",
+        "problems in herbicide use include the high cost of the chemicals and their application, ecological concerns"
+      ]
+    },
+    {
+      "species": "Chromolaena odorata",
+      "method": "biological",
+      "summary": "A defoliating moth, Pareuchaetes pseudoinsulata, effectively defoliated pure stands in Guam but was less successful on scattered plants and patches.",
+      "effectiveness": "variable",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "Release of a biocontrol agent is a regulated decision; results from island sites may not carry over to Indian forests.",
+      "failure_cases": "Less successful on scattered plants and patches.",
+      "region_note": "Reported from Guam and other Pacific islands. This source does not report results in India.",
+      "source": "gisd_chromolaena",
+      "quotes": [
+        "the biological control agent Pareuchaetes pseudoinsulata has been introduced into Guam, where it effectively defoliates pure stands. It is less successful in scattered plants and patches."
+      ]
+    },
+    {
+      "species": "Parthenium hysterophorus",
+      "method": "integrated",
+      "summary": "Control depends on the site and can combine biological control, pasture management, cultivation and chemicals. The profile also stresses detection and monitoring to stop spread by vehicles and as a contaminant.",
+      "effectiveness": "variable",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "The profile gives no outcomes or specifics for any single method.",
+      "failure_cases": null,
+      "region_note": "General guidance from GISD, written largely from the Australian experience.",
+      "source": "gisd_parthenium",
+      "quotes": [
+        "Control of parthenium weed can be managed using a combination of methods depending on the site, including biological control agents, pasture management, cultivation and chemicals.",
+        "Emphasis must be laid on establishing detection/monitoring procedures and stopping the spread of parthenium weed via vehicles and as a contaminant."
+      ]
+    },
+    {
+      "species": "Parthenium hysterophorus",
+      "method": "biological",
+      "summary": "GISD notes that biological control using insects and fungi is being pursued in Australia and in India. It reports activity, not results.",
+      "effectiveness": "variable",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "No outcomes reported in this source.",
+      "failure_cases": null,
+      "region_note": "Australia and India.",
+      "source": "gisd_parthenium",
+      "quotes": [
+        "Biological control using insects and fungi is being pursued in Australia and in India."
+      ]
+    },
+    {
+      "species": "Prosopis juliflora",
+      "method": "mechanical",
+      "summary": "In a four-year randomised field experiment at eight sites in India's Banni grassland, mechanically removing Prosopis tripled native herb richness and multiplied cover sixfold compared with leaving it alone. It was costly, and perennial grasses did not return.",
+      "effectiveness": "moderate",
+      "evidence_strength": "high",
+      "cost_tier": "high",
+      "risks": "Costly, especially at larger scales; the restored plots were still missing the perennial grasses of the reference grasslands.",
+      "failure_cases": null,
+      "region_note": "Banni grassland, Gujarat: an arid grassland. Not tested in forest reserves such as Bandipur or Nagarahole.",
+      "source": "nerlekar2021",
+      "quotes": [
+        "We found native herbaceous plant richness and cover to be threefold (mean = 6 species) and sixfold (mean = 18% cover) higher, respectively, in the mechanical-removal treatment compared to the control (mean richness = 2 species, cover = 3%)",
+        "However, mechanically removing Prosopis is costly, especially at larger scales.",
+        "both of these treatments were still missing perennial grasses that dominate the reference grasslands."
+      ]
+    },
+    {
+      "species": "Prosopis juliflora",
+      "method": "mechanical",
+      "summary": "In the same experiment, lopping (a cheaper approach) produced no significant improvement over doing nothing.",
+      "effectiveness": "low",
+      "evidence_strength": "high",
+      "cost_tier": "medium",
+      "risks": "Gives little benefit for native plant recovery.",
+      "failure_cases": "No significant difference between lopping and the untreated control.",
+      "region_note": "Banni grassland, Gujarat; an arid grassland.",
+      "source": "nerlekar2021",
+      "quotes": [
+        "found no significant differences between the lopping treatment (mean richness = 5 species, cover = 11%) and the control"
+      ]
+    },
+    {
+      "species": "Prosopis juliflora",
+      "method": "integrated",
+      "summary": "Because Prosopis also benefits some local people and full removal is costly, the authors suggest managing the landscape as a mosaic of restored grassland and invaded patches until the trade-offs are better understood.",
+      "effectiveness": "variable",
+      "evidence_strength": "moderate",
+      "cost_tier": null,
+      "risks": "A recommendation by the study's authors, not a tested outcome.",
+      "failure_cases": null,
+      "region_note": "Banni grassland, Gujarat; socio-ecological context of pastoral communities.",
+      "source": "nerlekar2021",
+      "quotes": [
+        "Until we fully understand the trade-offs involved, it may therefore be better to manage this social-ecological landscape as a mosaic of restored grassland and Prosopis- invaded patches."
+      ]
+    }
+  ],
+  "impact_findings": [
+    {
+      "species": "Lantana camara",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "forest plant species richness and regeneration",
+      "summary": "Reported to reduce plant species richness as its density rises and, at some sites, to stall rainforest regeneration for decades.",
+      "certainty": "review",
+      "region_note": "Cited by GISD from other studies (Fensham et al. 1994; Lamb 1991, in Day et al. 2003); not measured in the pilot reserves.",
+      "source": "gisd_lantana",
+      "quotes": [
+        "As the density of lantana in forest increases species richness decreases",
+        "At some sites, infestations have been so persistent that they have completely stalled the regeneration of rainforest for three decades."
+      ]
+    },
+    {
+      "species": "Lantana camara",
+      "zone": "bandipur",
+      "finding_type": "impact",
+      "affected": "dominant large mammal species",
+      "summary": "Preliminary survey work in Bandipur found an inverse pattern between the distribution of invasive plants (Lantana, Eupatorium/Chromolaena and Parthenium are named together) and that of dominant large mammals. This is a correlation from preliminary work, and the same page says the infestation's extent and effects were still unquantified.",
+      "certainty": "preliminary",
+      "region_note": "Bandipur National Park. A 2007 project description, not a published result.",
+      "source": "rufford_bandipur",
+      "quotes": [
+        "Preliminary work by our team in Bandipur has shown a striking inverse pattern in the distribution of the above invasive plants and the overall distribution of dominant large mammal species.",
+        "the extent of infestation is yet to be quantified and its effects on vegetation communities and consequently wildlife communities remain largely unknown"
+      ]
+    },
+    {
+      "species": "Chromolaena odorata",
+      "zone": "bandipur",
+      "finding_type": "impact",
+      "affected": "dominant large mammal species",
+      "summary": "Named (as Eupatorium odoratum) in the same preliminary Bandipur observation of an inverse pattern with dominant large mammals. Correlational and preliminary.",
+      "certainty": "preliminary",
+      "region_note": "Bandipur National Park. The page lists Lantana, Eupatorium odoratum and Parthenium together and does not separate their effects.",
+      "source": "rufford_bandipur",
+      "quotes": [
+        "exotic plants such as Lantana camara, Eupatorium odoratum, and Parthenium hysterophorus have invaded the deciduous habitats in this landscape, altering native vegetation community dynamics and wildlife",
+        "Preliminary work by our team in Bandipur has shown a striking inverse pattern in the distribution of the above invasive plants and the overall distribution of dominant large mammal species."
+      ]
+    },
+    {
+      "species": "Parthenium hysterophorus",
+      "zone": "bandipur",
+      "finding_type": "impact",
+      "affected": "dominant large mammal species",
+      "summary": "Named in the same preliminary Bandipur observation of an inverse pattern with dominant large mammals. Correlational and preliminary.",
+      "certainty": "preliminary",
+      "region_note": "Bandipur National Park. The page lists Lantana, Eupatorium odoratum and Parthenium together and does not separate their effects.",
+      "source": "rufford_bandipur",
+      "quotes": [
+        "exotic plants such as Lantana camara, Eupatorium odoratum, and Parthenium hysterophorus have invaded the deciduous habitats in this landscape, altering native vegetation community dynamics and wildlife",
+        "Preliminary work by our team in Bandipur has shown a striking inverse pattern in the distribution of the above invasive plants and the overall distribution of dominant large mammal species."
+      ]
+    },
+    {
+      "species": "Chromolaena odorata",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "other plant species",
+      "summary": "Forms dense stands that prevent the establishment of other plant species.",
+      "certainty": "review",
+      "region_note": "General account from GISD; not specific to the pilot reserves.",
+      "source": "gisd_chromolaena",
+      "quotes": [
+        "it forms dense stands that prevent the establishment of other plant species."
+      ]
+    },
+    {
+      "species": "Parthenium hysterophorus",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "native plant species and natural ecosystems",
+      "summary": "Outcompetes native species, in part through allelopathy, and can degrade natural ecosystems.",
+      "certainty": "review",
+      "region_note": "General account from GISD; not specific to the pilot reserves.",
+      "source": "gisd_parthenium",
+      "quotes": [
+        "Outcompetes native species, in part due to allelopathy.",
+        "Infestations of parthenium weed can degrade natural ecosystems."
+      ]
+    },
+    {
+      "species": "Prosopis juliflora",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "native grassland plants",
+      "summary": "Documented to suppress native grassland vegetation, though it also provides benefits to some local people, which complicates removal.",
+      "certainty": "experimental",
+      "region_note": "Banni grassland, Gujarat. A controlled experiment, in an arid grassland rather than forest.",
+      "source": "nerlekar2021",
+      "quotes": [
+        "Apart from its detrimental impact on grasslands, Prosopis also has benefits varying with stakeholder groups, and its removal involves complex trade-offs."
+      ]
+    },
+    {
+      "species": "Senna spectabilis",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "native tree regeneration and biodiversity",
+      "summary": "Reported to have spread across protected areas in the Western and Eastern Ghats of three states and to suppress regeneration of native trees.",
+      "certainty": "observational",
+      "region_note": "Southern India (Kerala, Tamil Nadu, Karnataka). Reported by journalists and researchers, not a single controlled study.",
+      "source": "mongabay_senna",
+      "quotes": [
+        "Senna has spread across various protected areas in the Western and Eastern Ghats in three south Indian states, leading to a decline in native biodiversity."
+      ]
+    },
+    {
+      "species": "Senna spectabilis",
+      "zone": null,
+      "finding_type": "spread",
+      "affected": "Wayanad Wildlife Sanctuary area invaded",
+      "summary": "In Wayanad Wildlife Sanctuary the mapped invaded area grew from under 16 square km in 2013-14 to 89 in 2019 and 123.86 in 2023, about 35% of the sanctuary. An earlier article by the same researcher gives somewhat different figures (under 15 square km in 2012 to 78 in 2020).",
+      "certainty": "observational",
+      "region_note": "Wayanad Wildlife Sanctuary, which borders the Nilgiri landscape but is not one of this project's monitored zones.",
+      "source": "mongabay_senna",
+      "quotes": [
+        "while the spread of Senna was less than 16 km² in 2013-2014 and 89 km² in 2019, it now stands at 123.86 km²."
+      ]
+    },
+    {
+      "species": "Senna spectabilis",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "native mammals as seed dispersers",
+      "summary": "Native mammals, including elephants, chital and porcupine, were found to disperse Senna seeds, with thousands of seeds counted in one elephant dung pile. Native fauna are therefore helping the invader spread.",
+      "certainty": "observational",
+      "region_note": "Wayanad Wildlife Sanctuary; a scat study reported in the journal Biotropica.",
+      "source": "roundglass_senna",
+      "quotes": [
+        "A recent study published in the journal Biotropica has reported that native mammals disperse the seeds of the golden shower tree in the Wayanad Wildlife Sanctuary."
+      ]
+    },
+    {
+      "species": "Senna spectabilis",
+      "zone": "bandipur",
+      "finding_type": "concern",
+      "affected": "native vegetation of the reserve",
+      "summary": "Karnataka's forest department planted Senna in Bandipur and Nagarahole in the early 2000s as a replacement for Lantana, a decision now regarded as a mistake. Management attempts are said to be underway there. Spread within these reserves is reported but has not been measured in this project.",
+      "certainty": "unverified_concern",
+      "region_note": "Bandipur Tiger Reserve. A cautionary example of a control measure that created a bigger problem.",
+      "source": "mongabay_senna",
+      "quotes": [
+        "even planting the saplings in Bandipur and Nagarahole Tiger Reserves as a replacement for Lantana camara",
+        "Management attempts are underway in Bandipur and Nagarahole Tiger Reserves, too by the Karnataka Forest Department."
+      ]
+    },
+    {
+      "species": "Senna spectabilis",
+      "zone": "nagarahole",
+      "finding_type": "concern",
+      "affected": "native vegetation of the reserve",
+      "summary": "Planted in Nagarahole in the early 2000s as a replacement for Lantana. A researcher notes that in Nagarahole certain grass has been growing beneath Senna, which differs from the suppression seen elsewhere. Spread within the reserve is reported but not measured in this project.",
+      "certainty": "unverified_concern",
+      "region_note": "Nagarahole Tiger Reserve.",
+      "source": "mongabay_senna",
+      "quotes": [
+        "even planting the saplings in Bandipur and Nagarahole Tiger Reserves as a replacement for Lantana camara",
+        "Ravikanth, however, said that in Nagarahole, certain grass has been growing beneath Senna."
+      ]
+    },
+    {
+      "species": "Senna spectabilis",
+      "zone": "mudumalai",
+      "finding_type": "concern",
+      "affected": "native vegetation of the reserve",
+      "summary": "A senior elephant researcher pointed to Senna thickets outside his research centre near Mudumalai and called its invasion an emerging problem in Tamil Nadu's protected areas. This is an anecdotal observation.",
+      "certainty": "unverified_concern",
+      "region_note": "Near Mudumalai National Park. The article itself calls the evidence for spread in several reserves anecdotal.",
+      "source": "mongabay_senna",
+      "quotes": [
+        "pointed to a thicket of canopy Senna trees bearing bright yellow flowers outside his research centre near Mudumalai National Park and said that its bioinvasion is an emerging problem in Tamil Nadu’s protected areas.",
+        "Anecdotal evidence points to its spread in other protected areas of southern India too"
+      ]
+    }
+  ]
+}
