@@ -54,3 +54,11 @@ def conn(db_url):
     with psycopg.connect(db_url) as c:
         yield c
         c.rollback()
+
+
+@pytest.fixture
+def ingest_db_url():
+    """A private, migrated and seeded database, for tests that write real data."""
+    with temp_database() as url:
+        migrate(url, seed=True)
+        yield url

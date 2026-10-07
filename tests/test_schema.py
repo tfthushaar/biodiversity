@@ -218,3 +218,51 @@ def test_threat_links_keep_iucn_and_literature_evidence_apart(conn):
     with pytest.raises(psycopg.errors.CheckViolation):  # an IUCN row must carry its code
         conn.execute(base, (native, invader, "iucn", None))
     conn.rollback()
+
+
+def test_mixed_origin_species_do_not_count_as_invasive(conn):
+    """Real case from the data: GRIIS lists Chital as 'Native|Alien' in India (native on the
+    mainland, introduced to the Andamans) and flags it invasive. Western Ghats chital are
+    native, so they must not inflate the invasion index."""
+    src = _seed_source(conn)
+    zone = _zone_id(conn, "bandipur")
+    when = datetime(2012, 3, 10, tzinfo=UTC)
+    media = _media(conn, src, zone, when, n=5)
+
+    def species(name, means):
+        sid = _one(conn, "insert into species (scientific_name) values (%s) returning id", (name,))
+        conn.execute(
+            "insert into invasive_status (species_id, country, is_invasive, establishment_means) "
+            "values (%s, 'IN', true, %s)",
+            (sid, means),
+        )
+        return sid
+
+    chital = species("Axis axis", "Native|Alien")
+    mystery = species("Cryptic one", "Cryptogenic|Uncertain")
+    lantana = species("Lantana camara", "Alien")
+    for m, sp in zip(media, (chital, chital, mystery, lantana, lantana), strict=True):
+        _detect(conn, m, sp, when, zone_id=zone)
+    conn.execute("select refresh_rollups()")
+
+    invasive = dict(conn.execute("select species_id, detections from invasion_index_monthly"))
+    native = dict(conn.execute("select species_id, detections from native_trend_monthly"))
+    assert invasive == {lantana: 2}  # only the purely alien species
+    assert native == {chital: 2}  # mixed origin counts as native
+    assert mystery not in invasive and mystery not in native  # unknown origin: neither
+
+
+def test_origin_class_is_derived_from_establishment_means(conn):
+    sid = _one(conn, "insert into species (scientific_name) values ('X y') returning id")
+    for means, expected in [
+        ("Alien", "alien"), ("Native|Alien", "native"),
+        ("Cryptogenic|Uncertain", "uncertain"), (None, "alien"),
+    ]:
+        conn.execute(
+            "insert into invasive_status (species_id, country, establishment_means) "
+            "values (%s, %s, %s)", (sid, f"X{len(expected)}", means))
+        got = _one(conn, "select origin_class from invasive_status where country = %s "
+                         "and establishment_means is not distinct from %s",
+                   (f"X{len(expected)}", means))
+        assert got == expected
+        conn.execute("delete from invasive_status where species_id = %s", (sid,))

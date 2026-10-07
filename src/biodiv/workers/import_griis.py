@@ -10,17 +10,16 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import json
 import logging
 import sys
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 
 import psycopg
 
 from biodiv.core.repo import upsert_invasive_status, upsert_species
 from biodiv.core.settings import get_settings
-from biodiv.ingestion.gbif import GbifClient, GbifTaxon
+from biodiv.ingestion.gbif import GbifClient, GbifTaxon, load_cache, save_cache
 from biodiv.ingestion.griis import (
     GRIIS_ARCHIVE_URL,
     filter_usable,
@@ -40,19 +39,6 @@ class ImportStats:
     gbif_matched: int = 0
     gbif_unmatched: int = 0
     invasive: int = 0
-
-
-def _load_cache(path: Path) -> dict[str, GbifTaxon | None]:
-    if not path.exists():
-        return {}
-    raw = json.loads(path.read_text(encoding="utf-8"))
-    return {k: (GbifTaxon(**v) if v else None) for k, v in raw.items()}
-
-
-def _save_cache(path: Path, cache: dict[str, GbifTaxon | None]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    raw = {k: (asdict(v) if v else None) for k, v in cache.items()}
-    path.write_text(json.dumps(raw, indent=0, sort_keys=True), encoding="utf-8")
 
 
 async def import_griis(
@@ -110,7 +96,7 @@ async def import_griis(
 
 async def _amain(args: argparse.Namespace) -> ImportStats:
     cache_path = Path(args.cache)
-    cache = _load_cache(cache_path)
+    cache = load_cache(cache_path)
     try:
         async with PoliteClient(
             user_agent=get_settings().user_agent, per_second=args.rate, max_concurrency=8
@@ -118,7 +104,7 @@ async def _amain(args: argparse.Namespace) -> ImportStats:
             with psycopg.connect(get_settings().database_url) as conn:
                 return await import_griis(conn, http, args.resource, cache)
     finally:
-        _save_cache(cache_path, cache)
+        save_cache(cache_path, cache)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -128,6 +114,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--rate", type=float, default=10.0, help="max requests/second to GBIF")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
+    logging.getLogger("httpx").setLevel(logging.WARNING)  # one line per request is noise
 
     if not get_settings().database_url:
         print("DATABASE_URL is not set", file=sys.stderr)

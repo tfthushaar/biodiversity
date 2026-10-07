@@ -42,6 +42,21 @@ cd web && npm install && npm run dev
 
 Copy `.env.example` to `.env` for local configuration. Never commit real keys.
 
+## Loading data
+
+```bash
+export DATABASE_URL=postgresql://...                     # a Postgres with PostGIS
+python -m biodiv.workers.migrate --seed                  # schema + monitored zones
+python -m biodiv.workers.import_griis --resource griis-india      # which species are invasive
+python -m biodiv.workers.import_griis --resource griis_tanzania
+python -m biodiv.workers.ingest --source inaturalist --max 2000   # community observations
+python -m biodiv.workers.ingest --source gbif                     # museum/herbarium specimens
+```
+
+Each run is incremental and idempotent, and polite to the source APIs (rate-limited, retried
+with backoff). Read [docs/data-quality.md](docs/data-quality.md) before interpreting any numbers:
+it records what the data can and cannot support.
+
 ## Layout
 
 `src/biodiv/` holds the Python package (ingestion, inference, analytics, api, workers), `web/` the

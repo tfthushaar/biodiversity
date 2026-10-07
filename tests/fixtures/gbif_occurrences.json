@@ -1,0 +1,155 @@
+{
+ "results": [
+  {
+   "key": 5862543715,
+   "datasetKey": "040c5662-da76-4782-a48e-cdea1892d14c",
+   "basisOfRecord": "MATERIAL_SAMPLE",
+   "scientificName": "BOLD:ACI0636",
+   "species": "Apis cerana",
+   "speciesKey": 1341979,
+   "taxonKey": 10488675,
+   "acceptedTaxonKey": 10488675,
+   "kingdom": "Animalia",
+   "taxonRank": "UNRANKED",
+   "decimalLatitude": 11.572,
+   "decimalLongitude": 76.642,
+   "eventDate": "2025-03-20",
+   "year": 2025,
+   "month": 3,
+   "day": 20,
+   "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+   "occurrenceStatus": "PRESENT",
+   "lastInterpreted": "2026-09-10T07:18:37.369+00:00",
+   "issues": [
+    "GEODETIC_DATUM_ASSUMED_WGS84",
+    "CONTINENT_DERIVED_FROM_COORDINATES",
+    "TAXON_CONCEPT_ID_NOT_FOUND",
+    "TAXON_ID_NOT_FOUND",
+    "INSTITUTION_MATCH_NONE"
+   ],
+   "media": []
+  },
+  {
+   "key": 4023987178,
+   "datasetKey": "393b8c26-e4e0-4dd0-a218-93fc074ebf4e",
+   "basisOfRecord": "MATERIAL_SAMPLE",
+   "scientificName": "Pasteurella multocida subsp. multocida",
+   "species": "Pasteurella multocida",
+   "speciesKey": 10945569,
+   "taxonKey": 7234521,
+   "acceptedTaxonKey": 7234521,
+   "kingdom": "Bacteria",
+   "taxonRank": "SUBSPECIES",
+   "decimalLatitude": 11.8083,
+   "decimalLongitude": 76.6927,
+   "eventDate": "2019",
+   "year": 2019,
+   "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+   "occurrenceStatus": "PRESENT",
+   "lastInterpreted": "2026-09-26T12:08:33.205+00:00",
+   "issues": [
+    "GEODETIC_DATUM_ASSUMED_WGS84",
+    "CONTINENT_DERIVED_FROM_COORDINATES",
+    "TAXON_CONCEPT_ID_NOT_FOUND"
+   ],
+   "media": []
+  },
+  {
+   "key": 1427423268,
+   "datasetKey": "43bb68e1-a118-4b97-ae1c-28965f45cb54",
+   "basisOfRecord": "OCCURRENCE",
+   "scientificName": "Camponotus Mayr, 1861",
+   "taxonKey": 1312361,
+   "acceptedTaxonKey": 1312361,
+   "kingdom": "Animalia",
+   "taxonRank": "GENUS",
+   "decimalLatitude": 11.8142,
+   "decimalLongitude": 76.6991,
+   "eventDate": "2010-10-13",
+   "year": 2010,
+   "month": 10,
+   "day": 13,
+   "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+   "occurrenceStatus": "PRESENT",
+   "lastInterpreted": "2026-09-02T04:17:22.793+00:00",
+   "issues": [
+    "GEODETIC_DATUM_ASSUMED_WGS84",
+    "CONTINENT_DERIVED_FROM_COORDINATES",
+    "SCIENTIFIC_NAME_ID_NOT_FOUND",
+    "TAXON_ID_NOT_FOUND",
+    "BASIS_OF_RECORD_INVALID",
+    "TYPE_STATUS_INVALID",
+    "OCCURRENCE_STATUS_INFERRED_FROM_INDIVIDUAL_COUNT"
+   ],
+   "media": []
+  },
+  {
+   "key": 5938298801,
+   "datasetKey": "50c9509d-22c7-4a22-a47d-8c48425ef4a7",
+   "basisOfRecord": "HUMAN_OBSERVATION",
+   "scientificName": "Kigelia africana (Lam.) Benth.",
+   "species": "Kigelia africana",
+   "speciesKey": 3172561,
+   "taxonKey": 3172561,
+   "acceptedTaxonKey": 3172561,
+   "kingdom": "Plantae",
+   "taxonRank": "SPECIES",
+   "decimalLatitude": 11.861241,
+   "decimalLongitude": 76.669304,
+   "coordinateUncertaintyInMeters": 3.0,
+   "eventDate": "2026-01-02T14:18:51",
+   "year": 2026,
+   "month": 1,
+   "day": 2,
+   "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+   "occurrenceStatus": "PRESENT",
+   "lastInterpreted": "2026-10-07T01:22:13.396+00:00",
+   "issues": [
+    "COORDINATE_ROUNDED",
+    "CONTINENT_DERIVED_FROM_COORDINATES",
+    "TAXON_ID_NOT_FOUND"
+   ],
+   "media": [
+    {
+     "type": "StillImage",
+     "license": "http://creativecommons.org/licenses/by-nc/4.0/",
+     "identifier": "https://inaturalist-open-data.s3.amazonaws.com/photos/604728357/original.jpg",
+     "creator": "[removed from test fixture]"
+    }
+   ]
+  },
+  {
+   "key": 5295787487,
+   "datasetKey": "4fa7b334-ce0d-4e88-aaae-2e0c138d049e",
+   "basisOfRecord": "HUMAN_OBSERVATION",
+   "scientificName": "Copsychus fulicatus (Linnaeus, 1766)",
+   "species": "Saxicoloides fulicatus",
+   "speciesKey": 5788893,
+   "taxonKey": 7341809,
+   "acceptedTaxonKey": 5788893,
+   "kingdom": "Animalia",
+   "taxonRank": "SPECIES",
+   "decimalLatitude": 11.566889,
+   "decimalLongitude": 76.63693,
+   "eventDate": "2024-01-29",
+   "year": 2024,
+   "month": 1,
+   "day": 29,
+   "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+   "occurrenceStatus": "PRESENT",
+   "lastInterpreted": "2026-09-02T06:29:13.471+00:00",
+   "issues": [
+    "CONTINENT_DERIVED_FROM_COORDINATES",
+    "TAXON_CONCEPT_ID_NOT_FOUND"
+   ],
+   "media": []
+  }
+ ],
+ "labels": {
+  "specimen_full_date": 5862543715,
+  "specimen_year_only": 4023987178,
+  "genus_only": 1427423268,
+  "inat_mirror": 5938298801,
+  "ebird": 5295787487
+ }
+}

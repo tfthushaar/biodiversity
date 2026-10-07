@@ -12,12 +12,38 @@ def upsert_species(
     name: str,
     kingdom: str | None,
     rank: str | None,
+    common_name: str | None = None,
+    inat_taxon_id: int | None = None,
 ) -> int:
     """Insert or update a species and return its id. Idempotent.
 
     Species with a GBIF key are identified by it. Without one, we fall back to the exact
     (case-insensitive) name within a kingdom, so re-running an import never duplicates them.
     """
+    species_id = _upsert_species_core(conn, gbif_key, name, kingdom, rank)
+    if common_name:
+        conn.execute(
+            "update species set common_name = %s where id = %s and common_name is null",
+            (common_name, species_id),
+        )
+    if inat_taxon_id is not None:
+        # inat_taxon_id is unique; two of our species can map to one iNaturalist taxon after
+        # synonym merging, so only claim it if nobody else has.
+        conn.execute(
+            "update species set inat_taxon_id = %s where id = %s and inat_taxon_id is null "
+            "and not exists (select 1 from species where inat_taxon_id = %s)",
+            (inat_taxon_id, species_id, inat_taxon_id),
+        )
+    return species_id
+
+
+def _upsert_species_core(
+    conn: psycopg.Connection,
+    gbif_key: int | None,
+    name: str,
+    kingdom: str | None,
+    rank: str | None,
+) -> int:
     if gbif_key is not None:
         return conn.execute(
             """

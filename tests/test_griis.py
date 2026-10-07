@@ -16,6 +16,7 @@ from biodiv.ingestion.griis import (
 from biodiv.ingestion.http import PoliteClient, RateLimiter
 from biodiv.workers.import_griis import import_griis
 from biodiv.workers.migrate import migrate
+from helpers import exact, mock_gbif
 
 TAXON_HEADER = (
     "id\ttaxonID\tscientificName\tacceptedNameUsage\tkingdom\tphylum\tclass\torder\tfamily"
@@ -139,25 +140,6 @@ async def test_rate_limiter_spaces_requests():
 
 
 # --------------------------------------------------------------------- gbif
-
-
-def mock_gbif(respx_mock, matches, species=None):
-    species = species or {}
-
-    def match(request):
-        name = request.url.params["scientificName"]
-        return httpx.Response(200, json=matches.get(name, {"matchType": "NONE"}))
-
-    def get_species(request):
-        return httpx.Response(200, json=species[int(request.url.path.rsplit("/", 1)[1])])
-
-    respx_mock.get("https://api.gbif.org/v1/species/match").mock(side_effect=match)
-    respx_mock.get(url__regex=r"https://api\.gbif\.org/v1/species/\d+").mock(side_effect=get_species)
-
-
-def exact(key, canonical, **extra):
-    return {"usageKey": key, "canonicalName": canonical, "matchType": "EXACT", "confidence": 100,
-            "kingdom": "Plantae", "rank": "SPECIES", **extra}
 
 
 async def test_gbif_resolves_synonyms_to_the_accepted_taxon(respx_mock):

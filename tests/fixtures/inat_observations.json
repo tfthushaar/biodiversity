@@ -1,0 +1,276 @@
+{
+ "results": [
+  {
+   "id": 299869834,
+   "uri": "https://www.inaturalist.org/observations/299869834",
+   "observed_on": "2025-01-25",
+   "time_observed_at": "2025-01-25T15:15:58+05:30",
+   "quality_grade": "research",
+   "geojson": {
+    "type": "Point",
+    "coordinates": [
+     76.6550111111,
+     11.6567083333
+    ]
+   },
+   "location": "11.6567083333,76.6550111111",
+   "positional_accuracy": null,
+   "public_positional_accuracy": null,
+   "obscured": false,
+   "geoprivacy": null,
+   "taxon_geoprivacy": null,
+   "license_code": "cc-by-nc",
+   "captive": false,
+   "taxon": {
+    "id": 50333,
+    "name": "Lantana camara",
+    "rank": "species",
+    "iconic_taxon_name": "Plantae",
+    "preferred_common_name": "common lantana",
+    "introduced": true,
+    "native": false,
+    "endemic": false
+   },
+   "photos": [
+    {
+     "id": 540261203,
+     "license_code": null,
+     "url": "https://static.inaturalist.org/photos/540261203/square.jpg",
+     "attribution": "(c) [observer name removed from test fixture]",
+     "original_dimensions": {
+      "width": 2048,
+      "height": 1536
+     }
+    }
+   ]
+  },
+  {
+   "id": 324301393,
+   "uri": "https://www.inaturalist.org/observations/324301393",
+   "observed_on": "2025-10-19",
+   "time_observed_at": "2025-10-19T12:12:02+05:30",
+   "quality_grade": "needs_id",
+   "geojson": {
+    "type": "Point",
+    "coordinates": [
+     76.6183861111,
+     11.7154944444
+    ]
+   },
+   "location": "11.7154944444,76.6183861111",
+   "positional_accuracy": null,
+   "public_positional_accuracy": null,
+   "obscured": false,
+   "geoprivacy": null,
+   "taxon_geoprivacy": "open",
+   "license_code": "",
+   "captive": false,
+   "taxon": {
+    "id": 138578,
+    "name": "Senna spectabilis",
+    "rank": "species",
+    "iconic_taxon_name": "Plantae",
+    "preferred_common_name": "whitebark senna",
+    "introduced": false,
+    "native": false,
+    "endemic": false
+   },
+   "photos": [
+    {
+     "id": 586947119,
+     "license_code": null,
+     "url": "https://static.inaturalist.org/photos/586947119/square.jpg",
+     "attribution": "(c) [observer name removed from test fixture]",
+     "original_dimensions": {
+      "width": 1536,
+      "height": 2048
+     }
+    }
+   ]
+  },
+  {
+   "id": 58419983,
+   "uri": "https://www.inaturalist.org/observations/58419983",
+   "observed_on": "2015-07-30",
+   "time_observed_at": "2015-07-30T09:18:14+05:30",
+   "quality_grade": "research",
+   "geojson": {
+    "type": "Point",
+    "coordinates": [
+     76.4255242422,
+     11.7210410272
+    ]
+   },
+   "location": "11.7210410272,76.4255242422",
+   "positional_accuracy": 370,
+   "public_positional_accuracy": 370,
+   "obscured": false,
+   "geoprivacy": null,
+   "taxon_geoprivacy": "open",
+   "license_code": "cc-by-nc",
+   "captive": false,
+   "taxon": {
+    "id": 26093,
+    "name": "Euphlyctis cyanophlyctis",
+    "rank": "species",
+    "iconic_taxon_name": "Amphibia",
+    "preferred_common_name": "Common skittering frog",
+    "introduced": false,
+    "native": true,
+    "endemic": false
+   },
+   "photos": [
+    {
+     "id": 93269473,
+     "license_code": "cc-by-nc",
+     "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/93269473/square.jpeg",
+     "attribution": "(c) [observer name removed from test fixture]",
+     "original_dimensions": {
+      "width": 2048,
+      "height": 1341
+     }
+    }
+   ]
+  },
+  {
+   "id": 399857417,
+   "uri": "https://www.inaturalist.org/observations/399857417",
+   "observed_on": "2024-11-12",
+   "time_observed_at": null,
+   "quality_grade": "needs_id",
+   "geojson": {
+    "type": "Point",
+    "coordinates": [
+     76.4153445432,
+     11.7070614197
+    ]
+   },
+   "location": "11.7070614197,76.4153445432",
+   "positional_accuracy": 18719,
+   "public_positional_accuracy": 31126,
+   "obscured": true,
+   "geoprivacy": "obscured",
+   "taxon_geoprivacy": null,
+   "license_code": "cc-by-nc",
+   "captive": false,
+   "taxon": {
+    "id": 88539,
+    "name": "Glyptothorax",
+    "rank": "genus",
+    "iconic_taxon_name": "Actinopterygii",
+    "preferred_common_name": null,
+    "introduced": false,
+    "native": false,
+    "endemic": false
+   },
+   "photos": [
+    {
+     "id": 733670074,
+     "license_code": "cc-by-nc",
+     "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/733670074/square.jpg",
+     "attribution": "(c) [observer name removed from test fixture]",
+     "original_dimensions": {
+      "width": 1156,
+      "height": 534
+     }
+    }
+   ]
+  },
+  {
+   "id": 147835910,
+   "uri": "https://www.inaturalist.org/observations/147835910",
+   "observed_on": "2022-09-03",
+   "time_observed_at": "2022-09-03T12:17:28+05:30",
+   "quality_grade": "research",
+   "geojson": {
+    "type": "Point",
+    "coordinates": [
+     76.3695167005,
+     11.6690781445
+    ]
+   },
+   "location": "11.6690781445,76.3695167005",
+   "positional_accuracy": 2872,
+   "public_positional_accuracy": 2872,
+   "obscured": false,
+   "geoprivacy": null,
+   "taxon_geoprivacy": null,
+   "license_code": null,
+   "captive": false,
+   "taxon": {
+    "id": 1304808,
+    "name": "Craspedocephalus occidentalis",
+    "rank": "species",
+    "iconic_taxon_name": "Reptilia",
+    "preferred_common_name": "Western bamboo pit viper",
+    "introduced": false,
+    "native": false,
+    "endemic": false
+   },
+   "photos": [
+    {
+     "id": 254458750,
+     "license_code": null,
+     "url": "https://static.inaturalist.org/photos/254458750/square.jpeg",
+     "attribution": "(c) [observer name removed from test fixture]",
+     "original_dimensions": {
+      "width": 2048,
+      "height": 1365
+     }
+    }
+   ]
+  },
+  {
+   "id": 401768177,
+   "uri": "https://www.inaturalist.org/observations/401768177",
+   "observed_on": "2026-09-20",
+   "time_observed_at": "2026-09-20T07:59:00+05:30",
+   "quality_grade": "needs_id",
+   "geojson": {
+    "type": "Point",
+    "coordinates": [
+     76.3686564,
+     11.6716011
+    ]
+   },
+   "location": "11.6716011,76.3686564",
+   "positional_accuracy": 205,
+   "public_positional_accuracy": 205,
+   "obscured": false,
+   "geoprivacy": null,
+   "taxon_geoprivacy": "open",
+   "license_code": "cc-by-nc",
+   "captive": false,
+   "taxon": {
+    "id": 18371,
+    "name": "Dinopium",
+    "rank": "genus",
+    "iconic_taxon_name": "Aves",
+    "preferred_common_name": "Dinopium Flamebacks",
+    "introduced": false,
+    "native": false,
+    "endemic": false
+   },
+   "photos": [
+    {
+     "id": 737457311,
+     "license_code": "cc-by-nc",
+     "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/737457311/square.jpg",
+     "attribution": "(c) [observer name removed from test fixture]",
+     "original_dimensions": {
+      "width": 2048,
+      "height": 1536
+     }
+    }
+   ]
+  }
+ ],
+ "labels": {
+  "lantana": 299869834,
+  "senna": 324301393,
+  "plain_research": 58419983,
+  "obscured": 399857417,
+  "unlicensed_photo": 147835910,
+  "genus_only": 401768177
+ }
+}
