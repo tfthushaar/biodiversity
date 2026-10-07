@@ -16,6 +16,16 @@ class Settings(BaseSettings):
     iucn_api_token: str = ""
     ebird_api_key: str = ""
 
+    # Models for the live demo endpoint. Unset means that endpoint reports itself unavailable.
+    megadetector_onnx: str = ""
+    backbone_onnx: str = ""
+    heads_dir: str = "models/heads"
+
+    # Public endpoint hygiene.
+    cors_origins: str = "*"  # comma-separated; the API is read-only and uses no cookies
+    max_upload_mb: int = 8
+    infer_requests_per_minute: int = 10
+
     # Be a polite client: identify ourselves to public APIs.
     user_agent: str = "biodiv/0.1 (+https://github.com/tfthushaar/biodiversity)"
 

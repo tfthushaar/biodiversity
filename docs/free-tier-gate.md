@@ -54,3 +54,13 @@ python -m biodiv.workers.migrate --seed
 Migrations are applied once each and checksummed: editing an already-applied migration is
 refused. Add a new numbered file instead. Row-level security allows the public `anon` key to
 read only; all writes use the service role from workers.
+
+## After deploying: check the public surface
+
+```bash
+python scripts/smoke_rest.py https://YOUR-REF.supabase.co/rest/v1 --key YOUR_ANON_KEY
+```
+
+It confirms the dashboard's data is readable and that writes, internal functions and PostGIS
+functions are refused. Use the **anon** key. The service-role key must never leave the workers'
+secrets. See [api.md](api.md).

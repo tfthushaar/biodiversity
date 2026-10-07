@@ -1,18 +1,30 @@
-# Render Blueprint for the FastAPI service. OPTIONAL: the dashboard reads Supabase's
-# built-in REST/GraphQL APIs directly, so the site works even if this is never deployed.
+# Render Blueprint for the FastAPI service. OPTIONAL: the dashboard reads Supabase's built-in REST
+# API directly, so the site works even if this is never deployed. What this adds is the live
+# "upload a photo" demo, the GraphQL endpoint, and a REST view of the reports.
+#
 # Verify Render's free plan needs no card at signup before relying on it (docs/free-tier-gate.md).
+# Free instances have 512 MB of RAM: the detector plus the species backbone are close to that, so
+# if the demo is killed for memory, the rest of the API is unaffected (models load on first use).
 services:
   - type: web
     name: biodiv-api
     runtime: python
     plan: free
-    buildCommand: pip install .
+    # The models are not in git (they are large). They come from a GitHub release; if it does not
+    # exist yet the service still deploys and the demo endpoints report themselves unavailable.
+    buildCommand: pip install ".[inference]" && bash scripts/fetch_models.sh
     startCommand: uvicorn biodiv.api.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.10"
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_ANON_KEY
+      - key: MEGADETECTOR_ONNX
+        value: data/models/MDV6-mit-yolov9-c.onnx
+      - key: BACKBONE_ONNX
+        value: data/models/dinov2_vits14.onnx
+      - key: HEADS_DIR
+        value: models/heads
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: DATABASE_URL        # Supabase "session pooler" string; read-only use here
         sync: false

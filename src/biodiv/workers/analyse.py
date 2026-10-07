@@ -34,6 +34,15 @@ def main(argv: list[str] | None = None) -> int:
         raised = upsert_alerts(conn, first_record_alerts(conn))
         slugs = args.zone or [r[0] for r in conn.execute("select slug from zones order by id")]
         reports = [zone_report(conn, s) for s in slugs]
+        for r in reports:  # the dashboard reads these; computing per request would need a server
+            conn.execute(
+                """
+                insert into zone_reports (zone_id, report)
+                select id, %s::jsonb from zones where slug = %s
+                on conflict (zone_id) do update set report = excluded.report, computed_at = now()
+                """,
+                (json.dumps(r, default=str), r["zone"]),
+            )
 
     print(f"alerts raised or refreshed: {raised}")
     for r in reports:

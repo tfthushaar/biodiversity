@@ -61,6 +61,10 @@ Species are named by small trained heads on a shared DINOv2 backbone: an invasiv
 classifier. Both run on CPU, and both come with honest, reproducible measurements of how often
 they are wrong; see the classifier section of [docs/models.md](docs/models.md).
 
+How the data is served (a read-only public REST path with no server of ours, plus a small API for
+the live photo demo and GraphQL), and exactly what the public can and cannot do, is in
+[docs/api.md](docs/api.md). Run `python scripts/smoke_rest.py <url>` against any deployment.
+
 What invasive species do to a zone is reported in three layers of decreasing certainty (cited
 findings, co-occurrence, trend). The statistical ones decline to answer when the data is too thin,
 which today it is; the cited knowledge base (impacts and management, every claim backed by a

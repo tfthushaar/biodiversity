@@ -33,6 +33,28 @@ jobs:
       - run: ruff check .
       - run: pytest
 
+      # Run the real PostgREST (what Supabase's REST API is) against a freshly migrated database
+      # and check what an anonymous visitor can and cannot do. Tests prove the database rules;
+      # this proves the HTTP surface the internet actually sees.
+      - name: Public API surface
+        env:
+          PGPASSWORD: dev
+        run: |
+          psql -h localhost -U postgres -c "create database surface"
+          DATABASE_URL=postgresql://postgres:dev@localhost:5432/surface \
+            python -m biodiv.workers.migrate --seed
+          psql -h localhost -U postgres -d surface \
+            -c "create role authenticator login password 'dev' noinherit" \
+            -c "grant anon, authenticated to authenticator"
+          docker run -d --name rest --network host \
+            -e PGRST_DB_URI=postgres://authenticator:dev@localhost:5432/surface \
+            -e PGRST_DB_SCHEMAS=public -e PGRST_DB_ANON_ROLE=anon \
+            postgrest/postgrest
+          for i in $(seq 1 30); do curl -sf http://localhost:3000/ > /dev/null && break; sleep 1; done
+          python scripts/smoke_rest.py http://localhost:3000
+      - if: failure()
+        run: docker logs rest || true
+
   web:
     runs-on: ubuntu-latest
     defaults:

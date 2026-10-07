@@ -1,0 +1,35 @@
+# A local stand-in for Supabase's data path: Postgres with PostGIS, plus PostgREST, the engine
+# behind Supabase's generated REST API. Same roles, same row-level security, same endpoints.
+#
+#   docker compose -f docker-compose.dev.yml up -d db
+#   DATABASE_URL=postgresql://postgres:dev@localhost:54329/biodiv python -m biodiv.workers.migrate --seed
+#   docker compose -f docker-compose.dev.yml up -d rest
+#   python scripts/smoke_rest.py http://localhost:3000
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: biodiv
+    ports: ["54329:5432"]
+    volumes:
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d biodiv"]
+      interval: 3s
+      retries: 20
+
+  rest:
+    image: postgrest/postgrest
+    depends_on:
+      db: { condition: service_healthy }
+    restart: on-failure   # it needs the schema, so it retries until migrations have run
+    environment:
+      PGRST_DB_URI: postgres://authenticator:dev@db:5432/biodiv
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+    ports: ["3000:3000"]
+
+volumes:
+  dbdata:
