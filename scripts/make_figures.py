@@ -38,6 +38,10 @@ def main() -> int:
             except Exception:
                 print(f"{slug}: no hotspots to draw")
                 continue
+            # The paper reports 2 km squares.
+            page.get_by_label("Square size").select_option(label="2 km")
+            page.add_style_tag(content=".leaflet-control-zoom { display: none }")
+            page.wait_for_selector("text=Busiest squares", timeout=30000)
             page.wait_for_timeout(3500)  # let the map tiles load
             page.locator(".map").screenshot(path=str(out / f"hotspots-{slug}.png"))
             print(f"wrote {out / f'hotspots-{slug}.png'}")

@@ -86,11 +86,11 @@ def analysis_table() -> str:
         co, tr = a["cooccurrence"], a["trend"]
         rows.append([
             NAMES[slug],
-            co["status"], f"{n(co.get('cells_usable', 0))} of {n(co.get('required_cells', 20))}",
-            tr["status"], f"{n(tr.get('invasive_records', 0))} of {n(tr.get('required_invasive_records', 30))}",
-            f"{n(tr.get('usable_years', 0))} of {n(tr.get('required_years', 6))}",
+            co["status"], f"{n(co.get('cells_usable', 0))} ({n(co.get('required_cells', 20))} needed)",
+            tr["status"], f"{n(tr.get('invasive_records', 0))} ({n(tr.get('required_invasive_records', 30))} needed)",
+            f"{n(tr.get('usable_years', 0))} ({n(tr.get('required_years', 6))} needed)",
         ])
-    return table(["Park", "Co-occurrence", "Usable cells", "Trend", "Invasive records", "Usable years"], rows, "lllllr")
+    return table(["Park", "Co-occurrence", "Usable cells", "Trend", "Invasive records", "Usable years"], rows, "llllll")
 
 
 def refused_table() -> str:

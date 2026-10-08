@@ -137,6 +137,18 @@ def summarise(conn: psycopg.Connection) -> dict:
                                  "join zones z on z.id = r.zone_id order by z.id")
     }
 
+    periods: dict[str, dict[str, dict[str, int]]] = {}
+    for z, period, source, n in rows(conn, """
+            select z.slug,
+                   case when extract(year from r.captured_at) < 2010 then 'to 2009'
+                        when extract(year from r.captured_at) < 2020 then '2010 to 2019'
+                        else '2020 on' end,
+                   s.name, count(*)
+            from invasive_records r join zones z on z.id = r.zone_id
+            join sources s on s.id = r.source_id group by 1, 2, 3"""):
+        periods.setdefault(z, {}).setdefault(period, {})[source] = n
+    out["invasive_records_by_period_and_source"] = periods
+
     out["analysis_detail"] = {
         z: {
             "cooccurrence": rep["layers"]["cooccurrence"]["detail"],

@@ -33,7 +33,9 @@ def trend(slug: str, series: str) -> dict:
 
 
 def p_value(p: float) -> str:
-    return "<0.001" if p < 0.001 else f"{p:.2f}"
+    if p < 0.001:
+        return "<0.001"
+    return f"{p:.3f}" if p < 0.1 else f"{p:.2f}"
 
 
 def cert_phrase() -> str:
@@ -43,6 +45,49 @@ def cert_phrase() -> str:
     got = S["knowledge_base"]["findings_by_certainty"]
     parts = [names[k].format(n=got[k]) for k in names if got.get(k)]
     return ", ".join(parts[:-1]) + " and " + parts[-1]
+
+
+def count_tests() -> int:
+    """Tests run in parks that meet the minimums: one correlation, and one trend test per series."""
+    n = 0
+    for a in S["analysis_detail"].values():
+        n += 1 if "spearman_rho" in a["cooccurrence"] else 0
+        n += sum(k in a["trend"] for k in ("invasive_per_observation", "native_per_observation"))
+    return n
+
+
+N_TESTS = count_tests()
+
+
+def check_claims() -> None:
+    """The template states directions and significance. Fail the build if the data no longer
+    supports a statement, so the prose is revised and not left to contradict the numbers."""
+    ad, bonf = S["analysis_detail"], 0.05 / N_TESTS
+    sm, ev = ad["smokies"], ad["everglades"]
+    ev_inv, ev_nat = T.trend_pair("everglades")
+    sm_inv, sm_nat = T.trend_pair("smokies")
+    mu_inv, mu_nat = T.trend_pair("mudumalai")
+    claims = {
+        "Smokies correlation is positive with an interval above zero": sm["cooccurrence"]["ci95"][0] > 0,
+        "Everglades correlation is positive with an interval including zero":
+            ev["cooccurrence"]["spearman_rho"] > 0 and ev["cooccurrence"]["ci95"][0] <= 0,
+        "Everglades invasive trend rose, p below 0.05 and above the Bonferroni threshold":
+            ev_inv["tau"] > 0 and bonf < ev_inv["p_value"] < 0.05,
+        "Everglades native trend is not significant": ev_nat["p_value"] >= 0.05,
+        "Smokies invasive trend is not significant": sm_inv["p_value"] >= 0.05,
+        "Smokies native trend fell, p below 0.05 and above the Bonferroni threshold":
+            sm_nat["tau"] < 0 and bonf < sm_nat["p_value"] < 0.05,
+        "Mudumalai trends are not significant": mu_inv["p_value"] >= 0.05 and mu_nat["p_value"] >= 0.05,
+        "Exactly Mudumalai, Everglades and the Smokies meet the trend minimum and only the Everglades "
+        "and Smokies the correlation minimum":
+            {z for z, a in ad.items() if "invasive_per_observation" in a["trend"]}
+            == {"mudumalai", "everglades", "smokies"}
+            and {z for z, a in ad.items() if "spearman_rho" in a["cooccurrence"]} == {"everglades", "smokies"},
+    }
+    failed = [k for k, ok in claims.items() if not ok]
+    if failed:
+        message = "paper template no longer matches the data; revise Sections 3.4 and 4:"
+        raise SystemExit(message + "\n  - " + ("\n  - ").join(failed))
 
 
 def values() -> dict[str, str]:
@@ -73,7 +118,38 @@ def values() -> dict[str, str]:
     alerts = S["alerts"]
     alert_text = "; ".join(
         f"{a['species']} in {T.NAMES[a['park']]} (first record {a['first_record'][:7]})" for a in alerts)
+    ad = S["analysis_detail"]
+    ev_co = ad["everglades"]["cooccurrence"]
+    sm_inv, sm_nat = T.trend_pair("smokies")
+    mud_nat = trend("mudumalai", "native_per_observation")
+    mix = S["invasive_records_by_period_and_source"]["everglades"]
+    pre = mix.get("to 2009", {})
+    late = mix.get("2020 on", {})
+    smk_hot = S["hotspots"]["smokies"]["0.02"]
+    n_tests = N_TESTS
     return {
+        "N_TESTS": str(n_tests),
+        "BONF": f"{0.05 / n_tests:.4f}",
+        "EVER_CELLS": T.n(ev_co["cells_usable"]),
+        "EVER_RHO": f"{ev_co['spearman_rho']:.2f}",
+        "EVER_RHO_LO": f"{ev_co['ci95'][0]:.2f}",
+        "EVER_RHO_HI": f"{ev_co['ci95'][1]:.2f}",
+        "EVER_NTAU": f"{ever_obs['tau']:.2f}",
+        "SMK_TAU": f"{sm_inv['tau']:.2f}",
+        "SMK_P": p_value(sm_inv["p_value"]),
+        "SMK_NTAU": f"{sm_nat['tau']:.2f}",
+        "SMK_NP": p_value(sm_nat["p_value"]),
+        "SMK_YEARS": str(sm_inv["n"]),
+        "SMK_Y0": str(ad["smokies"]["trend"]["years"][0]),
+        "SMK_Y1": str(ad["smokies"]["trend"]["years"][1]),
+        "MUD_NTAU": f"{mud_nat['tau']:.2f}",
+        "SMK_INV": T.n(smk_hot["records"]),
+        "SMK_CELLS_OCC": T.n(smk_hot["occupied_cells"]),
+        "SMK_ONE": T.n(smk_hot["cells_with_one_record"]),
+        "EVER_PRE_TOTAL": T.n(sum(pre.values())),
+        "EVER_PRE_USGS": T.n(pre.get("USGS NAS", 0)),
+        "EVER_LATE_TOTAL": T.n(sum(late.values())),
+        "EVER_LATE_GBIF": T.n(late.get("GBIF occurrences", 0)),
         "INV_TOTAL": T.n(inv_total),
         "EVER_SHARE": f"{100 * share['everglades']:.0f}",
         "SHARE_LOW": f"{100 * share[lo]:.1f}",
@@ -134,6 +210,7 @@ def values() -> dict[str, str]:
 
 def build(template: str, out: str) -> int:
     text = Path(template).read_text(encoding="utf-8")
+    check_claims()
     vals = values()
     text = re.sub(r"\{\{(\w+)\}\}", lambda m: vals[m.group(1)], text)  # KeyError names a missing value
     text = re.sub(

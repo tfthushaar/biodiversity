@@ -100,9 +100,9 @@ what the public can and cannot do.
 
 - The statistical impact layers report that more data is needed in most parks. [impact.md](impact.md)
   gives the thresholds.
-- IUCN Red List threat links are not imported yet. When they are, the database keeps those rows
-  hidden from the public API, because IUCN's terms prohibit redistribution without written
-  permission. See [iucn.md](iucn.md).
+- IUCN Red List threat links are imported and stored, and the database hides those rows from the
+  public API, because IUCN's terms prohibit redistribution without written permission. See
+  [iucn.md](iucn.md).
 - The animal classifier covers 13 North American species. It shows how a classifier transfers to
   unseen cameras and does not cover Indian or African fauna. See [models.md](models.md).
 - Detection runs on archived images. There is no live camera feed.

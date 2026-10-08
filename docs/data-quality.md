@@ -33,10 +33,10 @@ USGS records add their own rules: only the "accurate" coordinate class passes, s
 | Bandipur | IN | 949 | 688 | 210 | - | 898 |
 | Nagarahole | IN | 680 | 1,428 | 18 | - | 1,446 |
 | Mudumalai | IN | 336 | 1,413 | 96 | - | 1,509 |
-| Serengeti | TZ | 12,947 | 2,065 | 84 | - | 2,149 |
-| Everglades | US | 6,237 | 919 | 555 | 4,352 | 5,826 |
-| Great Smoky Mountains | US | 2,107 | 1,544 | 578 | 65 | 2,187 |
-| **Total** |  |  | 8,057 | 1,541 | 4,417 | 14,015 |
+| Serengeti | TZ | 12,947 | 2,553 | 84 | - | 2,637 |
+| Everglades | US | 6,237 | 1,838 | 689 | 4,613 | 7,140 |
+| Great Smoky Mountains | US | 2,107 | 2,393 | 1,156 | 65 | 3,614 |
+| **Total** |  |  | 10,313 | 2,253 | 4,678 | 17,244 |
 <!-- /table -->
 
 **Table 2.** Records refused, by reason. USGS figures come from the most complete single scan of
@@ -45,12 +45,12 @@ each park's counties, because that source re-reads every record on each run.
 <!-- table:refused -->
 | Reason | iNaturalist | GBIF occurrences | USGS NAS |
 |---|---:|---:|---:|
-| outside zone | 7,486 | 1,530 | 9,325 |
-| imprecise location | 6,369 | 306 | 1,898 |
-| obscured location | 5,887 | 58 | 0 |
-| not species level | 38 | 3,138 | 0 |
-| no date | 0 | 647 | 6 |
-| not established | 0 | 0 | 32 |
+| outside zone | 8,824 | 1,730 | 13,411 |
+| imprecise location | 7,328 | 655 | 2,424 |
+| obscured location | 6,762 | 58 | 0 |
+| not species level | 71 | 3,216 | 0 |
+| no date | 0 | 925 | 6 |
+| not established | 0 | 0 | 36 |
 <!-- /table -->
 
 ## Limits that follow
@@ -118,8 +118,8 @@ evidence covers most records.
 | Nagarahole | 6 | 2 | 2 | 29% |
 | Mudumalai | 18 | 4 | 4 | 27% |
 | Serengeti | 2 | 0 | 0 | 0% |
-| Everglades | 17 | 1 | 1 | 73% |
-| Great Smoky Mountains | 34 | 2 | 0 | 10% |
+| Everglades | 27 | 1 | 1 | 68% |
+| Great Smoky Mountains | 44 | 2 | 0 | 5% |
 <!-- /table -->
 
 ## What this means for use

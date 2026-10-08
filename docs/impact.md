@@ -11,10 +11,13 @@ Run it with `python -m biodiv.workers.analyse` (all parks, or `--zone bandipur`)
 | Layer | Question | Needs | Status |
 |---|---|---|---|
 | 1. Documented findings | What do cited sources report about these species here? | Nothing beyond the sources | Available for the species with cited findings |
-| 2. Co-occurrence | Where invasives are denser, is native richness lower? | 20 or more grid cells with 10 or more native records each, and 5 or more of those also holding invasive records | STATUS_CO |
-| 3. Trend | Is the invasive share rising while natives fall? | 6 or more years with 15 or more observations each, and 30 or more invasive records in the park | STATUS_TREND |
+| 2. Co-occurrence | Where invasives are denser, is native richness lower? | 20 or more grid cells with 10 or more native records each, and 5 or more of those also holding invasive records | Computed for the Everglades and Great Smoky Mountains. Insufficient in the other four parks |
+| 3. Trend | Is the invasive share rising while natives fall? | 6 or more years with 15 or more observations each, and 30 or more invasive records in the park | Computed for Mudumalai, the Everglades and Great Smoky Mountains. Insufficient in the other three parks |
 
-Layers 2 and 3 are implemented, tested and gated by those minimums. Below them, the result is
+Layers 2 and 3 are implemented, tested and gated by those minimums. Where they run, their results
+are shaped by recording effort and by the mix of sources, so they describe records and give limited
+information about effects of invaders. [paper.md](../paper.md) reports the results and these
+caveats. Below them, the result is
 "insufficient", with the reason and what would help, for example *"only 8 invasive records in the
 zone (need 30)"*. A statistic computed from a handful of records would suggest more certainty than
 the records support, so none is shown. The dashboard's Impact page shows each park's distance from

@@ -4,8 +4,10 @@
 threaten it. The Red List codes this as threat 8.1.2, "invasive non-native species: named
 species".
 
-**Status (October 2026).** We hold an API token and have examined the API. The importer is not
-built yet, and no IUCN data is stored in the database.
+**Status (October 2026).** The importer is built (`python -m biodiv.workers.import_iucn`) and has
+run against Red List version 2026-1 for India, Tanzania and the United States. The database holds
+4,362 links for 1,986 assessed species, stored privately. Nothing from the Red List appears in the
+dashboard, the public API or the paper's results.
 
 ## Terms of use
 
@@ -41,21 +43,24 @@ In a full assessment, each entry in `threats` has a `code`, `timing`, `scope`, `
 code `8_1_2`, an `ias` field that names the invasive species. For example, an assessment of a
 North American fish lists *Ambloplites rupestris* under `8_1_2`.
 
-On Red List version 2026-1 the threat 8.1.2 list has about 10,200 assessments. Intersecting it
-with the country lists leaves 591 assessments that name an invasive species and occur in India
-(368) or Tanzania (260), with 37 in both.
+On Red List version 2026-1 the threat 8.1.2 list has 10,102 assessments. Intersecting it with the
+country lists leaves 2,134 assessments that name an invasive species and occur in India (368),
+Tanzania (260) or the United States (1,592), with some in more than one country. The run wrote 4,402
+links, which merged into 4,362 distinct rows, and 1,307 of the links name an invader that has no
+row in our species table, so they are stored by name.
 
-**Rate limit.** The API answered HTTP 429 at about four requests per second with four in flight,
-so the importer should stay near one request per second and honour `Retry-After`.
+**Rate limit.** The API answered HTTP 429 at about four requests per second with four in flight.
+The importer runs at one request per second and honours `Retry-After`.
 
-## Planned importer
+## The importer
 
 1. List the 8.1.2 assessments and each country's assessments, and intersect them.
-2. Fetch each candidate assessment and read its `8_1_2` entries.
+2. Fetch each candidate assessment and read its `8_1_2` entries. Names are taken from the `ias`
+   field and kept only when they have the shape of a scientific name.
 3. Store a row in `threat_links` with `evidence_source = 'iucn'`, the native species, the named
-   invasive species (resolved to a species row when the name matches, kept as text otherwise),
-   scope, timing, score, assessment year, the assessment URL and a citation that includes the
-   Red List version.
+   invasive species (linked to a species row when the name matches, kept as text otherwise), scope,
+   timing, impact score, assessment year, the assessment URL and a citation that includes the Red
+   List version. A re-run skips assessments already stored. `--dry-run` reads and parses only.
 
 Rows from cited publications use `evidence_source = 'literature'` with a citation, are public, and
 are labelled as literature wherever they appear.

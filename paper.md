@@ -8,7 +8,7 @@ Draft of 8 October 2026. Code, data pipeline and live dashboard: <https://github
 
 ## Abstract
 
-Park managers need to know where invasive species concentrate and what they do to native species, but the open data that could answer this is scattered, uneven in quality and rarely linked to the evidence on effects. We built an open pipeline that runs entirely on free services and joins iNaturalist observations, GBIF specimen records, curated USGS records of non-native aquatic species, GRIIS invasive-status checklists and a quote-verified evidence base for six national parks in India, Tanzania and the United States. After counted quality rules the database held 14,015 records, of which 3,015 are records of species that GRIIS lists as alien and invasive in the park's country. Records concentrate where one source dominates: in the Everglades the busiest 10% of 2 km squares hold 62% of invasive records. Statistical layers ran for two parks and did not exclude a null effect. Native richness correlated negatively with invasive share in Great Smoky Mountains (Spearman's rho = -0.31, 95% bootstrap interval -0.62 to 0.11), and no monotonic trend appeared in the Everglades or Mudumalai. The evidence base holds 22 cited findings and 19 management options, each quote checked against its live source, and it covers few of the recorded species. Classifiers on a frozen DINOv2 backbone named invasive plants correctly in 84.9% of test photos by photographers unseen in training and made no native look-alike error in 113 trials, and the MegaDetector V6 detector found 92.6% of animal photos on a held-out camera-trap sample. Invasive counts reflect recording effort as well as presence, the evidence covers a minority of species, and the first statistical estimates are underpowered. The pipeline, its data minimums and its evidence checks are open, so the estimates can sharpen as records accumulate.
+Park managers need to know where invasive species concentrate and what they do to native species, but the open data that could answer this is scattered, uneven in quality and rarely linked to the evidence on effects. We built an open pipeline that runs entirely on free services and joins iNaturalist observations, GBIF specimen records, curated USGS records of non-native aquatic species, GRIIS invasive-status checklists and a quote-verified evidence base for six national parks in India, Tanzania and the United States. After counted quality rules the database held 17,244 records, of which 3,327 are records of species that GRIIS lists as alien and invasive in the park's country. Invasive records are strongly concentrated in the Everglades, where the busiest 10% of 2 km squares hold 64% of them. Three parks had enough data for the statistical layers. In Great Smoky Mountains native richness correlated positively with invasive share across 43 squares (Spearman's rho = 0.40, 95% bootstrap interval 0.09 to 0.65), which is consistent with both measures being higher in accessible, disturbed and heavily visited squares. In the Everglades the invasive share of records rose over 30 years (Kendall's tau = 0.34, p = 0.009), a result that does not survive a correction for the 8 tests we ran and that follows a changing mix of sources. The evidence base holds 22 cited findings and 19 management options, each quote checked against its live source, and it covers few of the recorded species. Classifiers on a frozen DINOv2 backbone named invasive plants correctly in 84.9% of test photos by photographers unseen in training and made no native look-alike error in 113 trials, and the MegaDetector V6 detector found 92.6% of animal photos on a held-out camera-trap sample. Invasive counts reflect recording effort as well as presence, the evidence covers a minority of species, and the statistical estimates are confounded by effort and source. The pipeline, its data minimums and its evidence checks are open, so the estimates can sharpen as records accumulate.
 
 **Keywords:** invasive alien species; hotspot mapping; citizen science; camera traps; GRIIS; iNaturalist; USGS NAS; computer vision; decision support
 
@@ -61,7 +61,7 @@ We grouped invasive records into square cells of a chosen size between 0.005 and
 
 ### 2.6 Statistical analysis of impact
 
-The analysis has three layers. The first reports cited findings (Section 2.7). The second asks whether native richness is lower where invaders are denser. For each 0.05-degree cell (about 5 km) we computed the share of records that are invasive and the native species richness rarefied to a common sample of 10 native records (Hurlbert 1971), which removes the dependence of richness on how often observers visited a cell. We then computed Spearman's rank correlation with a 95% percentile bootstrap interval from 2,000 resamples (Efron 1979). The third layer asks whether the invasive share of records is changing. We computed yearly invasive and native records per observation and tested each series with the Mann-Kendall test (Mann 1945) and the Theil-Sen slope (Sen 1968). Our implementations agree with SciPy (Virtanen et al. 2020), exactly for Kendall's tau and the slope and within 0.03 for the p-value.
+The analysis has three layers. The first reports cited findings (Section 2.7). The second asks whether native richness is lower where invaders are denser. For each 0.05-degree cell (about 5 km) we computed the share of records that are invasive and the native species richness rarefied to a common sample of 10 native records (Hurlbert 1971), which removes the dependence of richness on how often observers visited a cell. We then computed Spearman's rank correlation with a 95% percentile bootstrap interval from 2,000 resamples (Efron 1979). The third layer asks whether the invasive share of records is changing. We computed yearly invasive and native records per observation and tested each series with the Mann-Kendall test (Mann 1945) and the Theil-Sen slope (Sen 1968). Our implementations agree with SciPy (Virtanen et al. 2020), exactly for Kendall's tau and the slope and within 0.03 for the p-value. Across all parks the layers can run at most 8 tests (one correlation for each park that meets the co-occurrence minimum, and one test for each of the two series in each park that meets the trend minimum), and we report unadjusted p-values beside a Bonferroni threshold of 0.0063.
 
 Each layer runs only above a minimum amount of data. The co-occurrence layer needs at least 20 cells with 10 or more native records, of which at least 5 also hold invasive records. The trend layer needs at least 6 years with 15 or more observations each and at least 30 invasive records in the park. Below these minimums the output is the shortfall and nothing else.
 
@@ -87,7 +87,7 @@ All counts below are generated from the database by `scripts/dataset_summary.py`
 
 ### 3.1 Data assembled
 
-On 8 October 2026 the database held 14,015 records that passed the quality rules (Table 1): 8,057 from iNaturalist, 1,541 from GBIF and 4,417 from the USGS NAS database. The database occupied 45 MB of the 500 MB free-tier budget.
+On 8 October 2026 the database held 17,244 records that passed the quality rules (Table 1): 10,313 from iNaturalist, 2,253 from GBIF and 4,678 from the USGS NAS database. The database occupied 48 MB of the 500 MB free-tier budget.
 
 **Table 1.** Records that passed the quality rules, by park and source.
 
@@ -97,30 +97,30 @@ On 8 October 2026 the database held 14,015 records that passed the quality rules
 | Bandipur | IN | 949 | 688 | 210 | - | 898 |
 | Nagarahole | IN | 680 | 1,428 | 18 | - | 1,446 |
 | Mudumalai | IN | 336 | 1,413 | 96 | - | 1,509 |
-| Serengeti | TZ | 12,947 | 2,065 | 84 | - | 2,149 |
-| Everglades | US | 6,237 | 919 | 555 | 4,352 | 5,826 |
-| Great Smoky Mountains | US | 2,107 | 1,544 | 578 | 65 | 2,187 |
-| **Total** |  |  | 8,057 | 1,541 | 4,417 | 14,015 |
+| Serengeti | TZ | 12,947 | 2,553 | 84 | - | 2,637 |
+| Everglades | US | 6,237 | 1,838 | 689 | 4,613 | 7,140 |
+| Great Smoky Mountains | US | 2,107 | 2,393 | 1,156 | 65 | 3,614 |
+| **Total** |  |  | 10,313 | 2,253 | 4,678 | 17,244 |
 <!-- /table -->
 
-Most fetched records were refused. Of the 28,638 iNaturalist records fetched, 28% were kept, against 21% of 7,349 GBIF records. The most complete USGS scan read 15,678 records and set 11,261 of them aside (Table 2). Records outside the park boundary but inside its search box were the largest single reason for iNaturalist and USGS, and imprecise positions came next. GBIF's main reason was a record that does not identify a species, and records without a full date were the second.
+Most fetched records were refused. Of the 34,638 iNaturalist records fetched, 30% were kept, against 25% of 8,969 GBIF records. The most complete USGS scan read 20,555 records and set 15,877 of them aside (Table 2). Records outside the park boundary but inside its search box were the largest single reason for iNaturalist and USGS, and imprecise positions came next. GBIF's main reason was a record that does not identify a species, and records without a full date were the second.
 
 **Table 2.** Records refused, by reason and source. USGS figures come from the most complete single scan of each park's counties.
 
 <!-- table:refused -->
 | Reason | iNaturalist | GBIF occurrences | USGS NAS |
 |---|---:|---:|---:|
-| outside zone | 7,486 | 1,530 | 9,325 |
-| imprecise location | 6,369 | 306 | 1,898 |
-| obscured location | 5,887 | 58 | 0 |
-| not species level | 38 | 3,138 | 0 |
-| no date | 0 | 647 | 6 |
-| not established | 0 | 0 | 32 |
+| outside zone | 8,824 | 1,730 | 13,411 |
+| imprecise location | 7,328 | 655 | 2,424 |
+| obscured location | 6,762 | 58 | 0 |
+| not species level | 71 | 3,216 | 0 |
+| no date | 0 | 925 | 6 |
+| not established | 0 | 0 | 36 |
 <!-- /table -->
 
 ### 3.2 Invasive records
 
-Invasive records are a small share of all records in the five parks that rely on citizen-science and specimen data, and the largest share in the Everglades, where USGS supplies most records (Table 3).
+Invasive records are a small share of all records in the Indian parks, Serengeti and Great Smoky Mountains, and nearly half (45%) of all records in the Everglades, where USGS supplies most records (Table 3).
 
 **Table 3.** Invasive records and invasive species by park.
 
@@ -130,12 +130,12 @@ Invasive records are a small share of all records in the five parks that rely on
 | Bandipur | 898 | 16 | 1.8% | 14 |
 | Nagarahole | 1,446 | 7 | 0.5% | 6 |
 | Mudumalai | 1,509 | 30 | 2.0% | 18 |
-| Serengeti | 2,149 | 2 | 0.1% | 2 |
-| Everglades | 5,826 | 2,912 | 50.0% | 17 |
-| Great Smoky Mountains | 2,187 | 48 | 2.2% | 34 |
+| Serengeti | 2,637 | 2 | 0.1% | 2 |
+| Everglades | 7,140 | 3,181 | 44.6% | 27 |
+| Great Smoky Mountains | 3,614 | 91 | 2.5% | 44 |
 <!-- /table -->
 
-The most recorded invasive species differ sharply between parks (Table 4). In the Everglades, USGS records of the Burmese python dominate. In the three Indian parks the most recorded species have between one and five records each, and *Lantana camara* and *Senna spectabilis*, the two invaders most often reported in these reserves, have 6 records between them and 0 records respectively.
+The most recorded invasive species differ sharply between parks (Table 4). In the Everglades, USGS records of the Burmese python dominate. In the three Indian parks the most recorded species have between one and five records each, and *Lantana camara* and *Senna spectabilis*, the two invaders most often reported in these reserves, have 6 and 0 records respectively across the three parks.
 
 **Table 4.** The five most recorded invasive species in each park.
 
@@ -159,21 +159,21 @@ The most recorded invasive species differ sharply between parks (Table 4). In th
 | Mudumalai | *Asclepias curassavica* (tropical milkweed) | 2 | 2025 |
 | Serengeti | *Biancaea decapetala* (Mysore Thorn) | 1 | 2018 |
 | Serengeti | *Datura stramonium* (jimsonweed) | 1 | 2018 |
-| Everglades | *Python bivittatus* (Burmese Python) | 2,129 | 1979 to 2026 |
-| Everglades | *Eleutherodactylus planirostris* (Greenhouse Frog) | 363 | 2011 to 2023 |
-| Everglades | *Osteopilus septentrionalis* (Cuban Tree Frog) | 278 | 1950 to 2023 |
-| Everglades | *Clarias batrachus* (Walking Catfish) | 64 | 1977 to 2026 |
-| Everglades | *Nymphoides hydrophylla* (crested floating-heart) | 18 | 2022 to 2026 |
+| Everglades | *Python bivittatus* (Burmese Python) | 2,159 | 1979 to 2026 |
+| Everglades | *Osteopilus septentrionalis* (Cuban Tree Frog) | 474 | 1950 to 2023 |
+| Everglades | *Eleutherodactylus planirostris* (Greenhouse Frog) | 366 | 2011 to 2023 |
+| Everglades | *Clarias batrachus* (Walking Catfish) | 66 | 1977 to 2026 |
+| Everglades | *Anolis sagrei* (Brown Anole) | 26 | 2009 to 2016 |
 | Great Smoky Mountains | *Myriophyllum aquaticum* (parrot feather) | 6 | 1995 to 2008 |
-| Great Smoky Mountains | *Nasturtium officinale* (water-cress) | 3 | 2005 to 2008 |
-| Great Smoky Mountains | *Salmo trutta* (Brown Trout) | 3 | 2018 to 2019 |
-| Great Smoky Mountains | *Epipactis helleborine* (Broad-leaved helleborine) | 2 | 2014 to 2016 |
-| Great Smoky Mountains | *Harmonia axyridis* (Asian Lady Beetle) | 2 | 2015 to 2016 |
+| Great Smoky Mountains | *Trifolium pratense* (Red Clover) | 6 | 2014 to 2016 |
+| Great Smoky Mountains | *Daucus carota* (wild carrot) | 5 | 2016 |
+| Great Smoky Mountains | *Dactylis glomerata* (orchard grass) | 4 | 2015 to 2016 |
+| Great Smoky Mountains | *Plantago lanceolata* (ribwort plantain) | 4 | 2016 |
 <!-- /table -->
 
 ### 3.3 Hotspots
 
-Invasive records are unevenly spread inside every park that has enough of them to show a pattern (Table 5). In the Everglades, the busiest 10% of occupied squares hold 62% of the park's invasive records, and the busiest single square (about 2 km across) holds 258 of the 2,912 records (Figure 1). The Indian parks and the Smokies have too few invasive records for concentration to carry much meaning: in the Indian parks, most occupied squares hold a single record.
+Invasive records are unevenly spread inside every park that has enough of them to show a pattern (Table 5). In the Everglades, the busiest 10% of occupied squares hold 64% of the park's invasive records, and the busiest single square (about 2 km across) holds 263 of the 3,181 records (Figure 1). The Indian parks and Serengeti have too few invasive records for concentration to carry much meaning, and most of their occupied squares hold a single record. In Great Smoky Mountains, 91 invasive records fall in 35 squares, 21 of which hold one record.
 
 **Table 5.** Concentration of invasive records in 0.02-degree squares (about 2 km).
 
@@ -184,29 +184,35 @@ Invasive records are unevenly spread inside every park that has enough of them t
 | Nagarahole | 7 | 6 | 2 | 29% | 5 |
 | Mudumalai | 30 | 9 | 16 | 53% | 6 |
 | Serengeti | 2 | 2 | 1 | 50% | 2 |
-| Everglades | 2,912 | 199 | 258 | 62% | 86 |
-| Great Smoky Mountains | 48 | 27 | 8 | 31% | 16 |
+| Everglades | 3,181 | 205 | 263 | 64% | 89 |
+| Great Smoky Mountains | 91 | 35 | 29 | 52% | 21 |
 <!-- /table -->
 
 ![Figure 1. Hotspots of invasive records in Everglades National Park. Squares are 0.02 degrees across and shaded by record count; the dashed line is the park boundary. Map data © OpenStreetMap contributors.](docs/figures/hotspots-everglades.png)
 
-![Figure 2. Hotspots of invasive records in Mudumalai National Park, at the same square size.](docs/figures/hotspots-mudumalai.png)
+![Figure 2. Hotspots of invasive records in Great Smoky Mountains National Park, at the same square size.](docs/figures/hotspots-smokies.png)
+
+![Figure 3. Hotspots of invasive records in Mudumalai National Park, at the same square size.](docs/figures/hotspots-mudumalai.png)
 
 ### 3.4 Whether the data supports the statistical layers
 
-Two parks reached the minimum data for a statistic (Table 6). In Great Smoky Mountains, native species richness was negatively correlated with the invasive share of records across 26 cells, with Spearman's rho = -0.31 and a 95% bootstrap interval from -0.62 to 0.11. The interval includes zero, so the data is compatible with no association. For the trend layer, Everglades (27 years with data, 1992 to 2026) and Mudumalai (16 years, 1958 to 2026) met the minimum. Neither showed a significant monotonic trend in the invasive share of records per observation (Everglades: Kendall's tau = 0.20, p = 0.16, Theil-Sen slope +0.0074 per year; Mudumalai: tau = 0.02, p = 0.96) or in the native share (Everglades p = 0.31; Mudumalai p = 0.46).
+Three parks reached the minimum data for at least one statistic (Table 6). We report each result with its interval or p-value, and with the unadjusted p-values compared against the Bonferroni threshold of 0.0063 for 8 tests.
+
+*Co-occurrence.* In Great Smoky Mountains, native species richness was positively correlated with the invasive share of records across 43 squares (Spearman's rho = 0.40, 95% bootstrap interval 0.09 to 0.65), and the interval excludes zero. The direction is opposite to a reduction of native richness by invaders. In the Everglades the correlation across 23 squares was also positive and its interval included zero (rho = 0.32, -0.16 to 0.68).
+
+*Trend.* In the Everglades (30 years with data, 1925 to 2026), the number of invasive records per observation rose (Kendall's tau = 0.34, p = 0.009, Theil-Sen slope +0.0061 per year), while the native share did not change significantly (tau = -0.18, p = 0.16). In Great Smoky Mountains (12 years, 1922 to 2025) the invasive share did not change significantly (tau = 0.33, p = 0.084) and the native share fell (tau = -0.41, p = 0.045). In Mudumalai (16 years, 1958 to 2026) neither series changed (invasive: tau = 0.02, p = 0.96; native: tau = -0.14, p = 0.46). Against the Bonferroni threshold of 0.0063, no trend result is significant.
 
 **Table 6.** Readiness of each park for the statistical layers. "Ok" means the minimum data was met and a result was computed.
 
 <!-- table:analysis -->
 | Park | Co-occurrence | Usable cells | Trend | Invasive records | Usable years |
-|---|---|---|---|---|---:|
-| Bandipur | insufficient | 14 of 20 | insufficient | 16 of 30 | 14 of 6 |
-| Nagarahole | insufficient | 17 of 20 | insufficient | 7 of 30 | 16 of 6 |
-| Mudumalai | insufficient | 9 of 20 | ok | 30 of 30 | 16 of 6 |
-| Serengeti | insufficient | 50 of 20 | insufficient | 2 of 30 | 10 of 6 |
-| Everglades | insufficient | 16 of 20 | ok | 2,912 of 30 | 27 of 6 |
-| Great Smoky Mountains | ok | 26 of 20 | insufficient | 27 of 30 | 9 of 6 |
+|---|---|---|---|---|---|
+| Bandipur | insufficient | 14 (20 needed) | insufficient | 16 (30 needed) | 14 (6 needed) |
+| Nagarahole | insufficient | 17 (20 needed) | insufficient | 7 (30 needed) | 16 (6 needed) |
+| Mudumalai | insufficient | 9 (20 needed) | ok | 30 (30 needed) | 16 (6 needed) |
+| Serengeti | insufficient | 63 (20 needed) | insufficient | 2 (30 needed) | 12 (6 needed) |
+| Everglades | ok | 23 (20 needed) | ok | 3,181 (30 needed) | 30 (6 needed) |
+| Great Smoky Mountains | ok | 43 (20 needed) | ok | 91 (30 needed) | 12 (6 needed) |
 <!-- /table -->
 
 ### 3.5 Evidence on effects
@@ -222,15 +228,15 @@ The evidence base holds 22 cited findings and 19 management options, rows backed
 | Nagarahole | 6 | 2 | 2 | 29% |
 | Mudumalai | 18 | 4 | 4 | 27% |
 | Serengeti | 2 | 0 | 0 | 0% |
-| Everglades | 17 | 1 | 1 | 73% |
-| Great Smoky Mountains | 34 | 2 | 0 | 10% |
+| Everglades | 27 | 1 | 1 | 68% |
+| Great Smoky Mountains | 44 | 2 | 0 | 5% |
 <!-- /table -->
 
-The Everglades result is a property of one species: the Burmese python has a peer-reviewed field study and a federal literature summary, and accounts for 73% of the park's invasive records. In the three Indian parks, 1 to 4 of the 6 to 18 invasive species recorded in each park have a cited finding.
+The Everglades result is a property of one species: the Burmese python has a peer-reviewed field study and a federal literature summary, and accounts for 68% of the park's invasive records. In the three Indian parks, 1 to 4 of the 6 to 18 invasive species recorded in each park have a cited finding.
 
 ### 3.6 Alerts
 
-3 early-detection alerts were raised: Cascabela thevetia in Bandipur (first record 2026-06); Kalanchoe pinnata in Bandipur (first record 2026-08); Cascabela thevetia in Mudumalai (first record 2025-11). Each rests on a handful of records and carries the caveat that a first record in our sources may follow the species' arrival by an unknown time.
+The pipeline raised 3 early-detection alerts: Cascabela thevetia in Bandipur (first record 2026-06); Kalanchoe pinnata in Bandipur (first record 2026-08); Cascabela thevetia in Mudumalai (first record 2025-11). Each rests on a handful of records and carries the caveat that a first record in our sources may follow the species' arrival by an unknown time.
 
 ### 3.7 Model performance
 
@@ -242,17 +248,19 @@ The Everglades result is a property of one species: the Burmese python has a pee
 
 ## 4. Observations
 
-**The source shapes the picture.** The Everglades share of invasive records is 50%, against 0.1 to 2.2% elsewhere, and that gap says more about the sources than about the parks. The USGS database records only non-native aquatic species and the reptiles and amphibians in its scope, and many of its Everglades records come from python removal programmes. A park's invasive share is therefore comparable with another park's only when both are drawn from the same kind of source. Within a source, differences are informative. Where USGS supplies few or no records, the invasive share ranged from 0.1% in Serengeti to 2.2% in Great Smoky Mountains.
+**The source shapes the picture.** The Everglades share of invasive records is 45%, against 0.1 to 2.5% elsewhere, and that gap says more about the sources than about the parks. The USGS database records non-native aquatic species and the reptiles and amphibians in its scope. Of the 8,294 Burmese python records it holds for the three Everglades counties (queried 8 October 2026), 7,531 are classed as derived from literature and 760 as museum specimens, so one report can contribute many records. A park's invasive share is therefore comparable with another park's only when both are drawn from the same kind of source. Within a source, differences are informative. Among the other five parks the invasive share ranged from 0.1% in Serengeti to 2.5% in Great Smoky Mountains.
 
-**Conspicuous weeds are under-recorded.** *Lantana camara* is reported to cover large areas of the Indian reserves. The three Indian parks hold 6 records of it, and *Senna spectabilis* has 0. People photograph flowers and animals more than common weeds, a known property of community data (Isaac et al. 2014). Counts from these sources describe where species were recorded, and they say little about how much ground a species covers. Any use of the hotspot maps for planning should take recording effort into account. In the Everglades, effort is itself uneven: removal campaigns and road access plausibly explain part of the concentration in a few squares.
+**Conspicuous weeds are under-recorded.** *Lantana camara* is reported to cover large areas of the Indian reserves. The three Indian parks hold 6 records of it, and *Senna spectabilis* has 0. People photograph flowers and animals more than common weeds, a known property of community data (Isaac et al. 2014). Counts from these sources describe where species were recorded, and they say little about how much ground a species covers. Any use of the hotspot maps for planning should take recording effort into account. In the Everglades, effort is itself uneven. At 2 km the shaded squares form lines across the park and not an even spread (Figure 1), which is consistent with recording that follows roads, trails and survey routes. We did not test this.
 
-**Statistical power is the limit.** Only two parks could support a correlation or a trend, and neither produced a result that excludes no effect. The negative correlation in Great Smoky Mountains (rho = -0.31) points the way the literature on invader effects would suggest, but its interval spans zero and the 26 cells are few. The trend tests used the share of records per observation, which tracks recorded presence over time and not abundance. We read these results as an indication that the pipeline can produce estimates once records accumulate, and as no evidence about effects. The data minimums keep estimates from smaller samples out of view.
+**The statistical results reflect where people go and which sources dominate.** The positive correlation in Great Smoky Mountains runs against what the literature on invader effects would lead one to expect. Apart from the aquatic parrot feather, its most recorded invasive species are widespread naturalised plants of fields and disturbed ground, such as red clover, wild carrot, orchard grass and ribwort plantain (Table 4), so the invasive share is plausibly highest where people walk and record. Native richness at a fixed sample size is also highest in well-visited, varied squares. Both measures plausibly rise with access, disturbance and habitat variety, and the correlation cannot separate them from an effect of invaders. We read it as a warning that raw co-occurrence in community data can point either way, and as no evidence that invaders raise or lower native richness.
 
-**Evidence is thin where records are dense, and sparse where invaders are most reported.** Cited findings cover most Everglades records because one species dominates them, and they cover only a minority of the species recorded elsewhere. Most findings are species-profile summaries (11 of 22) and only 1 is a controlled experiment. Several findings come from other regions, for example brown trout studies from Michigan applied to the Smokies, and each row says so. A manager reading a card should treat it as a pointer to the literature.
+The Everglades trend has a similar caveat. The rise in invasive records per observation spans a period in which the mix of sources changed: USGS supplied 509 of the 515 invasive records dated up to 2009, iNaturalist grew in the 2010s, and GBIF supplied 505 of the 1,506 invasive records dated 2020 or later. Its p-value of 0.009 exceeds the Bonferroni threshold of 0.0063, so we do not treat it as established, and a rise in recorded presence is not a rise in abundance. The Smokies result for native records (tau = -0.41, p = 0.045) is also above the threshold. The layers report nothing for the parks below the minimums. For the three parks above them, the results mostly show the limits of record-based inference and give little information about effects of invaders.
 
-**The classifiers are accurate on their test sets and untested on Indian field photos.** The plant classifier names invasive species correctly in about 85% of test photos and made no look-alike errors in 113 trials. Its training photos are mostly naturalist close-ups, and the ranger snapshots it would meet in the field follow another distribution. The animal classifier covers North American species and demonstrates transfer to unseen cameras (a 4.4 point cost) without covering Indian or African fauna. Outputs below a calibrated threshold return "unknown", which the dashboard shows as such.
+**Evidence is concentrated on a few species.** Cited findings cover most Everglades records because one species dominates them, and they cover a minority of the species recorded elsewhere. Most findings are species-profile summaries (11 of 22) and only 1 is a controlled experiment. Several findings come from other regions, for example brown trout studies from Michigan applied to the Smokies, and each row says so. A manager reading a card should treat it as a pointer to the literature.
 
-**Design for free infrastructure shaped the engineering.** Running on free tiers, with scheduled jobs in the United States writing to a database in Asia, meant that each database round trip cost about 0.2 s. Resumable ingestion, batch-level duplicate and boundary checks, per-park caps and a stop at 90% of the database budget kept a first load of thousands of records inside the limits, and the whole database used 45 MB of the 500 MB budget.
+**The classifiers are accurate on their test sets and untested on ranger photos.** The plant classifier names invasive species correctly in about 85% of test photos and made no look-alike errors in 113 trials. On the test photos taken in India it named 88.1% of invasives correctly and called none of 120 non-target plants invasive. Its training photos are mostly naturalist close-ups, and the snapshots a ranger would take from a distance, in shade or of whole thickets follow another distribution that we have not measured. The animal classifier covers North American species and demonstrates transfer to unseen cameras (a 4.4 point cost) without covering Indian or African fauna. Outputs below a calibrated threshold return "unknown", which the dashboard shows as such.
+
+**Design for free infrastructure shaped the engineering.** Running on free tiers, with scheduled jobs in the United States writing to a database in Asia, meant that each database round trip cost about 0.2 s. Resumable ingestion, batch-level duplicate and boundary checks, per-park caps and a stop at 90% of the database budget kept a first load of thousands of records inside the limits, and the whole database used 48 MB of the 500 MB budget.
 
 **Data licences constrain what can be published.** IUCN's terms prohibit republishing Red List data without written permission, so we hold its threat links in the database but hide them from the public interface, and this paper reports none of them. The USGS database asks authors to contact its team before publishing results that depend on it. We note that step as open (Section 6).
 
@@ -260,7 +268,7 @@ The Everglades result is a property of one species: the Burmese python has a pee
 
 ## 5. Conclusion
 
-An open pipeline built entirely on free services can join community observations, specimen records, a curated federal database and country checklists into a spatial database for six national parks on three continents, apply counted quality rules, and show where invasive records concentrate together with what cited research reports about each species. The first statistical estimates are now computable for two parks and do not exclude a null effect, which is the honest reading of a pipeline whose data is still accumulating. The next steps are more field photos for the plant classifier, local labelled camera-trap data, a model of recording effort, and written permission from IUCN to publish its threat links.
+An open pipeline built entirely on free services can join community observations, specimen records, a curated federal database and country checklists into a spatial database for six national parks on three continents, apply counted quality rules, and show where invasive records concentrate together with what cited research reports about each species. Statistical estimates are now computable for three parks. They are confounded by recording effort and by changes in the mix of sources, none of the trend results survives a correction for multiple tests, and we do not read any of them as an effect of invaders. The next steps are a model of recording effort that can separate access from invasion, more field photos for the plant classifier, local labelled camera-trap data, and written permission from IUCN to publish its threat links, which would let the dashboard show which assessed native species named invaders threaten in these parks.
 
 ## 6. Data and code availability, and acknowledgements
 

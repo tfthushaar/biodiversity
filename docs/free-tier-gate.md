@@ -50,7 +50,7 @@ python -m biodiv.workers.migrate --seed
 ```
 
 Each migration is applied once and checksummed, so editing an applied migration is refused. Add a
-new numbered file instead. The runner applies every pending migration in one transaction. A
+new numbered file instead. The runner applies each pending migration in its own transaction. A
 migration that alters a busy table such as `species` needs an exclusive lock, so run it while no
 long import is running, and set a lock timeout (`PGOPTIONS="-c lock_timeout=4000"`) so a busy
 moment fails the attempt and does not stall the live site.
