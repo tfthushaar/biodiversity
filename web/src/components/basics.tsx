@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { errorMessage } from "../api/rest";
 import type { Certainty } from "../api/types";
 import { humanise } from "../lib/format";
+import { Icon } from "./icons";
 
 // ---------------------------------------------------------------------------- states
 
@@ -17,7 +18,7 @@ export function Loading({ what = "data" }: { what?: string }) {
 export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
   return (
     <div className="state error" role="alert">
-      <span aria-hidden="true">⚠</span>
+      <Icon name="warning" />
       <div>
         <strong>Couldn’t load this.</strong>
         <div>{errorMessage(error)}</div>
@@ -159,10 +160,14 @@ export function EvidenceBadge({ label, level }: { label: string; level: string |
 }
 
 export function SeverityBadge({ severity }: { severity: "low" | "medium" | "high" }) {
-  const mark = severity === "high" ? "▲▲" : severity === "medium" ? "▲" : "△";
+  const level = severity === "high" ? 3 : severity === "medium" ? 2 : 1;
   return (
     <span className="badge strong">
-      <span aria-hidden="true">{mark}</span>
+      <span className="severity" aria-hidden="true">
+        {[1, 2, 3].map((i) => (
+          <i key={i} className={i <= level ? "on" : undefined} />
+        ))}
+      </span>
       {severity}
     </span>
   );

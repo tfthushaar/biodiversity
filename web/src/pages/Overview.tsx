@@ -2,6 +2,7 @@ import { useAlerts, useReports, useZones } from "../api/hooks";
 import type { ZoneReportRow } from "../api/types";
 import { BarList, type BarItem } from "../components/charts";
 import { Empty, ErrorState, Loading, StatTile } from "../components/basics";
+import { Icon } from "../components/icons";
 import { fmtInt, fmtPct, pluralise } from "../lib/format";
 
 export function summarise(reports: ZoneReportRow[]) {
@@ -18,6 +19,24 @@ export function summarise(reports: ZoneReportRow[]) {
   return { invasiveSpecies: names.size, findings, insufficientCo, insufficientTrend, zones: reports.length };
 }
 
+const START = [
+  {
+    href: "#/hotspots",
+    title: "Explore hotspots",
+    text: "See where records concentrate in each park, and what the species there do to the local environment.",
+  },
+  {
+    href: "#/species",
+    title: "Look up a species",
+    text: "Photos, cited research on effects, and the management options that have been tried.",
+  },
+  {
+    href: "#/impact",
+    title: "See what the data supports",
+    text: "Which questions the records can answer today, and how much more data the others need.",
+  },
+];
+
 export function Overview() {
   const zones = useZones();
   const reports = useReports();
@@ -25,28 +44,41 @@ export function Overview() {
 
   return (
     <>
-      <h1>Invasive species and their effect on native ecosystems</h1>
+      <h1>Invasive species in protected landscapes</h1>
       <p className="lede">
-        Where invasive plants and animals have been recorded in four protected landscapes, what published
-        research says they do to the native species there, and what has been tried to manage them, with
-        the evidence for every claim.
+        Where invasive plants and animals have been recorded in national parks in India, Tanzania and the
+        United States, what published research reports about their effect on native species, and how they are
+        managed. Every claim links to its evidence.
       </p>
 
+      <nav className="start" aria-label="Where to start">
+        {START.map((s) => (
+          <a key={s.href} className="card" href={s.href}>
+            <strong>{s.title}</strong>
+            <span>{s.text}</span>
+            <span className="go">
+              Open <Icon name="arrow" />
+            </span>
+          </a>
+        ))}
+      </nav>
+
+      <h2>The numbers</h2>
       <div className="banner" role="note">
-        <span aria-hidden="true">ⓘ</span>
+        <Icon name="info" />
         <div>
-          <strong>Read counts as recorded presence, not abundance.</strong> Most records here come from
-          citizen-science photos, which badly under-record the plants that dominate these reserves: across
-          three Indian reserves there are only a handful of <em>Lantana</em> and <em>Senna</em> records, though both
-          are widely reported to be widespread. Where the data is too thin to support a statistic, this
-          dashboard says so instead of showing one. <a href="#/sources">See what the data can and cannot say</a>.
+          Counts reflect where people recorded species as well as where the species lives. Citizen-science
+          photos under-record the plants that dominate these reserves: across the three Indian parks there are
+          only a handful of <em>Lantana</em> and <em>Senna</em> records, though both are widely reported to be
+          widespread. A low count can mean few observers. Statistics appear only when there is enough data, and
+          otherwise the page shows how much more is needed. Details are on the <a href="#/sources">Sources</a> page.
         </div>
       </div>
 
       {zones.isError && !zones.data ? (
         <ErrorState error={zones.error} onRetry={() => void zones.refetch()} />
       ) : !zones.data ? (
-        <Loading what="zones" />
+        <Loading what="parks" />
       ) : (
         <ZoneOverview zones={zones.data.features.map((f) => f.properties)} reports={reports.data} alerts={alerts.data?.length} />
       )}
@@ -73,19 +105,19 @@ function ZoneOverview({
       label: z.name,
       value: z.invasive_records,
       display: `${fmtInt(z.invasive_records)} of ${fmtInt(z.observations)}`,
-      note: `${fmtPct(z.observations ? z.invasive_records / z.observations : 0)} of observations · ${pluralise(z.invasive_species, "invasive species", "invasive species")}`,
+      note: `${fmtPct(z.observations ? z.invasive_records / z.observations : 0)} of observations, ${pluralise(z.invasive_species, "invasive species", "invasive species")}`,
     }))
     .sort((a, b) => b.value - a.value);
 
   return (
     <>
       <div className="grid" aria-label="Headline numbers">
-        <StatTile label="Observations" value={fmtInt(obs)} sub={`across ${zones.length} zones`} />
+        <StatTile label="Observations" value={fmtInt(obs)} sub={`across ${zones.length} parks`} />
         <StatTile label="Invasive-species records" value={fmtInt(inv)} sub={obs ? `${fmtPct(inv / obs)} of observations` : undefined} />
         <StatTile
           label="Invasive species recorded"
           value={sum ? fmtInt(sum.invasiveSpecies) : "–"}
-          sub="distinct, across all zones"
+          sub="distinct, across all parks"
         />
         <StatTile
           label="Early-detection alerts"
@@ -94,64 +126,64 @@ function ZoneOverview({
         />
       </div>
 
-      <h2>Invasive records by zone</h2>
+      <h2>Invasive records by park</h2>
       <div className="card">
         <p className="hint" style={{ marginTop: 0 }}>
-          Records of species that are purely alien and flagged invasive, against all observations in the
-          zone. Serengeti has none because wildlife photos there rarely include introduced plants, not
-          because it is free of them.
+          Records of species that GRIIS lists as alien and invasive in the park's country, compared with all
+          observations in the park. Serengeti has none because wildlife photos there rarely include
+          introduced plants.
         </p>
         <BarList
           items={items}
           color="var(--invasive)"
-          caption="Invasive-species records by zone"
+          caption="Invasive-species records by park"
           valueLabel="Invasive records"
           max={Math.max(1, ...items.map((i) => i.value))}
         />
       </div>
 
-      <h2>What the data can support</h2>
+      <h2>What the data supports</h2>
       {!sum ? (
         <Loading what="analysis" />
       ) : (
         <div className="grid">
           <div className="card">
-            <h3>1 · Documented findings</h3>
+            <h3 style={{ marginTop: 0 }}>Reported findings</h3>
             <p className="muted small" style={{ margin: "0 0 8px" }}>
-              What published sources report, quoted and cited. No inference by us.
+              What published sources report, quoted and cited.
             </p>
-            <strong>{pluralise(sum.findings, "finding")}</strong> across the zones.
+            <strong>{pluralise(sum.findings, "finding")}</strong> across the parks.
           </div>
           <div className="card">
-            <h3>2 · Co-occurrence</h3>
+            <h3 style={{ marginTop: 0 }}>Fewer native species where invaders are dense?</h3>
             <p className="muted small" style={{ margin: "0 0 8px" }}>
-              Is native richness lower where invasives are denser?
+              Compares native species richness across map squares with different invasive densities.
             </p>
             <strong>
-              {sum.insufficientCo === sum.zones ? "Not enough data" : `${sum.zones - sum.insufficientCo} of ${sum.zones} zones`}
+              {sum.insufficientCo === sum.zones ? "Not enough data" : `${sum.zones - sum.insufficientCo} of ${sum.zones} parks`}
             </strong>
-            {sum.insufficientCo === sum.zones ? " in any zone yet." : " have enough data."}
+            {sum.insufficientCo === sum.zones ? " in any park yet." : " have enough data."}
           </div>
           <div className="card">
-            <h3>3 · Trend</h3>
+            <h3 style={{ marginTop: 0 }}>Is the invasive share changing?</h3>
             <p className="muted small" style={{ margin: "0 0 8px" }}>
-              Is the invasive share rising while natives fall?
+              Follows the invasive share of records, and the native share, year by year.
             </p>
             <strong>
-              {sum.insufficientTrend === sum.zones ? "Not enough data" : `${sum.zones - sum.insufficientTrend} of ${sum.zones} zones`}
+              {sum.insufficientTrend === sum.zones ? "Not enough data" : `${sum.zones - sum.insufficientTrend} of ${sum.zones} parks`}
             </strong>
-            {sum.insufficientTrend === sum.zones ? " in any zone yet." : " have enough data."}
+            {sum.insufficientTrend === sum.zones ? " in any park yet." : " have enough data."}
           </div>
         </div>
       )}
       <p style={{ marginTop: 14 }}>
-        <a href="#/impact">See each layer, and exactly how much more data it needs →</a>
+        <a href="#/impact">See what each question needs</a>
       </p>
 
       {alerts === 0 && (
         <Empty>
-          No early-detection alerts. An alert means an invasive species was recorded in a zone for the
-          first time, in the past year, after enough observation that its absence earlier means something.
+          No early-detection alerts. An alert is raised when an invasive species is recorded in a park for the
+          first time in the past year, after enough observation that its earlier absence means something.
         </Empty>
       )}
     </>

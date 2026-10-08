@@ -36,8 +36,8 @@ export function TryIt() {
     return (
       <div className="card">
         <p style={{ margin: 0 }}>
-          The live photo demo needs the optional analysis service, which is not connected to this deployment.
-          The measurements above stand on their own; the demo only lets you try the same models yourself.
+          The photo demo needs an analysis service, which is not connected to this deployment. The
+          measurements above describe the same models.
         </p>
       </div>
     );
@@ -93,7 +93,7 @@ export function TryIt() {
         </button>
       </div>
       <p className="hint" style={{ marginTop: 0 }}>
-        Your photo is analysed in memory and not stored. People in camera-trap photos are detected but never cropped or classified.
+        Your photo is analysed in memory and is not stored. People in camera-trap photos are detected and left uncropped and unclassified.
         The first request after a quiet spell can take about a minute.
       </p>
       {error != null && <ErrorState error={error} />}

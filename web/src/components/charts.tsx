@@ -140,7 +140,19 @@ export interface LineSeries {
   short?: string;
   /** A CSS colour (a design token such as var(--series-2)). */
   color: string;
+  /** SVG dash pattern. Series are told apart by line style as well as shade, so the chart
+   *  reads the same in greyscale, in print and for readers who cannot separate shades. */
+  dash?: string;
   points: { x: number; y: number | null }[];
+}
+
+/** The sample of a series' line shown in the legend and the tooltip. */
+function LineKey({ s }: { s: Pick<LineSeries, "color" | "dash"> }) {
+  return (
+    <svg className="legend-key" viewBox="0 0 28 8" aria-hidden="true" focusable="false">
+      <line x1="1" y1="4" x2="27" y2="4" stroke={s.color} strokeDasharray={s.dash} />
+    </svg>
+  );
 }
 
 const W = 640;
@@ -212,7 +224,7 @@ export function LineChart({
           return (
             <div className="t-row" key={s.id}>
               <span>
-                <span className="t-key" style={{ background: s.color }} />
+                <LineKey s={s} />
                 {s.label}
               </span>
               <strong>{v == null ? "–" : yFormat(v)}</strong>
@@ -252,7 +264,7 @@ export function LineChart({
         <ul className="legend" aria-label="Legend">
           {series.map((s) => (
             <li key={s.id}>
-              <span className="key" style={{ background: s.color }} />
+              <LineKey s={s} />
               {s.label}
             </li>
           ))}
@@ -297,6 +309,7 @@ export function LineChart({
               <polyline
                 className="line"
                 stroke={s.color}
+                strokeDasharray={s.dash}
                 points={pts.map((p) => `${sx(p.x)},${sy(p.y)}`).join(" ")}
               />
               {pts.length > 0 && (

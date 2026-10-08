@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useFindings, useInvasiveSpecies, usePlaybooks, useReports } from "../api/hooks";
+import { useFindings, usePlaybooks, useReports } from "../api/hooks";
 import type { Finding, InvasiveSpecies, Playbook, ZoneReportRow } from "../api/types";
 import { Empty, ErrorState, Loading } from "../components/basics";
 import { BarList } from "../components/charts";
@@ -43,8 +43,24 @@ export function buildEntries(
   );
 }
 
+/** Species recorded in any park, in the shape the list expects. */
+function recordedSpecies(reports: ZoneReportRow[]): InvasiveSpecies[] {
+  const seen = new Map<string, InvasiveSpecies>();
+  for (const r of reports) {
+    for (const s of r.report.invasive_species) {
+      if (!seen.has(s.species)) {
+        seen.set(s.species, {
+          species_id: 0,
+          establishment_means: null,
+          species: { scientific_name: s.species, common_name: s.common_name, kingdom: null },
+        });
+      }
+    }
+  }
+  return [...seen.values()];
+}
+
 export function SpeciesPage({ selected }: { selected: string | null }) {
-  const invasives = useInvasiveSpecies();
   const playbooks = usePlaybooks();
   const findings = useFindings();
   const reports = useReports();
@@ -52,13 +68,13 @@ export function SpeciesPage({ selected }: { selected: string | null }) {
 
   const entries = useMemo(
     () =>
-      invasives.data && playbooks.data && findings.data && reports.data
-        ? buildEntries(invasives.data, playbooks.data, findings.data, reports.data)
+      playbooks.data && findings.data && reports.data
+        ? buildEntries(recordedSpecies(reports.data), playbooks.data, findings.data, reports.data)
         : null,
-    [invasives.data, playbooks.data, findings.data, reports.data],
+    [playbooks.data, findings.data, reports.data],
   );
 
-  const failed = [invasives, playbooks, findings, reports].find((x) => x.isError && !x.data);
+  const failed = [playbooks, findings, reports].find((x) => x.isError && !x.data);
   if (failed) return <ErrorState error={failed.error} onRetry={() => void failed.refetch()} />;
   if (!entries) return <Loading what="species" />;
 
@@ -71,9 +87,9 @@ export function SpeciesPage({ selected }: { selected: string | null }) {
     <>
       <h1>Species</h1>
       <p className="lede">
-        {fmtInt(entries.length)} species are flagged invasive in India. Only a few have cited findings and
-        management guidance, and a claim needs a verbatim quote from a source that can be checked. The rest
-        are listed honestly as having none yet.
+        {fmtInt(entries.length)} invasive species are recorded in the parks or have cited research. Findings and
+        management guidance each need a verbatim quote from a source that can be checked, so some species have
+        none yet and say so.
       </p>
       <div className="grid two" style={{ alignItems: "start" }}>
         <section className="card" aria-label="Species list" style={{ maxHeight: 640, overflowY: "auto" }}>
@@ -146,11 +162,11 @@ function Dossier({ entry, playbooks, findings, reports }: { entry: Entry; playbo
           <em>{entry.name}</em>
         </h2>
         {entry.common && <p className="muted" style={{ marginTop: -4 }}>{entry.common}</p>}
-        <span className="badge invasive"><span className="dot" aria-hidden="true" />invasive in India (GRIIS)</span>
-        <h3 style={{ marginTop: 16 }}>Recorded in the monitored zones</h3>
+        <span className="badge invasive"><span className="dot" aria-hidden="true" />listed as invasive (GRIIS)</span>
+        <h3 style={{ marginTop: 16 }}>Recorded in the parks</h3>
         {byZone.length === 0 ? (
           <p className="muted" style={{ margin: 0 }}>
-            No records in these four zones. That says nothing about whether it is present: see the data notes under Sources.
+            No records in these parks. The data cannot show whether it is present; see the limits under Sources.
           </p>
         ) : (
           <BarList
@@ -189,13 +205,13 @@ function Dossier({ entry, playbooks, findings, reports }: { entry: Entry; playbo
       <h2>What has been tried</h2>
       {pbs.length === 0 ? (
         <Empty>
-          No cited management guidance for this species yet. Nothing is shown rather than something uncited.
+          No cited management guidance for this species yet.
         </Empty>
       ) : (
         <>
           <p className="hint">
-            This summarises what published sources report, with their caveats. It is not advice to act: methods that
-            worked in one habitat or country may not in another, and where experts disagree both views are shown.
+            This summarises what published sources report, with their caveats. A method that worked in one habitat
+            or country may not work in another, and where experts disagree both views are shown.
           </p>
           <div className="card">
             {pbs.map((p) => (

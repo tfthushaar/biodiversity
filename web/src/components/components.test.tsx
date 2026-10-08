@@ -159,7 +159,7 @@ describe("LineChart", () => {
       <LineChart {...props} series={[line("a", "Found", [1, 0.5, 0.25]), line("b", "Right", [0.2, 0.9, 0.95])]} />,
     );
     await userEvent.tab();
-    expect(container.querySelector("svg")).toHaveFocus();
+    expect(container.querySelector("svg.chart")).toHaveFocus();
     await userEvent.keyboard("{ArrowRight}");
     const tip = container.querySelector(".tooltip");
     expect(tip).toHaveTextContent("Threshold: 0.5");

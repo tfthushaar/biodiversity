@@ -17,8 +17,8 @@ export function Models() {
     <>
       <h1>Models and how well they work</h1>
       <p className="lede">
-        Every figure here was measured on photos the model never saw during training, and each comes with the
-        caveats that matter. They are stored with the model, so what you read is exactly what was measured.
+        Every figure on this page was measured on photos that were held out of training. The measurements are
+        stored alongside each model, with the limits that apply to them.
       </p>
       {models.isError && !models.data ? (
         <ErrorState error={models.error} onRetry={() => void models.refetch()} />
@@ -41,7 +41,7 @@ function Caveats({ items }: { items: string[] | undefined }) {
   if (!items?.length) return null;
   return (
     <div className="callout fail">
-      <strong>Read with care.</strong>
+      <strong>Limits</strong>
       <ul style={{ margin: "4px 0 0", paddingLeft: 18 }}>
         {items.map((c) => (
           <li key={c}>{c}</li>
@@ -71,8 +71,8 @@ function PlantSection({ m }: { m?: ModelVersion }) {
   const rows = x.threshold_tradeoff_on_test;
   const series: LineSeries[] = [
     { id: "named", label: "Photos named", short: "Photos named", color: "var(--series-1)", points: curve(rows, (r) => r.answered) },
-    { id: "inv", label: "Invasives correctly named", short: "Invasives named", color: "var(--series-2)", points: curve(rows, (r) => r.invasives_named?.rate) },
-    { id: "other", label: "Other plants called invasive", short: "Others flagged", color: "var(--series-3)", points: curve(rows, (r) => r.non_target_called_invasive?.other?.rate) },
+    { id: "inv", label: "Invasives correctly named", short: "Invasives named", color: "var(--series-2)", dash: "8 5", points: curve(rows, (r) => r.invasives_named?.rate) },
+    { id: "other", label: "Other plants called invasive", short: "Others flagged", color: "var(--series-3)", dash: "2 5", points: curve(rows, (r) => r.non_target_called_invasive?.other?.rate) },
   ];
   const look = x.dangerous_errors_by_kind?.native_lookalike;
   const other = x.dangerous_errors_by_kind?.other;
@@ -96,9 +96,9 @@ function PlantSection({ m }: { m?: ModelVersion }) {
       <h3 style={{ marginTop: 20 }}>The threshold trades coverage for caution</h3>
       <div className="card">
         <p className="hint" style={{ marginTop: 0 }}>
-          Raising the confidence needed before it names a plant makes it name fewer, but wrongly call far fewer
-          other plants invasive. The shipped threshold is {x.chosen?.threshold.toFixed(2)}, fixed on separate
-          validation data, not chosen by looking at these results.
+          Raising the confidence needed before it names a plant makes it name fewer plants and wrongly call far
+          fewer other plants invasive. The deployed threshold is {x.chosen?.threshold.toFixed(2)}, set on separate
+          validation data before these results were measured.
         </p>
         <LineChart
           series={series}
@@ -119,13 +119,13 @@ function AnimalSection({ m }: { m?: ModelVersion }) {
   const rows = x.threshold_tradeoff_on_test;
   const series: LineSeries[] = [
     { id: "named", label: "Crops named", short: "Named", color: "var(--series-1)", points: curve(rows, (r) => r.answered) },
-    { id: "right", label: "Right, when named", short: "Right", color: "var(--series-2)", points: curve(rows, (r) => r.accuracy_when_answered) },
+    { id: "right", label: "Right, when named", short: "Right", color: "var(--series-2)", dash: "8 5", points: curve(rows, (r) => r.accuracy_when_answered) },
   ];
   const gap = x.same_cameras_top1 != null && x.new_cameras_top1 != null ? x.same_cameras_top1 - x.new_cameras_top1 : null;
   return (
     <Section
       title="Camera-trap animal classifier"
-      intro={<>13 North American species from Caltech Camera Traps. It demonstrates the pipeline and measures how well a model travels to cameras it has never seen.</>}
+      intro={<>Identifies 13 North American species from Caltech Camera Traps. It demonstrates the pipeline and measures how well a classifier transfers to cameras it was not trained on.</>}
     >
       <div className="grid" aria-label="Animal classifier results">
         <StatTile label="Accuracy on cameras never seen" value={fmtPct(x.new_cameras_top1)} sub={`${fmtInt(x.test_photos)} crops · baseline ${fmtPct(x.majority_class_baseline, 0)}`} />
@@ -155,8 +155,8 @@ function DetectorSection({ m }: { m?: ModelVersion }) {
   const r02 = at(0.2);
   const series: LineSeries[] = [
     { id: "recall", label: "Animal photos found", short: "Found", color: "var(--series-1)", points: rows.map((r) => ({ x: r.threshold, y: r.recall })) },
-    { id: "precision", label: "Flagged photos with an animal", short: "Precision", color: "var(--series-2)", points: rows.map((r) => ({ x: r.threshold, y: r.precision })) },
-    { id: "fa", label: "Empty photos flagged (upper bound)", short: "Empty flagged", color: "var(--series-3)", points: rows.map((r) => ({ x: r.threshold, y: r.false_alarm_rate })) },
+    { id: "precision", label: "Flagged photos with an animal", short: "Precision", color: "var(--series-2)", dash: "8 5", points: rows.map((r) => ({ x: r.threshold, y: r.precision })) },
+    { id: "fa", label: "Empty photos flagged (upper bound)", short: "Empty flagged", color: "var(--series-3)", dash: "2 5", points: rows.map((r) => ({ x: r.threshold, y: r.false_alarm_rate })) },
   ];
   return (
     <Section

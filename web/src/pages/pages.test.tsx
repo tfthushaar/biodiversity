@@ -5,13 +5,28 @@ import type { ReactElement } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { LayerResult, ZoneReportRow } from "../api/types";
 
-// The real map needs a browser canvas; what matters here is which zone the page asks it to show.
-vi.mock("../components/MapView", () => ({
-  MapView: ({ selected }: { selected: string | null }) => <div data-testid="map">zone:{selected ?? "all"}</div>,
+// The real map needs a browser canvas. This stand-in offers each square as a button, which is all
+// the page needs from it: which squares it was given, and a way to choose one.
+vi.mock("../components/HotspotMap", () => ({
+  HotspotMap: ({
+    cells,
+    onSelect,
+  }: {
+    cells: { west: number; south: number; records: number }[];
+    onSelect: (key: string) => void;
+  }) => (
+    <div data-testid="map">
+      {cells.map((c) => (
+        <button key={`${c.west}${c.south}`} onClick={() => onSelect(`${c.west.toFixed(4)},${c.south.toFixed(4)}`)}>
+          square of {c.records}
+        </button>
+      ))}
+    </div>
+  ),
 }));
 
 import { Impact } from "./Impact";
-import { MapPage } from "./MapPage";
+import { Hotspots } from "./Hotspots";
 import { Sources } from "./Sources";
 import { buildEntries } from "./SpeciesPage";
 
@@ -120,39 +135,150 @@ describe("Impact page", () => {
   });
 });
 
-describe("Map page", () => {
+describe("Hotspots page", () => {
+  const square = [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]];
   const zones = {
     type: "FeatureCollection",
-    features: ["bandipur", "serengeti", "mudumalai"].map((slug, i) => ({
+    features: [
+      ["bandipur", "Bandipur National Park", "IN", 8],
+      ["serengeti", "Serengeti National Park", "TZ", 0],
+      ["everglades", "Everglades National Park", "US", 90],
+    ].map(([slug, name, country, n]) => ({
       type: "Feature",
-      geometry: null,
-      properties: { slug, name: slug, invasive_records: [8, 0, 3][i] },
+      geometry: { type: "Polygon", coordinates: square },
+      properties: { slug, name, country, group: null, observations: 100, species: 10, invasive_records: n, invasive_species: 1 },
     })),
   };
-  const none = { type: "FeatureCollection", features: [] };
-
-  it("opens on the zone with the most invasive records, not on two continents of specks", async () => {
-    serve({ "/rpc/zones_geojson": zones, "/rpc/records_geojson": none });
-    wrap(<MapPage />);
-    expect(await screen.findByTestId("map")).toHaveTextContent("zone:bandipur");
+  const sp = (name: string, common: string | null, records: number, first = 2015, last = 2024) => ({
+    name, common_name: common, records, first_year: first, last_year: last,
+  });
+  const cell = (west: number, species: ReturnType<typeof sp>[]) => ({
+    west, south: 25, east: west + 0.05, north: 25.05,
+    records: species.reduce((a, x) => a + x.records, 0), species_count: species.length, species,
+  });
+  const hotspots = {
+    cell: 0.05,
+    cells: [
+      cell(-80.6, [sp("Python bivittatus", "Burmese python", 40), sp("Pterois volitans", "Red lionfish", 5)]),
+      cell(-80.5, [sp("Pterois volitans", "Red lionfish", 12)]),
+    ],
+  };
+  const finding = {
+    id: 1, finding_type: "impact", affected: "marsh rabbits and raccoons", certainty: "observational",
+    summary: "Mammal numbers fell sharply where pythons were established.",
+    region_note: "Everglades National Park, Florida", source_quotes: ["Severe mammal declines coincide"],
+    citation_text: "Dorcas et al. 2012", citation_url: "https://doi.org/10.1073/pnas.1115226109", verified_on: "2026-10-08",
+    species: { scientific_name: "Python bivittatus", common_name: "Burmese python" }, zones: null,
+  };
+  const photo = (over = {}) => ({
+    scientific_name: "Python bivittatus", common_name: "Burmese python",
+    photo_url: "https://static.example.org/python.jpg", photo_credit: "(c) Wayne Fidler, some rights reserved (CC BY-NC)",
+    photo_license: "cc-by-nc", photo_source_url: "https://www.inaturalist.org/photos/1", ...over,
+  });
+  const routes = (over: Record<string, unknown> = {}) => ({
+    "/rpc/zones_geojson": zones,
+    "/rpc/hotspot_cells": hotspots,
+    "/impact_findings": [finding],
+    "/mitigation_playbooks": [],
+    "/species?select": [photo()],
+    ...over,
   });
 
-  it("keeps 'All zones' one choice away, and respects it once chosen", async () => {
-    const fetchMock = serve({ "/rpc/zones_geojson": zones, "/rpc/records_geojson": none });
-    wrap(<MapPage />);
-    const select = await screen.findByRole<HTMLSelectElement>("combobox");
-    await waitFor(() => expect(select.value).toBe("bandipur"));
-    await userEvent.selectOptions(select, "");
-    await waitFor(() => expect(screen.getByTestId("map")).toHaveTextContent("zone:all"));
-    expect(select.value).toBe("");
-    // The query for all zones carries no zone filter.
-    expect(fetchMock.mock.calls.some(([u]) => String(u).includes("records_geojson") && !String(u).includes("p_zone"))).toBe(true);
+  it("opens on the park with the most invasive records and asks for that park's squares", async () => {
+    const fetchMock = serve(routes());
+    wrap(<Hotspots zone={null} />);
+    expect(await screen.findByTestId("map")).toBeInTheDocument();
+    const asked = fetchMock.mock.calls.map(([u]) => String(u)).find((u) => u.includes("hotspot_cells"))!;
+    expect(asked).toContain("p_zone=everglades");
+    const select = screen.getByRole<HTMLSelectElement>("combobox", { name: "Park" });
+    expect(select.value).toBe("everglades");
   });
 
-  it("says plainly when a zone has no invasive records", async () => {
-    serve({ "/rpc/zones_geojson": zones, "/rpc/records_geojson": none });
-    wrap(<MapPage />);
-    expect(await screen.findByText(/No invasive-species records in this zone/)).toBeInTheDocument();
+  it("opens the park named in the address", async () => {
+    const fetchMock = serve(routes());
+    wrap(<Hotspots zone="bandipur" />);
+    await screen.findByTestId("map");
+    expect(fetchMock.mock.calls.some(([u]) => String(u).includes("p_zone=bandipur"))).toBe(true);
+  });
+
+  it("groups parks by country", async () => {
+    serve(routes());
+    wrap(<Hotspots zone={null} />);
+    await screen.findByTestId("map");
+    const groups = [...document.querySelectorAll("optgroup")].map((g) => g.label);
+    expect(groups).toEqual(["India", "Tanzania", "United States"]);
+  });
+
+  it("ranks the busiest squares and the most recorded species", async () => {
+    serve(routes());
+    wrap(<Hotspots zone={null} />);
+    const buttons = await screen.findAllByRole("button", { name: /records?\b/ });
+    expect(buttons[0]).toHaveTextContent("45 records");
+    expect(buttons[0]).toHaveTextContent("Burmese python");
+    expect(screen.getByRole("list", { name: "Most recorded invasive species in this park" })).toBeInTheDocument();
+  });
+
+  it("shows a species card with photo, credit, record count and cited effects when a square is chosen", async () => {
+    serve(routes());
+    wrap(<Hotspots zone={null} />);
+    await userEvent.click(await screen.findByRole("button", { name: "square of 45" }));
+    const card = await screen.findByRole("article", { name: "Burmese python" });
+    expect(within(card).getByRole("img", { name: "Photograph of Burmese python" })).toHaveAttribute("src", "https://static.example.org/python.jpg");
+    expect(within(card).getByText(/Wayne Fidler/)).toBeInTheDocument();
+    expect(within(card).getByRole("link", { name: "Photo page" })).toHaveAttribute("href", "https://www.inaturalist.org/photos/1");
+    expect(within(card).getByText("40 records here")).toBeInTheDocument();
+    expect(within(card).getByText("2015 to 2024")).toBeInTheDocument();
+    expect(within(card).getByText(/Mammal numbers fell sharply/)).toBeInTheDocument();
+    expect(within(card).getByText(/Everglades National Park, Florida/)).toBeInTheDocument();
+  });
+
+  it("says plainly when a species has no photo or no cited research", async () => {
+    serve(routes());
+    wrap(<Hotspots zone={null} />);
+    await userEvent.click(await screen.findByRole("button", { name: "square of 45" }));
+    const lionfish = await screen.findByRole("article", { name: "Red lionfish" });
+    expect(within(lionfish).getByText("No openly licensed photo available")).toBeInTheDocument();
+    expect(within(lionfish).queryByRole("img")).not.toBeInTheDocument();
+    expect(within(lionfish).getByText(/No cited research on this species/)).toBeInTheDocument();
+  });
+
+  it("never renders an image address that could run code", async () => {
+    serve(routes({ "/species?select": [photo({ photo_url: "javascript:alert(1)" })] }));
+    wrap(<Hotspots zone={null} />);
+    await userEvent.click(await screen.findByRole("button", { name: "square of 45" }));
+    const card = await screen.findByRole("article", { name: "Burmese python" });
+    expect(within(card).queryByRole("img")).not.toBeInTheDocument();
+    expect(within(card).getByText("No openly licensed photo available")).toBeInTheDocument();
+  });
+
+  it("narrows the squares to one species and returns to the list", async () => {
+    serve(routes());
+    wrap(<Hotspots zone={null} />);
+    await screen.findByRole("button", { name: "square of 45" });
+    await userEvent.selectOptions(screen.getByRole("combobox", { name: "Species" }), "Red lionfish (Pterois volitans) · 17");
+    expect(screen.queryByRole("button", { name: "square of 45" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "square of 5" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "square of 12" })).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "square of 12" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Back to all squares" }));
+    expect(await screen.findByText("Busiest squares")).toBeInTheDocument();
+  });
+
+  it("explains an empty park instead of drawing nothing", async () => {
+    serve(routes({ "/rpc/hotspot_cells": { cell: 0.05, cells: [] } }));
+    wrap(<Hotspots zone="serengeti" />);
+    expect(await screen.findByText(/No invasive-species records in Serengeti National Park yet/)).toBeInTheDocument();
+    expect(screen.queryByTestId("map")).not.toBeInTheDocument();
+  });
+
+  it("offers a retry when the squares cannot be loaded", async () => {
+    let calls = 0;
+    serve(routes({ "/rpc/hotspot_cells": () => (++calls === 1 ? json({ message: "down" }, 503) : json(hotspots)) }));
+    wrap(<Hotspots zone={null} />);
+    const alert = await screen.findByRole("alert");
+    await userEvent.click(within(alert).getByRole("button", { name: "Try again" }));
+    expect(await screen.findByTestId("map")).toBeInTheDocument();
   });
 });
 

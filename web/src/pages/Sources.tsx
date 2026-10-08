@@ -14,7 +14,7 @@ export function Sources() {
       <h1>Data sources and what they can support</h1>
       <p className="lede">
         Every record keeps its source, licence and original date. Archived camera-trap images are labelled as
-        replays and are never passed off as live.
+        replays.
       </p>
 
       {sources.isError && !sources.data ? (
@@ -91,8 +91,8 @@ export function Sources() {
               limit
             />
             <p className="hint" style={{ marginBottom: 0 }}>
-              The data workers stop adding records at 90% full, because a full free database goes read-only.
-              Old run logs are trimmed automatically; the records themselves never are.
+              Data collection pauses at 90% full, because a full free database becomes read-only. Old run
+              logs are trimmed automatically, and records are kept.
             </p>
           </>
         ) : storage.isError ? (
@@ -102,13 +102,13 @@ export function Sources() {
         )}
       </div>
 
-      <h2>What this data cannot tell you</h2>
+      <h2>Limits of this data</h2>
       <div className="card">
         <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 10 }}>
           <li>
-            <strong>It under-records the dominant invasive plants.</strong> People photograph animals and flowers,
-            not ubiquitous weeds. <em>Lantana</em>, widely reported to have invaded large areas of these reserves,
-            has a single record here. Treat any count as <em>recorded presence</em>, never abundance or cover.
+            <strong>Dominant invasive plants are under-recorded.</strong> People photograph animals and flowers
+            more than common weeds. <em>Lantana</em>, widely reported across these reserves, has a single record
+            here. A count shows where a species was recorded and says little about how much ground it covers.
           </li>
           <li>
             <strong>Threatened species are probably under-represented.</strong> Observations with deliberately
@@ -116,11 +116,18 @@ export function Sources() {
           </li>
           <li>
             <strong>Invasive status comes from a country-level list.</strong> A species can be native in part of a
-            country and introduced elsewhere in it (the chital is native on the mainland but introduced to the
-            Andaman Islands). Species of mixed or uncertain origin are therefore excluded from the invasive counts.
+            country and introduced elsewhere in it: the chital is native on the Indian mainland and introduced to
+            the Andaman Islands. Species of mixed or uncertain origin are excluded from the invasive counts.
           </li>
           <li>
-            <strong>“Empty” is not “absent”.</strong> A zone with no invasive records may simply have few observers.
+            <strong>Parks with few observers show few records.</strong> An empty park on the map reflects
+            recording effort, and the species may still be present.
+          </li>
+          <li>
+            <strong>USGS records cover non-native aquatic species in the United States.</strong> They add
+            fishes, reptiles, amphibians, molluscs and aquatic plants, each with a source type and a coordinate
+            accuracy class. Approximate and centroid positions, failed introductions and records without a full
+            date are set aside.
           </li>
         </ul>
         <p className="hint" style={{ marginBottom: 0 }}>

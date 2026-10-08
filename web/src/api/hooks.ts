@@ -3,11 +3,13 @@ import { rest } from "./rest";
 import type {
   Alert,
   Finding,
+  HotspotResult,
   InvasiveSpecies,
   ModelVersion,
   Playbook,
   RecordsGeoJSON,
   SourceHealth,
+  SpeciesPhoto,
   StorageStatus,
   ZoneReportRow,
   ZonesGeoJSON,
@@ -27,11 +29,30 @@ const q = <T>(key: unknown[], path: string) =>
 
 export const useZones = () => useQuery(q<ZonesGeoJSON>(["zones"], "/rpc/zones_geojson"));
 
-export const useRecords = (zone: string | null) =>
-  useQuery(
-    q<RecordsGeoJSON>(
+export const useRecords = (zone: string | null, enabled = true) =>
+  useQuery({
+    ...q<RecordsGeoJSON>(
       ["records", zone],
-      `/rpc/records_geojson?p_kind=all&p_limit=5000${zone ? `&p_zone=${encodeURIComponent(zone)}` : ""}`,
+      `/rpc/records_geojson?p_kind=invasive&p_limit=5000${zone ? `&p_zone=${encodeURIComponent(zone)}` : ""}`,
+    ),
+    enabled: enabled && zone !== null,
+  });
+
+/** Invasive records grouped into square cells of `cell` degrees, with the species in each. */
+export const useHotspots = (zone: string | null, cell: number) =>
+  useQuery({
+    ...q<HotspotResult>(
+      ["hotspots", zone, cell],
+      `/rpc/hotspot_cells?p_zone=${encodeURIComponent(zone ?? "")}&p_cell=${cell}`,
+    ),
+    enabled: zone !== null,
+  });
+
+export const useSpeciesPhotos = () =>
+  useQuery(
+    q<SpeciesPhoto[]>(
+      ["species-photos"],
+      "/species?select=scientific_name,common_name,photo_url,photo_credit,photo_license,photo_source_url&photo_url=not.is.null&limit=1000",
     ),
   );
 

@@ -8,9 +8,9 @@ export function Alerts() {
     <>
       <h1>Early-detection alerts</h1>
       <p className="lede">
-        An alert means one specific thing: an invasive species was <strong>recorded in a zone for the first
-        time in the past year</strong>, after enough observation there that not having seen it earlier means
-        something. It is a prompt to go and look, never a finding.
+        An alert is raised when an invasive species is <strong>recorded in a park for the first time in
+        the past year</strong>, after enough observation there that not having seen it earlier means something.
+        Each alert is a prompt to go and look.
       </p>
 
       {alerts.isError && !alerts.data ? (
@@ -19,9 +19,11 @@ export function Alerts() {
         <Loading what="alerts" />
       ) : alerts.data.length === 0 ? (
         <Empty>
-          <strong>No alerts.</strong> No invasive species has been recorded in any zone for the first time in the
-          past year. That is a statement about the records we hold, not a clean bill of health: the dominant
-          invasive plants are rarely photographed (see Sources).
+          <div>
+            <strong>No alerts.</strong> No invasive species has been recorded in any park for the first time in
+            the past year. This describes the records held here. The dominant invasive plants are rarely
+            photographed, so the absence of an alert is limited evidence (see Sources).
+          </div>
         </Empty>
       ) : (
         <div className="card">

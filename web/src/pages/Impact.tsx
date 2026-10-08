@@ -28,8 +28,8 @@ export function Impact() {
     <>
       <h1>Impact on native ecosystems</h1>
       <p className="lede">
-        Three questions, in decreasing order of certainty. The first reports what cited sources say. The
-        other two are statistics, and each refuses to answer until there is enough data to support one.
+        Three questions, from the most certain to the least. The first reports what cited sources say. The
+        other two are statistics that give an answer only once there is enough data to support one.
       </p>
 
       {reports.isError && !rows ? (
@@ -85,7 +85,7 @@ function ZoneLayers({ report, name }: { report: ZoneReport; name: string }) {
             {reported.length > 0 && (
               <FindingGroup
                 title="Reported for this reserve, but not recorded in our data"
-                note="A report or worry about a species here is not a sighting. These are shown because they matter, and labelled so they are not mistaken for records."
+                note="The literature reports these species for this park, and none has been recorded in our data. They are listed because they matter and kept apart from sightings."
                 items={reported}
               />
             )}
@@ -166,7 +166,7 @@ function LayerResultView({ result, kind }: { result: LayerResult; kind: "co" | "
         )}
         {result.needs && <p className="hint">Needs: {result.needs}.</p>}
         <p className="hint">
-          Reporting a number from this little data would look more certain than it is, so none is shown.
+          A number computed from this little data would suggest more certainty than the records support, so none is shown.
         </p>
       </>
     );

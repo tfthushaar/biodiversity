@@ -12,7 +12,42 @@ export interface ZoneProps {
 }
 export type ZonesGeoJSON = FeatureCollection<Geometry, ZoneProps>;
 
-/** What kind of record a point is. Colour follows this, never a rank. */
+/** One species recorded in a hotspot cell. */
+export interface HotspotSpecies {
+  name: string;
+  common_name: string | null;
+  records: number;
+  first_year: number;
+  last_year: number;
+}
+
+/** A square of the map, in degrees, and the invasive records inside it. */
+export interface HotspotCell {
+  west: number;
+  south: number;
+  east: number;
+  north: number;
+  records: number;
+  species_count: number;
+  species: HotspotSpecies[];
+}
+
+export interface HotspotResult {
+  cell: number;
+  cells: HotspotCell[];
+}
+
+/** A species' representative photo, with the credit and licence its owner chose. */
+export interface SpeciesPhoto {
+  scientific_name: string;
+  common_name: string | null;
+  photo_url: string | null;
+  photo_credit: string | null;
+  photo_license: string | null;
+  photo_source_url: string | null;
+}
+
+/** What kind of record a point is. */
 export type RecordClass = "invasive" | "introduced" | "native";
 export interface RecordProps {
   species: string;
