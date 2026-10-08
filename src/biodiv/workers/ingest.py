@@ -27,6 +27,7 @@ import psycopg
 
 from biodiv.core.repo import upsert_species
 from biodiv.core.settings import get_settings
+from biodiv.ingestion import usgs_nas
 from biodiv.ingestion.gbif import (
     GbifClient,
     TaxonCache,
@@ -80,6 +81,16 @@ SOURCES = {
         "GBIF occurrences", GBIF_OCCURRENCE_API, "Per record (CC); see media_items.license",
         "Occurrence data via GBIF.org",
     ),
+    "usgs_nas": SourceSpec(
+        "USGS NAS", usgs_nas.NAS_API, usgs_nas.NAS_LICENSE,
+        "U.S. Geological Survey, Nonindigenous Aquatic Species Database",
+    ),
+}
+
+PARSERS = {
+    "inaturalist": parse_observation,
+    "gbif": parse_occurrence,
+    "usgs_nas": usgs_nas.parse_occurrence,
 }
 
 
@@ -118,6 +129,11 @@ def _ensure_source(conn: psycopg.Connection, spec: SourceSpec) -> int:
         """,
         (spec.name, spec.base_url, spec.license, spec.attribution),
     ).fetchone()[0]
+
+
+def _in_bbox(obs: Observation, bbox: tuple[float, float, float, float]) -> bool:
+    west, south, east, north = bbox
+    return west <= obs.lon <= east and south <= obs.lat <= north
 
 
 def _out_of_time(deadline: float | None) -> bool:
@@ -185,6 +201,20 @@ async def _flush(
     # costs one round trip to the database, not a hundred. That matters on a slow link: a run on
     # a US runner against a database in Asia pays about 0.2 s for every round trip.
     memo = species_ids if species_ids is not None else {}
+    # Records already stored are recognised with one query for the whole batch. A re-run reads the
+    # same records again, and a round trip each would make that slow over a distant database.
+    known = {
+        row[0]
+        for row in conn.execute(
+            "select external_id from media_items where source_id = %s and external_id = any(%s)",
+            (source_id, [o.external_id for o in batch]),
+        )
+    }
+    stats.skipped_dupe += sum(o.external_id in known for o in batch)
+    batch[:] = [o for o in batch if o.external_id not in known]
+    if not batch:
+        return
+
     # Taxonomy first (network), then one transaction for the whole batch (database).
     await resolve_into_cache(
         gbif, [(o.taxon_name, o.kingdom) for o in batch if o.gbif_taxon_key is None], cache
@@ -236,13 +266,29 @@ async def ingest_zone(
     gbif_dataset: str = "specimens",
     deadline: float | None = None,
     species_ids: dict | None = None,
+    max_stored: int | None = None,
 ) -> IngestStats:
     if not conn.autocommit:
         raise ValueError("ingest needs an autocommit connection; each batch is its own transaction")
+    if source == "usgs_nas" and zone.slug not in usgs_nas.ZONE_COUNTIES:
+        return IngestStats()  # NAS covers the United States only
 
     spec = SOURCES[source]
     source_id = _ensure_source(conn, spec)
-    scope = zone.slug if source == "inaturalist" else f"{zone.slug}:{gbif_dataset}"
+    if max_stored is not None:
+        held = conn.execute(
+            "select count(*) from media_items where zone_id = %s and source_id = %s",
+            (zone.id, source_id),
+        ).fetchone()[0]
+        if held >= max_stored:
+            log.info("%s %s: %d stored, at the cap of %d", zone.slug, source, held, max_stored)
+            return IngestStats()
+    if source == "inaturalist":
+        scope = zone.slug
+    elif source == "usgs_nas":
+        scope = f"{zone.slug}:nas"
+    else:
+        scope = f"{zone.slug}:{gbif_dataset}"
     row = conn.execute(
         "select cursor from ingestion_cursors where source_id = %s and scope = %s",
         (source_id, scope),
@@ -266,6 +312,10 @@ async def ingest_zone(
         raw = iter_observations(
             raw_http, zone.bbox, id_above=int(cursor or 0), max_results=max_results
         )
+    elif source == "usgs_nas":
+        raw = usgs_nas.iter_occurrences(
+            raw_http, usgs_nas.ZONE_COUNTIES[zone.slug], max_results=max_results
+        )
     elif gbif_dataset == "ebird":
         raw = iter_occurrences(
             raw_http, zone.bbox, dataset_key=EBIRD_DATASET, last_interpreted=cursor,
@@ -286,15 +336,18 @@ async def ingest_zone(
             stats.fetched += 1
             if source == "inaturalist":
                 new_cursor = str(max(int(new_cursor or 0), rec["id"]))
-            elif is_inaturalist_mirror(rec):
+            elif source == "gbif" and is_inaturalist_mirror(rec):
                 stats.rejected["duplicate_of_inaturalist"] += 1
                 continue
-            obs = parse_observation(rec) if source == "inaturalist" else parse_occurrence(rec)
+            obs = PARSERS[source](rec)
             if obs is None:
                 stats.rejected["unparseable"] += 1
                 continue
             if reason := validate(obs):
                 stats.rejected[reason] += 1
+                continue
+            if not _in_bbox(obs, zone.bbox):
+                stats.rejected["outside_zone"] += 1  # no database round trip needed to know this
                 continue
             batch.append(obs)
             if len(batch) >= BATCH_SIZE:
@@ -333,7 +386,7 @@ async def _amain(args: argparse.Namespace) -> int:
     settings = get_settings()
     cache_path = Path(args.cache)
     cache = load_cache(cache_path)
-    rate = 1.0 if args.source == "inaturalist" else 5.0  # iNaturalist asks for ~1 req/s
+    rate = {"inaturalist": 1.0, "usgs_nas": 2.0}.get(args.source, 5.0)  # iNaturalist asks ~1/s
     total = IngestStats()
     deadline = time.monotonic() + args.max_minutes * 60 if args.max_minutes else None
     species_ids: dict = {}
@@ -361,6 +414,7 @@ async def _amain(args: argparse.Namespace) -> int:
                         conn, zone, source=args.source, raw_http=raw_http, gbif_http=gb,
                         cache=cache, max_results=args.max, full=args.full,
                         gbif_dataset=args.gbif_dataset, deadline=deadline, species_ids=species_ids,
+                        max_stored=args.max_stored_per_zone,
                     )
                     log.info(
                         "%s: fetched %d, stored %d, duplicates %d, rejected %s",
@@ -385,6 +439,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--full", action="store_true", help="ignore the saved cursor")
     p.add_argument("--gbif-dataset", choices=["specimens", "ebird"], default="specimens")
     p.add_argument("--cache", default=str(DEFAULT_CACHE))
+    p.add_argument("--max-stored-per-zone", type=int, default=None,
+                   help="skip a zone once this source has stored this many records there")
     p.add_argument("--max-minutes", type=float, default=None,
                    help="stop cleanly after this long; progress is kept and the next run continues")
     p.add_argument("--stop-at", type=float, default=STOP_AT,

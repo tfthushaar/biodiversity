@@ -22,6 +22,9 @@ ZONES = [
     # Mudumalai is the contiguous Nilgiri landscape where Bandipur, Wayanad and Tamil Nadu meet.
     ("mudumalai", "Mudumalai National Park", "Nilgiri", "IN", "W159049306"),
     ("serengeti", "Serengeti National Park", "Serengeti", "TZ", "R4475047"),
+    # United States: two contrasting landscapes with dense records and well-studied invasions.
+    ("everglades", "Everglades National Park", "Florida Everglades", "US", "R2163707"),
+    ("smokies", "Great Smoky Mountains National Park", "Southern Appalachians", "US", "R2131838"),
 ]
 
 

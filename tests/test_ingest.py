@@ -307,3 +307,17 @@ async def test_gbif_that_stops_early_does_not_claim_to_have_read_everything(
     stats = await run(url, source="gbif", deadline=0.0)
     assert stats.stopped_early and stats.fetched == 1
     assert q(url, "select count(*) from ingestion_cursors") == [(0,)]
+
+
+async def test_a_zone_that_has_reached_its_cap_is_skipped(ingest_db_url, respx_mock):
+    """The free database is small; a cap per zone and source keeps one busy park from filling it."""
+    url = ingest_db_url
+    mock_gbif(respx_mock, {"Lantana camara": exact(2925303, "Lantana camara")})
+    mock_inat(respx_mock, [inat_obs(i, "Lantana camara") for i in range(1, 4)])
+    first = await run(url, max_stored=3)  # nothing held yet, so it runs
+    assert first.stored == 3
+    again = await run(url, full=True, max_stored=3)  # at the cap: nothing is even requested
+    assert (again.fetched, again.stored) == (0, 0)
+    assert q(url, "select count(*) from ingestion_runs") == [(1,)]
+    more = await run(url, full=True, max_stored=4)  # room again
+    assert more.fetched == 3

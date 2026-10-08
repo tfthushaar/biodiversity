@@ -23,7 +23,7 @@ MAX_UNCERTAINTY_M = 2000.0  # zone-level analysis tolerates ~2 km; coarser is mo
 
 @dataclass(frozen=True)
 class Observation:
-    source: str  # 'inaturalist' | 'gbif'
+    source: str  # 'inaturalist' | 'gbif' | 'usgs_nas'
     external_id: str
     record_url: str
     taxon_name: str
@@ -43,6 +43,7 @@ class Observation:
     uncertainty_m: float | None = None
     obscured: bool = False
     captive: bool = False
+    not_established: bool = False  # a recorded introduction that did not take hold
 
 
 _CC_URL = re.compile(r"creativecommons\.org/(licenses|publicdomain)/([a-z-]+)", re.I)
@@ -85,6 +86,8 @@ def validate(obs: Observation, *, now: datetime | None = None) -> str | None:
         return "not_species_level"
     if obs.captive:
         return "captive_or_cultivated"  # planted or caged: not a wild occurrence
+    if obs.not_established:
+        return "not_established"  # found, but the population failed
     if not obs.taxon_name:
         return "no_taxon"
     return None

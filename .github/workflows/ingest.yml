@@ -70,7 +70,8 @@ jobs:
           MAX: ${{ github.event.inputs.max || '2000' }}
         run: |
           case "$MAX" in ''|*[!0-9]*) echo "::error::max must be a number"; exit 1;; esac
-          python -m biodiv.workers.ingest --source inaturalist --max "$MAX" --max-minutes 30
+          python -m biodiv.workers.ingest --source inaturalist --max "$MAX" --max-minutes 30 \
+            --max-stored-per-zone 8000
 
       - name: GBIF specimens
         if: steps.pre.outputs.ready == 'true'
@@ -78,7 +79,16 @@ jobs:
           MAX: ${{ github.event.inputs.max || '2000' }}
         run: |
           case "$MAX" in ''|*[!0-9]*) echo "::error::max must be a number"; exit 1;; esac
-          python -m biodiv.workers.ingest --source gbif --max "$MAX" --max-minutes 15
+          python -m biodiv.workers.ingest --source gbif --max "$MAX" --max-minutes 15 \
+            --max-stored-per-zone 4000
+
+      # United States only: a curated federal database of non-native aquatic species. Each run reads
+      # every record for the zone's counties again, so most of it is recognised as already stored.
+      - name: USGS Nonindigenous Aquatic Species
+        if: steps.pre.outputs.ready == 'true'
+        run: |
+          python -m biodiv.workers.ingest --source usgs_nas --max 30000 --max-minutes 15 \
+            --max-stored-per-zone 25000
 
       # Always last, and even if a source failed: trims old run logs and reports how full the
       # database is, so a filling database shows up as a warning long before it is an outage.
