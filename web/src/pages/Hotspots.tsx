@@ -8,6 +8,7 @@ import { SpeciesCard } from "../components/SpeciesCard";
 import { fmtInt, pluralise } from "../lib/format";
 import {
   HEAT_OPACITY,
+  SIZES,
   bboxOf,
   cellKey,
   chooseCellSize,
@@ -38,7 +39,8 @@ export function Hotspots({ zone: zoneParam }: { zone: string | null }) {
     const [w, s, e, n] = bboxOf(feature.geometry);
     return Math.max(e - w, n - s);
   }, [feature]);
-  const cellSize = chooseCellSize(extent);
+  const [size, setSize] = useState<number | null>(null);
+  const cellSize = size ?? chooseCellSize(extent, feature?.properties.invasive_records ?? 0);
   const hot = useHotspots(slug, cellSize);
 
   const [species, setSpecies] = useState<string | null>(null);
@@ -51,6 +53,7 @@ export function Hotspots({ zone: zoneParam }: { zone: string | null }) {
     setSpecies(null);
     setSelected(null);
     setShowPoints(false);
+    setSize(null);
   }, [slug]);
 
   const all = hot.data?.cells ?? [];
@@ -121,6 +124,23 @@ export function Hotspots({ zone: zoneParam }: { zone: string | null }) {
               </select>
             </label>
             <label>
+              Square size
+              <select
+                value={size ?? ""}
+                onChange={(e) => {
+                  setSize(e.target.value ? Number(e.target.value) : null);
+                  setSelected(null);
+                }}
+              >
+                <option value="">Automatic</option>
+                {SIZES.map((s) => (
+                  <option key={s.deg} value={s.deg}>
+                    {s.km} km
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
               <input type="checkbox" checked={showPoints} onChange={(e) => setShowPoints(e.target.checked)} />
               Show individual records
             </label>
@@ -150,7 +170,7 @@ export function Hotspots({ zone: zoneParam }: { zone: string | null }) {
                   <span>Fewer records</span>
                   <span className="scale-bar" aria-hidden="true">
                     {HEAT_OPACITY.map((a) => (
-                      <span key={a} style={{ background: `rgba(var(--heat), ${a})` }} />
+                      <span key={a} style={{ background: `rgba(var(--hot), ${a})` }} />
                     ))}
                   </span>
                   <span>More records</span>

@@ -70,7 +70,7 @@ export function HotspotMap({ zone, cells, selected, onSelect, points, label }: H
     group.clearLayers();
     selectedBounds.current = null;
     const max = Math.max(0, ...cells.map((c) => c.records));
-    const heat = token("--heat").split(",").map((v) => v.trim()).join(",");
+    const hot = token("--hot").split(",").map((v) => v.trim()).join(",");
     const ink = token("--ink");
     for (const c of cells) {
       const key = cellKey(c);
@@ -81,7 +81,7 @@ export function HotspotMap({ zone, cells, selected, onSelect, points, label }: H
         color: ink,
         weight: isSelected ? 3 : 1,
         opacity: isSelected ? 1 : 0.4,
-        fillColor: `rgb(${heat})`,
+        fillColor: `rgb(${hot})`,
         fillOpacity: HEAT_OPACITY[heatLevel(c.records, max)],
       });
       rect.bindTooltip(`${c.records} ${c.records === 1 ? "record" : "records"}, ${c.species_count} species`);

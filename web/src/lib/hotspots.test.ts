@@ -34,9 +34,15 @@ describe("chooseCellSize", () => {
       expect([0.005, 0.01, 0.02, 0.05, 0.1]).toContain(chooseCellSize(extent));
     }
   });
-  it("aims for a few dozen squares across", () => {
+  it("aims for a few dozen squares across when there is plenty of data", () => {
     expect(chooseCellSize(0.56)).toBe(0.02);
     expect(chooseCellSize(1.4)).toBe(0.05);
+  });
+  it("uses coarser squares where records are few", () => {
+    expect(chooseCellSize(0.5, 6)).toBeGreaterThan(chooseCellSize(0.5, 5000));
+  });
+  it("copes with no records at all", () => {
+    expect([0.005, 0.01, 0.02, 0.05, 0.1]).toContain(chooseCellSize(0.5, 0));
   });
 });
 

@@ -1,15 +1,24 @@
 import type { Geometry } from "geojson";
 import type { HotspotCell, HotspotSpecies } from "../api/types";
 
-/** Cell sizes on offer, in degrees: about 0.5, 1, 2, 5 and 10 km. */
-const STEPS = [0.005, 0.01, 0.02, 0.05, 0.1];
+/** Square sizes on offer, in degrees, with their width in kilometres. */
+export const SIZES = [
+  { deg: 0.005, km: 0.5 },
+  { deg: 0.01, km: 1 },
+  { deg: 0.02, km: 2 },
+  { deg: 0.05, km: 5 },
+  { deg: 0.1, km: 10 },
+];
+const STEPS = SIZES.map((s) => s.deg);
 
 /**
- * A cell size that gives roughly 20 to 40 cells across a zone, so a small park is not one square
- * and a large one is not a blur. `extentDeg` is the larger side of the zone's bounding box.
+ * A square size that suits the park and its data: up to about 28 squares across for a park with
+ * thousands of records, and coarser squares where records are few, so a handful of records does
+ * not become a scatter of tiny marks. `extentDeg` is the larger side of the park's bounding box.
  */
-export function chooseCellSize(extentDeg: number): number {
-  const target = extentDeg / 28;
+export function chooseCellSize(extentDeg: number, records = Number.POSITIVE_INFINITY): number {
+  const across = Math.min(28, Math.max(6, Math.round(Math.sqrt(Math.max(records, 0)) * 2.5)));
+  const target = extentDeg / across;
   return STEPS.reduce((best, s) => (Math.abs(s - target) < Math.abs(best - target) ? s : best), STEPS[0]!);
 }
 
