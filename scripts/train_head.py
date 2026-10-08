@@ -1,4 +1,4 @@
-"""Train a classification head on top of the frozen backbone, and measure it honestly.
+"""Train a classification head on top of the frozen backbone, and measure it on held-out data.
 
     python scripts/train_head.py plants
     python scripts/train_head.py animals
