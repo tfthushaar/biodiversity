@@ -94,6 +94,29 @@ def test_the_public_can_see_how_full_the_database_is(anon):
     assert status["budget_bytes"] == 500 * 1024 * 1024 and status["db_bytes"] > 0
 
 
+def test_iucn_threat_rows_are_hidden_from_the_public_but_literature_rows_are_not(ingest_db_url):
+    """IUCN's terms forbid redistributing its data without written permission (migration 0017)."""
+    with psycopg.connect(ingest_db_url) as conn:
+        native, invasive = (
+            conn.execute("insert into species (scientific_name) values (%s) returning id", (n,)
+                         ).fetchone()[0]
+            for n in ("Native example", "Invasive example")
+        )
+        conn.execute(
+            "insert into threat_links (native_species_id, invasive_species_id, iucn_threat_code, "
+            "evidence_source, citation) values (%s, %s, '8.1.2', 'iucn', 'IUCN example')",
+            (native, invasive))
+        conn.execute(
+            "insert into threat_links (native_species_id, invasive_species_id, "
+            "evidence_source, citation, citation_url) values (%s, %s, 'literature', "
+            "'A paper', 'https://example.org/paper')", (native, invasive))
+        conn.commit()
+        assert conn.execute("select count(*) from threat_links").fetchone()[0] == 2  # owner: both
+        conn.execute("set local role anon")
+        visible = [r[0] for r in conn.execute("select evidence_source from threat_links")]
+    assert visible == ["literature"]
+
+
 def test_the_point_query_is_capped_whatever_the_caller_asks_for(ingest_db_url):
     from helpers import World, day
 
