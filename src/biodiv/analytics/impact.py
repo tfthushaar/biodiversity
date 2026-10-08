@@ -37,12 +37,13 @@ MIN_RECORDS_PER_YEAR = 15  # observations in a zone-year for it to count
 MIN_INVASIVE_RECORDS = 30  # invasive records needed in a zone for a trend
 
 CAUTION_COOCCURRENCE = (
-    "Correlation, not cause. Invasives and natives may both depend on disturbance, access or "
-    "where observers go; richness is rarefied to reduce, not remove, the effect of effort."
+    "This is a correlation and does not show cause. Invasives and natives may both depend on "
+    "disturbance, access or where observers go. Richness is rarefied to reduce the effect of "
+    "effort, and some of that effect remains."
 )
 CAUTION_TREND = (
-    "A trend in records is not a trend in abundance, and says nothing about cause. Observer "
-    "numbers and habits change over the years."
+    "A trend in records reflects recorded presence over time. It does not show a change in "
+    "abundance or its cause, and observer numbers and habits change over the years."
 )
 
 

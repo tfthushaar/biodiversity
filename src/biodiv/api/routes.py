@@ -17,8 +17,8 @@ from biodiv.inference.pipeline import analyse
 router = APIRouter(prefix="/api/v1")
 
 NOTICE = (
-    "A decision aid, not an identification. Confirm with a botanist or ranger before acting. "
-    "Your image was analysed in memory and not stored."
+    "Treat this as a decision aid and confirm with a botanist or ranger before acting. "
+    "Your image was analysed in memory and is not stored."
 )
 
 

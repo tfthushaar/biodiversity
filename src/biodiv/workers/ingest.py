@@ -235,7 +235,8 @@ async def _flush(
 
     # Records outside every park boundary are set aside now, before any taxonomy lookups.
     zone_ids = _zones_for(conn, batch)
-    stats.rejected["outside_zone"] += sum(z is None for z in zone_ids)
+    if outside := sum(z is None for z in zone_ids):
+        stats.rejected["outside_zone"] += outside
     inside = [(o, z) for o, z in zip(batch, zone_ids, strict=True) if z is not None]
     batch[:] = [o for o, _ in inside]
     zone_of = [z for _, z in inside]

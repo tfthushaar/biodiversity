@@ -23,13 +23,13 @@ CAVEATS = {
     "plants": [
         "Trained on naturalist close-ups; ranger snapshots taken from a distance are a "
         "different distribution, and that shift is unmeasured.",
-        "Zero native look-alikes called invasive is the absence of observed errors, not proof of "
-        "none: the 95% interval reaches 3.3%.",
+        "No native look-alike was called invasive in testing. With this many trials the true "
+        "rate could still be as high as 3.3% (95% interval).",
         "It labels a photo. It cannot say how much ground a species covers.",
     ],
     "animals": [
-        "North American species from Caltech Camera Traps: a demonstration of the pipeline and a "
-        "measure of generalisation, not a model of Indian or African fauna.",
+        "North American species from Caltech Camera Traps. The model demonstrates the pipeline "
+        "and measures generalisation; Indian and African fauna are outside its scope.",
         "The 'same cameras' figure also lets near-identical burst frames fall on both sides, so "
         "part of the gap to unseen cameras is leakage.",
     ],

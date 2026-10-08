@@ -81,7 +81,7 @@ def test_where_invasives_are_denser_native_richness_is_lower_when_that_is_true(w
     assert d["cells_usable"] == 36 and d["richness_compared_at"] == RAREFY_TO
     assert d["spearman_rho"] < -0.7
     assert d["ci95"][1] < 0  # the whole interval is below zero
-    assert "Correlation, not cause" in result.caution
+    assert "does not show cause" in result.caution
 
 
 def test_no_relationship_gives_an_interval_that_includes_zero(world):
@@ -136,7 +136,7 @@ def test_a_rising_invasive_share_and_falling_native_share_is_detected(world):
     inv, nat = r.detail["invasive_per_observation"], r.detail["native_per_observation"]
     assert inv["tau"] == pytest.approx(1.0) and inv["p_value"] < 0.01 and inv["slope"] > 0
     assert nat["tau"] < 0 and nat["slope"] < 0
-    assert "not a trend in abundance" in r.caution
+    assert "does not show a change in abundance" in r.caution
 
 
 def test_too_few_years_is_refused(world):

@@ -1,34 +1,71 @@
 # Biodiversity Monitoring Using AI Vision
 
-A software-only platform that ingests public wildlife imagery and biodiversity records, detects
-species with deep-learning vision, and shows **where invasive species are established, how they
-are spreading, which native species they threaten, and what the published evidence says to do
-about it**, on a dashboard for researchers, NGOs and policymakers.
+A free, open platform that gathers public wildlife and invasive-species records, identifies animals
+and plants in photos with deep-learning models, and shows where invasive species concentrate in
+protected landscapes, what published research reports about their effect on native species, and how
+they have been managed. It is built for researchers, conservation groups and park managers.
 
-> Project by K N Thushaar Rangan, Yashas S, Amogh P A and G Ritzia.
+Project by K N Thushaar Rangan, Yashas S, Amogh P A and G Ritzia.
 
 ## Live
 
 | | |
 |---|---|
 | Dashboard | <https://biodiversity-ecru.vercel.app> |
-| API (photo analysis, GraphQL), with interactive docs | <https://biodiversity-4xvo.onrender.com/docs> |
+| API (photo analysis, GraphQL), with interactive documentation | <https://biodiversity-4xvo.onrender.com/docs> |
 
-The data refreshes itself every few hours. The API runs on a free host that sleeps when idle, so a
-request after a quiet spell can take about a minute; the dashboard does not depend on it.
+The data refreshes every few hours. The API runs on a free host that sleeps when idle, so a request
+after a quiet spell can take about a minute. The dashboard works without it.
 
-## Everything is free, with no credit card
+## What it covers
+
+Six national parks on three continents:
+
+| Park | Country |
+|---|---|
+| Bandipur, Nagarahole, Mudumalai | India |
+| Serengeti | Tanzania |
+| Everglades, Great Smoky Mountains | United States |
+
+Sources of records and status:
+
+| Source | Used for |
+|---|---|
+| iNaturalist (research grade) | Community observations of plants and animals |
+| GBIF | Museum and herbarium specimens |
+| GRIIS country checklists | Which species are alien and invasive in each country |
+| USGS Nonindigenous Aquatic Species database | Curated records of non-native fishes, reptiles, amphibians, molluscs and aquatic plants in the United States |
+| Caltech Camera Traps (LILA BC) | Camera-trap images for testing the detector |
+| Published literature and species profiles | Cited findings on effects and management, each with verbatim quotes |
+
+## What the dashboard offers
+
+- **Hotspots.** A map of each park with squares shaded red by the number of invasive records.
+  Selecting a square lists the species there, each with a photo, the number of records, and the
+  cited research on its effect on the local environment.
+- **Species.** One page per species: where it is recorded, what research reports, and the
+  management options that have been tried.
+- **Impact.** Three questions in order of certainty: what cited sources report, whether native
+  richness is lower where invaders are dense, and whether the invasive share is changing. The two
+  statistical questions answer only when the data meets stated minimums, and the page shows how far
+  each park is from them.
+- **Alerts, Models, Sources.** First records of invasive species, measured accuracy of each model,
+  and where the data came from with its licence.
+
+## Hosting and cost
+
+Everything runs on free tiers that need no credit card.
 
 | Part | Host |
 |---|---|
-| Dashboard (React 18 + TypeScript) | Vercel Hobby |
-| Database (Postgres + PostGIS) with REST and GraphQL | Supabase free |
-| Custom API (FastAPI), optional | Render free |
-| Ingestion, inference, analytics | GitHub Actions cron (free on public repos) |
+| Dashboard (React 18, TypeScript) | Vercel Hobby |
+| Database (Postgres with PostGIS), REST API | Supabase free |
+| Photo analysis and GraphQL API (FastAPI), optional | Render free |
+| Data collection, inference and analysis | GitHub Actions on a public repository |
 | Model training | Kaggle free GPU |
-| Model weights | Hugging Face Hub |
 
-See [docs/free-tier-gate.md](docs/free-tier-gate.md) for the signup checklist and fallbacks.
+[docs/free-tier-gate.md](docs/free-tier-gate.md) has the signup checklist, the secrets to set, and
+the fallback for each service.
 
 ## Quick start
 
@@ -44,72 +81,67 @@ cd web && npm install && npm run dev
 npm test && npm run build
 ```
 
-Copy `.env.example` to `.env` for local configuration. Never commit real keys.
+Copy `.env.example` to `.env` for local settings. Keep real keys out of version control.
 
 ## Loading data
 
 ```bash
 export DATABASE_URL=postgresql://...                     # a Postgres with PostGIS
-python -m biodiv.workers.migrate --seed                  # schema + monitored zones
-python -m biodiv.workers.import_griis --resource griis-india      # which species are invasive
+python -m biodiv.workers.migrate --seed                  # schema and the six parks
+python -m biodiv.workers.import_griis --resource griis-india
 python -m biodiv.workers.import_griis --resource griis_tanzania
-python -m biodiv.workers.ingest --source inaturalist --max 2000   # community observations
-python -m biodiv.workers.ingest --source gbif                     # museum/herbarium specimens
-python -m biodiv.workers.detect --model data/models/MDV6-mit-yolov9-c.onnx   # find animals in images
-python -m biodiv.workers.seed_knowledge                           # cited impacts and mitigation
-python -m biodiv.workers.analyse                                  # alerts and per-zone report
+python -m biodiv.workers.import_griis --resource griis-contiguous-united-states-of-america
+python -m biodiv.workers.ingest --source inaturalist --max 2000
+python -m biodiv.workers.ingest --source gbif
+python -m biodiv.workers.ingest --source usgs_nas        # United States parks only
+python -m biodiv.workers.seed_knowledge                  # cited findings and management options
+python -m biodiv.workers.enrich_species                  # one licensed photo per species
+python -m biodiv.workers.analyse                         # alerts and per-park reports
 ```
 
+Each run is incremental and safe to repeat, and each source is queried politely (rate limited,
+retried with backoff). A cap per park and source keeps the free database from filling, and
+ingestion stops at 90% of the database budget.
+
 Species are named by small trained heads on a shared DINOv2 backbone: an invasive-plant classifier
-(10 invasives plus native look-alikes, with an explicit "unknown") and a camera-trap animal
-classifier. Both run on CPU, and both come with honest, reproducible measurements of how often
-they are wrong; see the classifier section of [docs/models.md](docs/models.md).
-
-How the data is served (a read-only public REST path with no server of ours, plus a small API for
-the live photo demo and GraphQL), and exactly what the public can and cannot do, is in
-[docs/api.md](docs/api.md). Run `python scripts/smoke_rest.py <url>` against any deployment.
-
-What invasive species do to a zone is reported in three layers of decreasing certainty (cited
-findings, co-occurrence, trend). The statistical ones decline to answer when the data is too thin,
-which today it is; the cited knowledge base (impacts and management, every claim backed by a
-verbatim quote that a script re-checks against the live source) is described in
-[docs/impact.md](docs/impact.md).
-
-The detector is MegaDetector V6 (MIT) converted to ONNX and run on CPU. How it was made, how it
-was verified against the reference implementation, and how accurate it is, including the
-mistakes made while measuring that: [docs/models.md](docs/models.md).
-
-Each run is incremental and idempotent, and polite to the source APIs (rate-limited, retried
-with backoff). Read [docs/data-quality.md](docs/data-quality.md) before interpreting any numbers:
-it records what the data can and cannot support.
+(ten invasives and native look-alikes, with an explicit "unknown") and a camera-trap animal
+classifier. Both run on CPU. [docs/models.md](docs/models.md) reports their measured accuracy.
 
 ## Scheduled jobs
 
-Once the `DATABASE_URL` secret exists, GitHub Actions keeps the data fresh on its own:
+Once the `DATABASE_URL` secret exists, GitHub Actions keeps the data current:
 [ingest](.github/workflows/ingest.yml) every 6 hours, then [detect](.github/workflows/infer.yml),
-then [analyse](.github/workflows/analytics.yml). Ingestion stops itself before the free database
-fills (see [docs/free-tier-gate.md](docs/free-tier-gate.md)). Until the secret exists each
-workflow explains itself and exits cleanly.
+then [analyse](.github/workflows/analytics.yml). Without the secret each workflow reports that it
+has nothing to do and exits.
 
 ## Documentation
 
 | | |
 |---|---|
-| [docs/architecture.md](docs/architecture.md) | How the pieces fit, what runs where, what is not built yet |
-| [docs/free-tier-gate.md](docs/free-tier-gate.md) | Account checklist, secrets, staying inside free limits |
-| [docs/dashboard.md](docs/dashboard.md) | The pages, configuration, deploying, design decisions |
-| [docs/api.md](docs/api.md) | The public REST path, the API, and what the public cannot do |
-| [docs/models.md](docs/models.md) | The detector and classifiers, with measured accuracy and caveats |
-| [docs/impact.md](docs/impact.md) | How invasive-species impact is analysed and why it often says "not enough data" |
-| [docs/data-quality.md](docs/data-quality.md) | What the data can and cannot support |
-| [docs/iucn.md](docs/iucn.md) | The IUCN threat link, waiting on an API token |
+| [docs/architecture.md](docs/architecture.md) | How the pieces fit and what runs where |
+| [docs/dashboard.md](docs/dashboard.md) | Pages, configuration, deployment and design decisions |
+| [docs/api.md](docs/api.md) | The public REST path, the API, and what the public can access |
+| [docs/models.md](docs/models.md) | The detector and classifiers with measured accuracy and limits |
+| [docs/impact.md](docs/impact.md) | How impact is analysed and why the statistics often wait for more data |
+| [docs/data-quality.md](docs/data-quality.md) | What the data supports and where it falls short |
+| [docs/free-tier-gate.md](docs/free-tier-gate.md) | Accounts, secrets and staying inside free limits |
+| [docs/iucn.md](docs/iucn.md) | IUCN Red List data: terms of use and current status |
+| [paper.md](paper.md) | A paper describing the method and results |
 
 ## Layout
 
-`src/biodiv/` holds the Python package (ingestion, inference, analytics, api, workers), `web/` the
-dashboard, `db/` the SQL migrations and seeds, `notebooks/` the training notebooks.
+`src/biodiv/` is the Python package (ingestion, inference, analytics, API, workers), `web/` the
+dashboard, `db/` the SQL migrations and seeds, `scripts/` the data-preparation and checking tools,
+and `notebooks/` the training notebooks.
 
-## Licence
+## Data and licence
 
-Apache-2.0. See [LICENSE](LICENSE). Third-party data keeps its own licence; the dashboard's
-Sources view shows each one.
+The code is Apache-2.0 ([LICENSE](LICENSE)). Data keeps the licence of its source, shown on the
+Sources page. Please cite the sources when you reuse results:
+
+- iNaturalist contributors, via iNaturalist.org and GBIF.org.
+- Pagad, S., et al. (2018) Introducing the Global Register of Introduced and Invasive Species.
+  Scientific Data 5, 170202.
+- U.S. Geological Survey. Nonindigenous Aquatic Species Database. Gainesville, Florida.
+  The database asks users to contact its team before publishing results that depend on it.
+- Park boundaries: OpenStreetMap contributors, ODbL.
