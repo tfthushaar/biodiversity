@@ -94,6 +94,7 @@ function ZoneLayers({ report, name }: { report: ZoneReport; name: string }) {
         <p className="hint">{documented.note}</p>
       </Layer>
 
+      <div className="cols">
       <Layer n={2} title="Co-occurrence" question="Where invasive records are denser, is native richness lower?">
         <LayerResultView result={cooccurrence} kind="co" />
       </Layer>
@@ -101,6 +102,7 @@ function ZoneLayers({ report, name }: { report: ZoneReport; name: string }) {
       <Layer n={3} title="Trend over time" question="Is the invasive share of records rising while native records fall?">
         <LayerResultView result={trend} kind="trend" />
       </Layer>
+      </div>
     </>
   );
 }

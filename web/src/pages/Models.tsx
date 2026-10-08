@@ -86,14 +86,16 @@ function PlantSection({ m }: { m?: ModelVersion }) {
         </>
       }
     >
-      <div className="grid" aria-label="Plant classifier results">
+      <div className="cols">
+      <div className="grid stats" aria-label="Plant classifier results">
         <StatTile label="Right, when it names a plant" value={fmtPct(x.accuracy_when_answered)} sub={`names ${fmtPct(x.answered, 0)} of photos; the rest are “unknown”`} />
         <StatTile label="Invasives correctly named" value={fmtPct(x.invasives_correctly_named?.rate)} sub={`${counts(x.invasives_correctly_named)} · ${interval(x.invasives_correctly_named)}`} />
         <StatTile label="Native look-alikes called invasive" value={counts(look)} sub={interval(look)} />
         <StatTile label="Other plants called invasive" value={fmtPct(other?.rate)} sub={`${counts(other)} · ${interval(other)}`} />
       </div>
 
-      <h3 style={{ marginTop: 20 }}>The threshold trades coverage for caution</h3>
+      <div>
+      <h3 style={{ marginTop: 0 }}>The threshold trades coverage for caution</h3>
       <div className="card">
         <p className="hint" style={{ marginTop: 0 }}>
           Raising the confidence needed before it names a plant makes it name fewer plants and wrongly call far
@@ -107,6 +109,8 @@ function PlantSection({ m }: { m?: ModelVersion }) {
           xFormat={(v) => v.toFixed(2)}
           yFormat={pct}
         />
+      </div>
+      </div>
       </div>
       <Caveats items={x.caveats} />
     </Section>
@@ -127,12 +131,14 @@ function AnimalSection({ m }: { m?: ModelVersion }) {
       title="Camera-trap animal classifier"
       intro={<>Identifies 13 North American species from Caltech Camera Traps. It demonstrates the pipeline and measures how well a classifier transfers to cameras it was not trained on.</>}
     >
-      <div className="grid" aria-label="Animal classifier results">
+      <div className="cols">
+      <div className="grid stats" aria-label="Animal classifier results">
         <StatTile label="Accuracy on cameras never seen" value={fmtPct(x.new_cameras_top1)} sub={`${fmtInt(x.test_photos)} crops · baseline ${fmtPct(x.majority_class_baseline, 0)}`} />
         <StatTile label="…with the same cameras on both sides" value={fmtPct(x.same_cameras_top1)} sub={gap != null ? `unseen cameras cost ${(gap * 100).toFixed(1)} points` : undefined} />
         <StatTile label="Right, when it names an animal" value={fmtPct(x.accuracy_when_answered)} sub={`names ${fmtPct(x.answered, 0)} of crops`} />
       </div>
-      <h3 style={{ marginTop: 20 }}>Coverage against reliability</h3>
+      <div>
+      <h3 style={{ marginTop: 0 }}>Coverage against reliability</h3>
       <div className="card">
         <LineChart
           series={series}
@@ -141,6 +147,8 @@ function AnimalSection({ m }: { m?: ModelVersion }) {
           xFormat={(v) => v.toFixed(2)}
           yFormat={pct}
         />
+      </div>
+      </div>
       </div>
       <Caveats items={x.caveats} />
     </Section>
@@ -163,12 +171,13 @@ function DetectorSection({ m }: { m?: ModelVersion }) {
       title="Detector (MegaDetector V6)"
       intro={<>Finds animals, people and vehicles in a camera-trap frame. Tested on {fmtInt(x.images)} real Caltech Camera Traps photos against human-drawn labels.</>}
     >
-      <div className="grid" aria-label="Detector results at threshold 0.2">
+      <div className="cols">
+      <div className="grid stats" aria-label="Detector results at threshold 0.2">
         <StatTile label="Animal photos found" value={fmtPct(r02?.recall)} sub="at confidence 0.2" />
         <StatTile label="Flagged photos that had an animal" value={fmtPct(r02?.precision)} sub="at confidence 0.2" />
         <StatTile label="Empty photos flagged" value={fmtPct(r02?.false_alarm_rate)} sub="an upper bound: see below" />
       </div>
-      <div className="card" style={{ marginTop: 14 }}>
+      <div className="card">
         <LineChart
           series={series}
           caption="Detector: effect of the confidence threshold"
@@ -176,6 +185,7 @@ function DetectorSection({ m }: { m?: ModelVersion }) {
           xFormat={(v) => v.toFixed(1)}
           yFormat={pct}
         />
+      </div>
       </div>
       <Caveats
         items={[

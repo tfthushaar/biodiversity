@@ -183,7 +183,9 @@ function Dossier({ entry, playbooks, findings, reports }: { entry: Entry; playbo
         )}
       </div>
 
-      <h2>What research reports</h2>
+      <div className="cols">
+      <div>
+      <h2 style={{ marginTop: 24 }}>What research reports</h2>
       {fds.length === 0 ? (
         <Empty>No cited findings for this species yet.</Empty>
       ) : (
@@ -202,7 +204,9 @@ function Dossier({ entry, playbooks, findings, reports }: { entry: Entry; playbo
         </div>
       )}
 
-      <h2>What has been tried</h2>
+      </div>
+      <div>
+      <h2 style={{ marginTop: 24 }}>What has been tried</h2>
       {pbs.length === 0 ? (
         <Empty>
           No cited management guidance for this species yet.
@@ -220,6 +224,8 @@ function Dossier({ entry, playbooks, findings, reports }: { entry: Entry; playbo
           </div>
         </>
       )}
+      </div>
+      </div>
     </section>
   );
 }

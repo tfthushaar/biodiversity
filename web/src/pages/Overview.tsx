@@ -126,6 +126,8 @@ function ZoneOverview({
         />
       </div>
 
+      <div className="cols wide-left">
+      <div>
       <h2>Invasive records by park</h2>
       <div className="card">
         <p className="hint" style={{ marginTop: 0 }}>
@@ -141,7 +143,9 @@ function ZoneOverview({
           max={Math.max(1, ...items.map((i) => i.value))}
         />
       </div>
+      </div>
 
+      <div>
       <h2>What the data supports</h2>
       {!sum ? (
         <Loading what="analysis" />
@@ -179,6 +183,8 @@ function ZoneOverview({
       <p style={{ marginTop: 14 }}>
         <a href="#/impact">See what each question needs</a>
       </p>
+      </div>
+      </div>
 
       {alerts === 0 && (
         <Empty>

@@ -28,6 +28,9 @@
   --heat: 32, 33, 36;
   --hot: 217, 48, 37;
   --shadow: 0 1px 2px rgba(60, 64, 67, 0.2), 0 2px 6px 2px rgba(60, 64, 67, 0.1);
+  /* The page uses the whole width: side margins grow gently with the screen. */
+  --gutter: clamp(16px, 3vw, 64px);
+  --stage: clamp(520px, calc(100vh - 290px), 900px);
   color-scheme: light;
 }
 
@@ -149,9 +152,9 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .topbar-inner {
-  max-width: 1120px;
+  max-width: 2400px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--gutter);
   display: flex;
   align-items: center;
   gap: 24px;
@@ -207,15 +210,15 @@ body {
 }
 
 main {
-  max-width: 1120px;
+  max-width: 2400px;
   margin: 0 auto;
-  padding: 40px 24px 72px;
+  padding: 40px var(--gutter) 72px;
 }
 
 footer {
-  max-width: 1120px;
+  max-width: 2400px;
   margin: 0 auto;
-  padding: 24px 24px 48px;
+  padding: 24px var(--gutter) 48px;
   color: var(--muted);
   font-size: 13px;
   border-top: 1px solid var(--border);
@@ -245,7 +248,7 @@ p {
   margin: 0 0 12px;
 }
 .lede {
-  max-width: 68ch;
+  max-width: 100ch;
   margin: 0 0 28px;
   font-size: 17px;
   line-height: 1.55;
@@ -311,6 +314,35 @@ a.card strong {
   display: block;
   font-size: 16px;
   font-weight: 500;
+}
+
+/* Two related blocks side by side on wide screens, stacked on narrow ones. */
+.cols {
+  display: grid;
+  gap: 24px 32px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+.cols.wide-left {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+}
+.cols .grid.stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.cols > * {
+  min-width: 0;
+}
+.cols.wide-left .grid {
+  grid-template-columns: 1fr;
+}
+.cols > .card {
+  margin-top: 0;
+}
+@media (max-width: 1100px) {
+  .cols,
+  .cols.wide-left {
+    grid-template-columns: 1fr;
+  }
 }
 
 .grid {
@@ -675,7 +707,7 @@ blockquote {
 .chart {
   display: block;
   width: 100%;
-  max-width: 720px;
+  max-width: 960px;
   height: auto;
   overflow: visible;
 }
@@ -787,7 +819,7 @@ blockquote {
 /* ------------------------------------------------------------------ map & hotspots */
 
 .map {
-  height: 560px;
+  height: var(--stage);
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
@@ -836,12 +868,12 @@ blockquote {
 }
 .split {
   display: grid;
-  gap: 24px;
-  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+  gap: 28px;
+  grid-template-columns: minmax(0, 2fr) minmax(340px, 1fr);
   align-items: start;
 }
 .panel {
-  max-height: 560px;
+  max-height: var(--stage);
   overflow-y: auto;
   padding-right: 4px;
 }
