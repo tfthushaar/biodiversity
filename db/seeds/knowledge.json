@@ -1,5 +1,5 @@
 {
-  "_about": "Curated, cited knowledge about the invasive species in the pilot zones. Rule: no verbatim quote, no row. Every quote is machine-checked against the live source by scripts/verify_citations.py. Descriptions are restatements for readers; the quotes are the evidence. Nothing here is a recommendation to act: it summarises what published sources report, with their caveats.",
+  "_about": "Curated, cited knowledge about the invasive species recorded in the parks. Rule: no verbatim quote, no row. scripts/verify_citations.py checks every quote against its live source. The descriptions restate the sources for readers and the quotes are the evidence. The rows summarise what published sources report, with their caveats.",
   "verified_on": "2026-10-08",
   "sources": {
     "gisd_lantana": {
@@ -100,7 +100,7 @@
       "effectiveness": "variable",
       "evidence_strength": "low",
       "cost_tier": null,
-      "risks": "Clearing without follow-up is not a one-off fix: the same profile says repeated control of regrowth is critical.",
+      "risks": "Clearing without follow-up gives no lasting result: the same profile says repeated control of regrowth is critical.",
       "failure_cases": null,
       "region_note": "General global guidance; not specific to India or to forest reserves.",
       "source": "gisd_lantana",
@@ -116,7 +116,7 @@
       "effectiveness": "low",
       "evidence_strength": "moderate",
       "cost_tier": null,
-      "risks": "Partial success only; agents are not a substitute for other control.",
+      "risks": "Partial success only; agents need to be combined with other control.",
       "failure_cases": "None of the over 40 agents trialled gave total control.",
       "region_note": "Trials reported worldwide in a review (Day et al. 2003, cited by GISD). Outcomes in Indian forests are not documented in this source.",
       "source": "gisd_lantana",
@@ -166,7 +166,7 @@
       "cost_tier": null,
       "risks": "Possible soil disturbance and erosion on slopes, raised by one researcher; contested by the practitioner.",
       "failure_cases": null,
-      "region_note": "Tholpetty range, Wayanad Wildlife Sanctuary. A practitioner's account, not a measured study.",
+      "region_note": "Tholpetty range, Wayanad Wildlife Sanctuary. A practitioner's account without measurements.",
       "source": "mongabay_senna",
       "quotes": [
         "Senna trees have been removed completely from 0.6 km² using the uprooting method where the entire tree is manually and mechanically uprooted.",
@@ -183,7 +183,7 @@
       "cost_tier": null,
       "risks": "Cut stumps resprout, and opening the overstorey triggers germination of stored seed.",
       "failure_cases": "Management efforts increased density and spread.",
-      "region_note": "Wayanad Wildlife Sanctuary, Kerala. A conservation article by a researcher who has mapped the spread since 2012, not a controlled study. It groups uprooting with the other methods, whereas the 2023 article reports local success for uprooting; the two accounts differ.",
+      "region_note": "Wayanad Wildlife Sanctuary, Kerala. A conservation article by a researcher who has mapped the spread since 2012, with no controlled comparison. It groups uprooting with the other methods, while the 2023 article reports local success for uprooting, so the two accounts differ.",
       "source": "roundglass_senna",
       "quotes": [
         "However, none of the management efforts succeeded in stopping or even limiting the spread of the golden shower tree.",
@@ -194,7 +194,7 @@
     {
       "species": "Senna spectabilis",
       "method": "cultural",
-      "summary": "Senna is described as excellent lightweight timber, and a researcher argues that policy changes allowing removal and sale outside the forest would motivate local communities to clear it. This is a proposal, not an evaluated method.",
+      "summary": "Senna is described as excellent lightweight timber, and a researcher argues that policy changes allowing removal and sale outside the forest would motivate local communities to clear it. This is a proposal that has not been evaluated.",
       "effectiveness": "variable",
       "evidence_strength": "low",
       "cost_tier": null,
@@ -324,7 +324,7 @@
       "effectiveness": "variable",
       "evidence_strength": "moderate",
       "cost_tier": null,
-      "risks": "A recommendation by the study's authors, not a tested outcome.",
+      "risks": "A recommendation by the study's authors with no tested outcome.",
       "failure_cases": null,
       "region_note": "Banni grassland, Gujarat; socio-ecological context of pastoral communities.",
       "source": "nerlekar2021",
@@ -423,7 +423,7 @@
       "affected": "dominant large mammal species",
       "summary": "Preliminary survey work in Bandipur found an inverse pattern between the distribution of invasive plants (Lantana, Eupatorium/Chromolaena and Parthenium are named together) and that of dominant large mammals. This is a correlation from preliminary work, and the same page says the infestation's extent and effects were still unquantified.",
       "certainty": "preliminary",
-      "region_note": "Bandipur National Park. A 2007 project description, not a published result.",
+      "region_note": "Bandipur National Park. A 2007 project description.",
       "source": "rufford_bandipur",
       "quotes": [
         "Preliminary work by our team in Bandipur has shown a striking inverse pattern in the distribution of the above invasive plants and the overall distribution of dominant large mammal species.",
@@ -492,7 +492,7 @@
       "affected": "native grassland plants",
       "summary": "Documented to suppress native grassland vegetation, though it also provides benefits to some local people, which complicates removal.",
       "certainty": "experimental",
-      "region_note": "Banni grassland, Gujarat. A controlled experiment, in an arid grassland rather than forest.",
+      "region_note": "Banni grassland, Gujarat. A controlled experiment in an arid grassland, whose conditions differ from forest.",
       "source": "nerlekar2021",
       "quotes": [
         "Apart from its detrimental impact on grasslands, Prosopis also has benefits varying with stakeholder groups, and its removal involves complex trade-offs."
@@ -505,7 +505,7 @@
       "affected": "native tree regeneration and biodiversity",
       "summary": "Reported to have spread across protected areas in the Western and Eastern Ghats of three states and to suppress regeneration of native trees.",
       "certainty": "observational",
-      "region_note": "Southern India (Kerala, Tamil Nadu, Karnataka). Reported by journalists and researchers, not a single controlled study.",
+      "region_note": "Southern India (Kerala, Tamil Nadu, Karnataka). Reported by journalists and researchers across several articles, with no controlled study.",
       "source": "mongabay_senna",
       "quotes": [
         "Senna has spread across various protected areas in the Western and Eastern Ghats in three south Indian states, leading to a decline in native biodiversity."

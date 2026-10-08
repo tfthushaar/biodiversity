@@ -1,98 +1,109 @@
-# Impact analysis and mitigation knowledge
+# Impact analysis and management knowledge
 
-How the platform reasons about what invasive species do to a zone's native ecosystem, and what it
-knows about managing them. The design rule throughout: **say what the evidence is, and decline to
-answer when it is too thin.**
+This document describes how the platform estimates what invasive species do to a park's native
+ecosystem and what it records about managing them. Each claim states its evidence, and an analysis
+declines to answer when the data is too thin to support it.
 
-Run it: `python -m biodiv.workers.analyse` (all zones, or `--zone bandipur`).
+Run it with `python -m biodiv.workers.analyse` (all parks, or `--zone bandipur`).
 
-## Three layers, in decreasing certainty
+## Three layers, from most to least certain
 
-| Layer | Question | Needs | Status on today's data |
+| Layer | Question | Needs | Status |
 |---|---|---|---|
-| **1. Documented findings** | What do cited sources report about these species here? | nothing: no inference by us | **Available.** 13 findings from 7 sources |
-| **2. Co-occurrence** | Where invasives are denser, is native richness lower? | 20+ grid cells with 10+ native records, 5+ of them also holding invasives | **Insufficient** in every zone (6 to 14 usable cells) |
-| **3. Trend** | Is the invasive share rising while natives fall? | 6+ years with 15+ observations each, and 30+ invasive records | **Insufficient** in every zone (at most 8 invasive records) |
+| 1. Documented findings | What do cited sources report about these species here? | Nothing beyond the sources | Available for the species with cited findings |
+| 2. Co-occurrence | Where invasives are denser, is native richness lower? | 20 or more grid cells with 10 or more native records each, and 5 or more of those also holding invasive records | STATUS_CO |
+| 3. Trend | Is the invasive share rising while natives fall? | 6 or more years with 15 or more observations each, and 30 or more invasive records in the park | STATUS_TREND |
 
-Layers 2 and 3 are implemented, tested, and gated. On the real data they answer
-*"insufficient: only 8 invasive records in the zone (need 30)"* and give the reason and what would
-help, rather than a number. A confident-looking statistic computed from a handful of records
-would be worse than no statistic.
+Layers 2 and 3 are implemented, tested and gated by those minimums. Below them, the result is
+"insufficient", with the reason and what would help, for example *"only 8 invasive records in the
+zone (need 30)"*. A statistic computed from a handful of records would suggest more certainty than
+the records support, so none is shown. The dashboard's Impact page shows each park's distance from
+each minimum as a meter.
 
 ### Layer 1: documented findings
 
-`db/seeds/knowledge.json`, loaded into `impact_findings` and `mitigation_playbooks`. Every row
-carries **verbatim quotes** from a named source, a note on **where the evidence is from**, and a
-certainty label (`experimental`, `observational`, `review`, `preliminary`, `unverified_concern`).
+`db/seeds/knowledge.json` is loaded into `impact_findings` and `mitigation_playbooks`. Every row
+carries verbatim quotes from a named source, a note on where the evidence was gathered, and a
+certainty label: `experimental`, `observational`, `review`, `preliminary` or `unverified_concern`.
 
-- **`scripts/verify_citations.py`** re-downloads each source and checks that every quote really
-  appears, tolerating only typography (curly quotes, dashes, case, spacing), never wording. All 50
-  quotes in 28 rows currently verify. It exists because a summarising tool once produced a "quote"
-  the page did not contain. A weekly workflow re-runs it to catch pages that change or vanish.
-- Findings about a zone are shown even when we hold no record of the species there, flagged
-  **"reported, not recorded here"**. A worry is not an occurrence.
-- Species-level IUCN threat links (code 8.1.2) are still pending an API token
-  ([iucn.md](iucn.md)).
+- `scripts/verify_citations.py` downloads each source and checks that every quote appears on it.
+  It tolerates typography (curly quotes, dashes, case, spacing) and nothing else. The current
+  file has 41 rows backed by 83 quotes from 17 sources, and all of them verify.
+  A weekly workflow repeats the check to catch pages that change or disappear.
+- A finding about a park is shown even when we hold no record of the species there, and the page
+  marks it as reported and not recorded. A report of a species in the literature is not a sighting.
+- IUCN threat links are described in [iucn.md](iucn.md).
 
-What it says about the pilot reserves, as sources report it (none of it measured by this project):
+Sources include a peer-reviewed field study (Dorcas et al. 2012, on mammal declines as Burmese
+pythons spread through Everglades National Park), USGS Nonindigenous Aquatic Species fact sheets,
+and Global Invasive Species Database profiles, which summarise published studies. Where a source
+reports work from another region, the row's region note says so. For example, the brown trout
+finding for the Great Smoky Mountains cites studies from Michigan and Pennsylvania.
 
-- **Bandipur:** a 2007 project page reports preliminary work finding "a striking inverse pattern"
-  between invasive plants (*Lantana*, *Eupatorium/Chromolaena*, *Parthenium*) and dominant large
-  mammals, and says the infestation's extent and effects were still unquantified.
-- **Bandipur and Nagarahole:** the Karnataka forest department planted *Senna spectabilis* in the
-  early 2000s **as a replacement for *Lantana***, a decision now regarded as a mistake. The same
-  article says management attempts are underway there.
-- **Mudumalai:** an elephant researcher pointed to *Senna* thickets near the reserve and called it an
-  emerging problem in Tamil Nadu's reserves; the article presents this alongside what it calls
+What the sources report about the Indian parks, none of it measured by this project:
+
+- **Bandipur.** A 2007 project page reports preliminary work finding "a striking inverse pattern"
+  between invasive plants (*Lantana*, *Eupatorium* and *Chromolaena*, *Parthenium*) and dominant large
+  mammals, and says the extent and effects of the infestation were still unquantified.
+- **Bandipur and Nagarahole.** The Karnataka forest department planted *Senna spectabilis* in the
+  early 2000s as a replacement for *Lantana*, a decision now regarded as a mistake. The same article
+  says management attempts are under way.
+- **Mudumalai.** An elephant researcher pointed to *Senna* thickets near the reserve and called
+  them an emerging problem in Tamil Nadu's reserves. The article sets this beside what it calls
   "anecdotal evidence" of spread in other southern protected areas.
 
-### Layer 2: co-occurrence (when there is enough data)
+### Layer 2: co-occurrence
 
-For each ~5 km grid cell: the share of records that are invasive, against the **rarefied** native
-species richness. Raw richness would be useless: a cell observers visited more simply records more
-species. Hurlbert's rarefaction asks how many species a fixed-size sample (10 records) would
-show, which makes cells comparable. Spearman's rank correlation with a bootstrap 95% interval
-gives a relationship and its uncertainty. Tested on synthetic grids with a known answer: a built-in
-negative relationship is recovered (rho below -0.7, interval wholly below zero), and unrelated data
-gives an interval spanning zero.
+For each grid cell of about 5 km, the analysis compares the share of records that are invasive
+with the rarefied native species richness. Raw richness depends on how often observers visited a
+cell, since a well-visited cell records more species. Hurlbert's rarefaction (Hurlbert 1971)
+removes that dependence by asking how many species a fixed sample of 10 records would show.
+Spearman's rank correlation with a bootstrap 95% interval then reports the relationship and its
+uncertainty. On synthetic grids with a known answer, a built-in negative relationship is recovered
+(rho below -0.7 with an interval wholly below zero) and unrelated data gives an interval that
+spans zero.
 
-**It is correlation, and the result says so.** Invasives and natives can both depend on
-disturbance, road access, or where observers go.
+The result is a correlation. Invasives and natives can both depend on disturbance, road access or
+where observers go, and the output carries that caution.
 
-### Layer 3: trend (when there is enough data)
+### Layer 3: trend
 
-Yearly invasive and native records per observation, tested with Mann-Kendall and the Theil-Sen
-slope (no normality assumption; one odd year cannot move it). The implementations match SciPy:
-Kendall's tau and the slope exactly, and the p-value to within 0.03 of SciPy's exact value. A
-trend in records is not a trend in abundance, and not evidence of cause.
+The analysis computes yearly invasive and native records per observation and tests each series
+with the Mann-Kendall test (Mann 1945) and the Theil-Sen slope (Sen 1968). Neither assumes a normal
+distribution, and a single unusual year cannot move the slope much. The implementations match SciPy:
+Kendall's tau and the slope exactly, and the p-value to within 0.03 of SciPy's exact value. A trend
+in records reflects recorded presence over time and does not show a change in abundance or its
+cause.
 
 ## Early-detection alerts
 
-An alert means one thing: **the first record of an invasive species in a zone, in our sources,
-after enough observation that not seeing it earlier means something.** It is raised only if the
-first record is within a year, the zone had 50+ observations before it, and no cited source already
-reports the species there. Every alert carries the caveat that "first record" is not "first
-arrival". Severity is "high" when the literature documents harm by the species anywhere, otherwise
-"medium": a prompt to look, not a finding. There are none on the current data, because no
-invasive record in these zones is less than a year old.
+An alert marks the first record of an invasive species in a park, in our sources, after enough
+observation that its earlier absence means something. It is raised only when the first record is
+less than a year old, the park had at least 50 observations before it, and no cited source already
+reports the species there. Each alert carries the caveat that a first record in our sources may
+predate the species' arrival in our data by an unknown time. Severity is high when the literature
+documents harm by the species anywhere, and medium otherwise. An alert is a prompt to look.
 
-## Mitigation knowledge
+## Management knowledge
 
-15 playbook rows for 5 species, each with its quotes, the region the evidence comes from, and
-evidence strength. The honest picture:
+`mitigation_playbooks` holds 19 management options for 9 species, each with its quotes,
+the region the evidence comes from, and an evidence-strength label.
 
-- **Only one result is strong evidence:** a four-year randomised field experiment on *Prosopis*
-  in Gujarat's Banni grassland (Nerlekar et al. 2021, *Restoration Ecology*). Mechanical removal
-  tripled native herb richness and multiplied cover sixfold; lopping did nothing; removal was costly; and it
-  was an arid grassland, not a forest.
-- **For *Senna*, nothing documented works reliably, and the experts disagree.** The Kerala forest
-  department's girdling of 19,500 trees was reported counterproductive; a practitioner reports uprooting
-  worked on 0.6 sq km; the researcher who mapped the spread warns uprooting at scale could cause
-  erosion on steep, high-rainfall ground. All of this is shown, not a single tidy "recommendation".
-- ***Lantana* biocontrol:** "none of the over 40 agents trialled have resulted in total control."
-- ***Chromolaena* biocontrol** worked in Guam; no result in India is reported by that source.
-- **Five of the ten classified invasives have no guidance yet** (*Opuntia stricta*, *Tridax*,
-  *Mikania*, *Ageratina*, *Eichhornia*): "no citation, no row" means no row.
+- One result is strong evidence: a four-year randomised field experiment on *Prosopis* in the Banni
+  grassland of Gujarat (Nerlekar et al. 2021). Mechanical removal tripled native herb richness and
+  multiplied cover sixfold, lopping had no effect, removal was costly, and the site is an arid
+  grassland and not a forest.
+- For *Senna spectabilis* no documented method works reliably, and experts disagree. The Kerala forest
+  department's girdling of 19,500 trees was reported as counterproductive. A practitioner reports that
+  uprooting worked on 0.6 sq km. The researcher who mapped the spread warns that uprooting at scale
+  could cause erosion on steep, high-rainfall ground. The dashboard shows all three accounts.
+- *Lantana* biocontrol: "none of the over 40 agents trialled have resulted in total control."
+- For melaleuca, climbing fern and Burmese pythons in the Everglades, the sources describe
+  combinations of herbicide, removal, fire and biological control with their limits. Herbicide
+  killed back climbing fern in a Florida trial, and thousands of new plants germinated afterwards
+  from a mass spore release.
+- Several species recorded in the parks have no cited management guidance yet. A row exists only
+  when a verbatim quote supports it.
 
-None of this is advice to act. It is a summary of what published sources report, with their
-caveats, for someone who then decides.
+The rows summarise what published sources report, with their caveats. A method that worked in one
+habitat or country may not work in another.
