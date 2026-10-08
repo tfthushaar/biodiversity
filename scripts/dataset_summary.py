@@ -67,11 +67,28 @@ def summarise(conn: psycopg.Connection) -> dict:
         for z in [p["slug"] for p in out["parks"]]
     }
 
+    # iNaturalist resumes after the last identifier and GBIF asks only for records changed since the
+    # last run, so their runs do not overlap and can be summed. USGS NAS has no such cursor: every
+    # run re-reads each park's counties. For it we take the most complete single scan per park, so
+    # no record is counted twice.
     refused: dict[str, Counter] = {}
-    for source, rejected in rows(conn, """
-            select s.name, r.rejected from ingestion_runs r join sources s on s.id = r.source_id
-            where r.rejected <> '{}'::jsonb"""):
+    fetched: Counter = Counter()
+    nas_best: dict[str, tuple[int, dict]] = {}
+    for source, notes, n_fetched, rejected in rows(conn, """
+            select s.name, coalesce(r.notes, ''), r.fetched, r.rejected
+            from ingestion_runs r join sources s on s.id = r.source_id
+            where s.name <> 'GRIIS' and r.finished_at is not null"""):
+        if source == "USGS NAS":
+            scope = notes.split(": stored")[0]
+            if ": stored" in notes and n_fetched > nas_best.get(scope, (-1, {}))[0]:
+                nas_best[scope] = (n_fetched, rejected)
+            continue
+        fetched[source] += n_fetched
         refused.setdefault(source, Counter()).update(rejected)
+    for n_fetched, rejected in nas_best.values():
+        fetched["USGS NAS"] += n_fetched
+        refused.setdefault("USGS NAS", Counter()).update(rejected)
+    out["records_fetched_by_source"] = dict(fetched)
     out["records_refused_by_reason"] = {k: dict(v.most_common()) for k, v in refused.items()}
 
     out["invasive_records_by_park"] = {
@@ -120,6 +137,15 @@ def summarise(conn: psycopg.Connection) -> dict:
                                  "join zones z on z.id = r.zone_id order by z.id")
     }
 
+    out["analysis_detail"] = {
+        z: {
+            "cooccurrence": rep["layers"]["cooccurrence"]["detail"],
+            "trend": rep["layers"]["trend"]["detail"],
+        }
+        for z, rep in rows(conn, "select z.slug, r.report from zone_reports r "
+                                 "join zones z on z.id = r.zone_id order by z.id")
+    }
+
     out["alerts"] = [
         {"park": z, "species": sp, "severity": sev, "first_record": str(first)}
         for z, sp, sev, first in rows(conn, """
@@ -136,6 +162,20 @@ def summarise(conn: psycopg.Connection) -> dict:
             rows(conn, "select method, count(*) from mitigation_playbooks group by 1")),
         "species_with_findings": rows(
             conn, "select count(distinct invasive_species_id) from impact_findings")[0][0],
+    }
+    out["evidence_coverage"] = {
+        z: {"invasive_species": sp, "with_cited_findings": wf, "with_cited_management": wm,
+            "records": n, "records_of_species_with_findings": rf}
+        for z, sp, wf, wm, n, rf in rows(conn, """
+            select z.slug, count(distinct r.species_id),
+                   count(distinct r.species_id) filter (where exists (
+                       select 1 from impact_findings f where f.invasive_species_id = r.species_id)),
+                   count(distinct r.species_id) filter (where exists (
+                       select 1 from mitigation_playbooks p where p.species_id = r.species_id)),
+                   count(*),
+                   count(*) filter (where exists (
+                       select 1 from impact_findings f where f.invasive_species_id = r.species_id))
+            from invasive_records r join zones z on z.id = r.zone_id group by 1 order by 1""")
     }
     out["species_with_photo"] = rows(
         conn, "select count(*) from species where photo_url is not null")[0][0]

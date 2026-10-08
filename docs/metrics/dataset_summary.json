@@ -1,5 +1,5 @@
 {
- "computed_at": "2026-10-08T13:41:11+00:00",
+ "computed_at": "2026-10-08T14:36:24+00:00",
  "parks": [
   {
    "slug": "bandipur",
@@ -51,8 +51,18 @@
   },
   {
    "park": "everglades",
+   "source": "GBIF occurrences",
+   "records": 555
+  },
+  {
+   "park": "everglades",
    "source": "iNaturalist",
-   "records": 182
+   "records": 919
+  },
+  {
+   "park": "everglades",
+   "source": "USGS NAS",
+   "records": 4352
   },
   {
    "park": "mudumalai",
@@ -62,7 +72,7 @@
   {
    "park": "mudumalai",
    "source": "iNaturalist",
-   "records": 1412
+   "records": 1413
   },
   {
    "park": "nagarahole",
@@ -72,7 +82,7 @@
   {
    "park": "nagarahole",
    "source": "iNaturalist",
-   "records": 1377
+   "records": 1428
   },
   {
    "park": "serengeti",
@@ -82,11 +92,26 @@
   {
    "park": "serengeti",
    "source": "iNaturalist",
-   "records": 1523
+   "records": 2065
+  },
+  {
+   "park": "smokies",
+   "source": "GBIF occurrences",
+   "records": 578
+  },
+  {
+   "park": "smokies",
+   "source": "iNaturalist",
+   "records": 1544
+  },
+  {
+   "park": "smokies",
+   "source": "USGS NAS",
+   "records": 65
   }
  ],
- "total_records": 5590,
- "species_recorded": 1354,
+ "total_records": 14015,
+ "species_recorded": 2401,
  "records_by_year": {
   "bandipur": {
    "1881": 10,
@@ -150,8 +175,8 @@
    "2022": 201,
    "2023": 88,
    "2024": 243,
-   "2025": 208,
-   "2026": 80
+   "2025": 209,
+   "2026": 130
   },
   "mudumalai": {
    "1922": 1,
@@ -187,62 +212,152 @@
    "2023": 212,
    "2024": 171,
    "2025": 284,
-   "2026": 139
+   "2026": 140
   },
   "serengeti": {
    "1976": 1,
+   "1977": 1,
+   "1982": 8,
    "1990": 3,
    "1991": 7,
    "1992": 1,
-   "1996": 1,
+   "1996": 2,
    "1997": 1,
+   "2003": 3,
    "2005": 4,
-   "2008": 2,
-   "2009": 9,
-   "2010": 1,
-   "2011": 10,
+   "2007": 78,
+   "2008": 3,
+   "2009": 10,
+   "2010": 2,
+   "2011": 12,
    "2012": 148,
-   "2013": 32,
-   "2014": 66,
-   "2015": 54,
-   "2016": 25,
-   "2017": 170,
-   "2018": 988,
+   "2013": 33,
+   "2014": 143,
+   "2015": 64,
+   "2016": 58,
+   "2017": 313,
+   "2018": 1040,
+   "2019": 130,
    "2022": 84
   },
   "everglades": {
-   "1990": 1,
-   "2004": 5,
-   "2007": 6,
-   "2008": 48,
-   "2009": 58,
-   "2010": 7,
-   "2011": 53,
-   "2012": 4
+   "1916": 1,
+   "1919": 1,
+   "1935": 1,
+   "1950": 1,
+   "1975": 1,
+   "1976": 1,
+   "1977": 14,
+   "1978": 9,
+   "1979": 1,
+   "1980": 1,
+   "1983": 3,
+   "1984": 2,
+   "1985": 5,
+   "1986": 2,
+   "1987": 3,
+   "1988": 1,
+   "1989": 1,
+   "1990": 3,
+   "1991": 4,
+   "1992": 15,
+   "1993": 4,
+   "1994": 7,
+   "1995": 4,
+   "1996": 4,
+   "1997": 1,
+   "1998": 2,
+   "1999": 3,
+   "2000": 41,
+   "2001": 14,
+   "2002": 38,
+   "2003": 96,
+   "2004": 289,
+   "2005": 258,
+   "2006": 91,
+   "2007": 91,
+   "2008": 198,
+   "2009": 184,
+   "2010": 163,
+   "2011": 183,
+   "2012": 218,
+   "2013": 409,
+   "2014": 175,
+   "2015": 314,
+   "2016": 80,
+   "2017": 92,
+   "2018": 289,
+   "2019": 375,
+   "2020": 336,
+   "2021": 601,
+   "2022": 740,
+   "2023": 185,
+   "2024": 92,
+   "2025": 116,
+   "2026": 63
   },
-  "smokies": {}
+  "smokies": {
+   "1939": 2,
+   "1995": 4,
+   "1996": 1,
+   "1999": 3,
+   "2000": 1,
+   "2001": 5,
+   "2003": 1,
+   "2004": 1,
+   "2005": 2,
+   "2006": 4,
+   "2007": 8,
+   "2008": 10,
+   "2010": 15,
+   "2011": 19,
+   "2012": 26,
+   "2013": 173,
+   "2014": 194,
+   "2015": 361,
+   "2016": 767,
+   "2017": 2,
+   "2018": 3,
+   "2019": 3,
+   "2021": 3,
+   "2024": 281,
+   "2025": 297,
+   "2026": 1
+  }
+ },
+ "records_fetched_by_source": {
+  "iNaturalist": 28638,
+  "GBIF occurrences": 7349,
+  "USGS NAS": 15678
  },
  "records_refused_by_reason": {
   "iNaturalist": {
-   "outside_zone": 6171,
-   "imprecise_location": 5224,
-   "obscured_location": 4745,
-   "not_species_level": 13
+   "outside_zone": 7486,
+   "imprecise_location": 6369,
+   "obscured_location": 5887,
+   "not_species_level": 38
   },
   "GBIF occurrences": {
-   "not_species_level": 1984,
+   "not_species_level": 3138,
+   "outside_zone": 1530,
+   "no_date": 647,
    "imprecise_location": 306,
-   "no_date": 261,
-   "outside_zone": 238,
-   "obscured_location": 3
+   "obscured_location": 58
+  },
+  "USGS NAS": {
+   "outside_zone": 9325,
+   "imprecise_location": 1898,
+   "not_established": 32,
+   "no_date": 6
   }
  },
  "invasive_records_by_park": {
   "bandipur": 16,
-  "everglades": 4,
+  "everglades": 2912,
   "mudumalai": 30,
   "nagarahole": 7,
-  "serengeti": 1
+  "serengeti": 2,
+  "smokies": 48
  },
  "invasive_species_by_park": {
   "bandipur": [
@@ -519,6 +634,13 @@
   ],
   "serengeti": [
    {
+    "species": "Biancaea decapetala",
+    "common_name": "Mysore Thorn",
+    "records": 1,
+    "first_year": 2018,
+    "last_year": 2018
+   },
+   {
     "species": "Datura stramonium",
     "common_name": "jimsonweed",
     "records": 1,
@@ -528,28 +650,365 @@
   ],
   "everglades": [
    {
-    "species": "Anolis sagrei",
-    "common_name": "Brown Anole",
-    "records": 2,
-    "first_year": 2009,
-    "last_year": 2011
+    "species": "Python bivittatus",
+    "common_name": "Burmese Python",
+    "records": 2129,
+    "first_year": 1979,
+    "last_year": 2026
+   },
+   {
+    "species": "Eleutherodactylus planirostris",
+    "common_name": "Greenhouse Frog",
+    "records": 363,
+    "first_year": 2011,
+    "last_year": 2023
+   },
+   {
+    "species": "Osteopilus septentrionalis",
+    "common_name": "Cuban Tree Frog",
+    "records": 278,
+    "first_year": 1950,
+    "last_year": 2023
+   },
+   {
+    "species": "Clarias batrachus",
+    "common_name": "Walking Catfish",
+    "records": 64,
+    "first_year": 1977,
+    "last_year": 2026
+   },
+   {
+    "species": "Nymphoides hydrophylla",
+    "common_name": "crested floating-heart",
+    "records": 18,
+    "first_year": 2022,
+    "last_year": 2026
    },
    {
     "species": "Ludwigia peruviana",
     "common_name": "Peruvian primrose-willow",
+    "records": 15,
+    "first_year": 2008,
+    "last_year": 2019
+   },
+   {
+    "species": "Anolis sagrei",
+    "common_name": "Brown Anole",
+    "records": 8,
+    "first_year": 2009,
+    "last_year": 2015
+   },
+   {
+    "species": "Salvinia minima",
+    "common_name": "water spangles",
+    "records": 8,
+    "first_year": 2010,
+    "last_year": 2026
+   },
+   {
+    "species": "Alternanthera philoxeroides",
+    "common_name": "alligatorweed",
+    "records": 7,
+    "first_year": 2012,
+    "last_year": 2012
+   },
+   {
+    "species": "Rotala rotundifolia",
+    "common_name": "roundleaf toothcup",
+    "records": 6,
+    "first_year": 2019,
+    "last_year": 2025
+   },
+   {
+    "species": "Hemidactylus mabouia",
+    "common_name": "Tropical House Gecko",
+    "records": 5,
+    "first_year": 2010,
+    "last_year": 2024
+   },
+   {
+    "species": "Ipomoea indica",
+    "common_name": "oceanblue morning glory",
+    "records": 4,
+    "first_year": 2008,
+    "last_year": 2014
+   },
+   {
+    "species": "Pontederia crassipes",
+    "common_name": "common water-hyacinth",
+    "records": 2,
+    "first_year": 2012,
+    "last_year": 2018
+   },
+   {
+    "species": "Varanus niloticus",
+    "common_name": "Nile Monitor",
+    "records": 2,
+    "first_year": 2011,
+    "last_year": 2011
+   },
+   {
+    "species": "Hydrilla verticillata",
+    "common_name": "whorled hydrilla",
     "records": 1,
+    "first_year": 2012,
+    "last_year": 2012
+   },
+   {
+    "species": "Limnophila sessiliflora",
+    "common_name": "Asian marshweed",
+    "records": 1,
+    "first_year": 2024,
+    "last_year": 2024
+   },
+   {
+    "species": "Spermacoce verticillata",
+    "common_name": "shrubby false buttonweed",
+    "records": 1,
+    "first_year": 2012,
+    "last_year": 2012
+   }
+  ],
+  "smokies": [
+   {
+    "species": "Myriophyllum aquaticum",
+    "common_name": "parrot feather",
+    "records": 6,
+    "first_year": 1995,
+    "last_year": 2008
+   },
+   {
+    "species": "Nasturtium officinale",
+    "common_name": "water-cress",
+    "records": 3,
+    "first_year": 2005,
+    "last_year": 2008
+   },
+   {
+    "species": "Salmo trutta",
+    "common_name": "Brown Trout",
+    "records": 3,
+    "first_year": 2018,
+    "last_year": 2019
+   },
+   {
+    "species": "Epipactis helleborine",
+    "common_name": "Broad-leaved helleborine",
+    "records": 2,
+    "first_year": 2014,
+    "last_year": 2016
+   },
+   {
+    "species": "Harmonia axyridis",
+    "common_name": "Asian Lady Beetle",
+    "records": 2,
+    "first_year": 2015,
+    "last_year": 2016
+   },
+   {
+    "species": "Iris pseudacorus",
+    "common_name": "yellow iris",
+    "records": 2,
     "first_year": 2008,
     "last_year": 2008
+   },
+   {
+    "species": "Microstegium vimineum",
+    "common_name": "Japanese stiltgrass",
+    "records": 2,
+    "first_year": 2015,
+    "last_year": 2016
+   },
+   {
+    "species": "Trifolium pratense",
+    "common_name": "Red Clover",
+    "records": 2,
+    "first_year": 2014,
+    "last_year": 2016
+   },
+   {
+    "species": "Adelges tsugae",
+    "common_name": "Hemlock Woolly Adelgid",
+    "records": 1,
+    "first_year": 2015,
+    "last_year": 2015
+   },
+   {
+    "species": "Ajuga reptans",
+    "common_name": "carpet bugle",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Allium vineale",
+    "common_name": "wild garlic",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Cerastium holosteoides",
+    "common_name": "Common mouse-ear chickweed",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Coccinella septempunctata",
+    "common_name": "Seven-spotted Lady Beetle",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Commelina communis",
+    "common_name": "Asiatic dayflower",
+    "records": 1,
+    "first_year": 2015,
+    "last_year": 2015
+   },
+   {
+    "species": "Dactylis glomerata",
+    "common_name": "orchard grass",
+    "records": 1,
+    "first_year": 2015,
+    "last_year": 2015
+   },
+   {
+    "species": "Dianthus barbatus",
+    "common_name": "Sweet-William",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Galinsoga quadriradiata",
+    "common_name": "shaggy soldier",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Geranium molle",
+    "common_name": "Dove's-foot crane's-bill",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Glechoma hederacea",
+    "common_name": "ground-ivy",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Holcus lanatus",
+    "common_name": "Yorkshire fog",
+    "records": 1,
+    "first_year": 2015,
+    "last_year": 2015
+   },
+   {
+    "species": "Lamium purpureum",
+    "common_name": "red deadnettle",
+    "records": 1,
+    "first_year": 2015,
+    "last_year": 2015
    },
    {
     "species": "Osteopilus septentrionalis",
     "common_name": "Cuban Tree Frog",
     "records": 1,
-    "first_year": 2010,
-    "last_year": 2010
+    "first_year": 2013,
+    "last_year": 2013
+   },
+   {
+    "species": "Plantago lanceolata",
+    "common_name": "ribwort plantain",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Potentilla indica",
+    "common_name": "mock strawberry",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Reynoutria japonica",
+    "common_name": "Japanese knotweed",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Rumex crispus",
+    "common_name": "curled dock",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Rumex obtusifolius",
+    "common_name": "broad-leaved dock",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Trifolium campestre",
+    "common_name": "hop trefoil",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Trifolium repens",
+    "common_name": "white clover",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Veronica officinalis",
+    "common_name": "heath speedwell",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Veronica persica",
+    "common_name": "bird's-eye speedwell",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Veronica serpyllifolia",
+    "common_name": "thyme-leaved speedwell",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Vicia sativa",
+    "common_name": "Common Vetch",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Vinca minor",
+    "common_name": "lesser periwinkle",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
    }
-  ],
-  "smokies": []
+  ]
  },
  "hotspots": {
   "bandipur": {
@@ -633,61 +1092,87 @@
   "serengeti": {
    "0.01": {
     "cell_degrees": 0.01,
-    "occupied_cells": 1,
-    "records": 1,
+    "occupied_cells": 2,
+    "records": 2,
     "busiest_cell_records": 1,
-    "share_in_top_10_percent_of_cells": 1.0,
-    "cells_with_one_record": 1
+    "share_in_top_10_percent_of_cells": 0.5,
+    "cells_with_one_record": 2
    },
    "0.02": {
     "cell_degrees": 0.02,
-    "occupied_cells": 1,
-    "records": 1,
+    "occupied_cells": 2,
+    "records": 2,
     "busiest_cell_records": 1,
-    "share_in_top_10_percent_of_cells": 1.0,
-    "cells_with_one_record": 1
+    "share_in_top_10_percent_of_cells": 0.5,
+    "cells_with_one_record": 2
    },
    "0.05": {
     "cell_degrees": 0.05,
-    "occupied_cells": 1,
-    "records": 1,
+    "occupied_cells": 2,
+    "records": 2,
     "busiest_cell_records": 1,
-    "share_in_top_10_percent_of_cells": 1.0,
-    "cells_with_one_record": 1
+    "share_in_top_10_percent_of_cells": 0.5,
+    "cells_with_one_record": 2
    }
   },
   "everglades": {
    "0.01": {
     "cell_degrees": 0.01,
-    "occupied_cells": 4,
-    "records": 4,
-    "busiest_cell_records": 1,
-    "share_in_top_10_percent_of_cells": 0.25,
-    "cells_with_one_record": 4
+    "occupied_cells": 300,
+    "records": 2912,
+    "busiest_cell_records": 242,
+    "share_in_top_10_percent_of_cells": 0.565,
+    "cells_with_one_record": 116
    },
    "0.02": {
     "cell_degrees": 0.02,
-    "occupied_cells": 4,
-    "records": 4,
-    "busiest_cell_records": 1,
-    "share_in_top_10_percent_of_cells": 0.25,
-    "cells_with_one_record": 4
+    "occupied_cells": 199,
+    "records": 2912,
+    "busiest_cell_records": 258,
+    "share_in_top_10_percent_of_cells": 0.618,
+    "cells_with_one_record": 86
    },
    "0.05": {
     "cell_degrees": 0.05,
-    "occupied_cells": 4,
-    "records": 4,
-    "busiest_cell_records": 1,
-    "share_in_top_10_percent_of_cells": 0.25,
-    "cells_with_one_record": 4
+    "occupied_cells": 95,
+    "records": 2912,
+    "busiest_cell_records": 300,
+    "share_in_top_10_percent_of_cells": 0.641,
+    "cells_with_one_record": 36
+   }
+  },
+  "smokies": {
+   "0.01": {
+    "cell_degrees": 0.01,
+    "occupied_cells": 28,
+    "records": 48,
+    "busiest_cell_records": 8,
+    "share_in_top_10_percent_of_cells": 0.312,
+    "cells_with_one_record": 18
+   },
+   "0.02": {
+    "cell_degrees": 0.02,
+    "occupied_cells": 27,
+    "records": 48,
+    "busiest_cell_records": 8,
+    "share_in_top_10_percent_of_cells": 0.312,
+    "cells_with_one_record": 16
+   },
+   "0.05": {
+    "cell_degrees": 0.05,
+    "occupied_cells": 18,
+    "records": 48,
+    "busiest_cell_records": 11,
+    "share_in_top_10_percent_of_cells": 0.333,
+    "cells_with_one_record": 6
    }
   }
  },
  "analysis": {
   "bandipur": {
-   "observations": 758,
-   "species": 346,
-   "invasive_species": 12,
+   "observations": 898,
+   "species": 380,
+   "invasive_species": 14,
    "cooccurrence": {
     "status": "insufficient",
     "cells_total": 28,
@@ -700,43 +1185,43 @@
    },
    "trend": {
     "status": "insufficient",
-    "usable_years": 13,
+    "usable_years": 14,
     "required_years": 6,
-    "years_with_data": 36,
-    "invasive_records": 14,
+    "years_with_data": 37,
+    "invasive_records": 16,
     "required_invasive_records": 30,
     "required_records_per_year": 15
    },
    "documented_findings": 5
   },
   "nagarahole": {
-   "observations": 1131,
-   "species": 309,
-   "invasive_species": 5,
+   "observations": 1446,
+   "species": 357,
+   "invasive_species": 6,
    "cooccurrence": {
     "status": "insufficient",
-    "cells_total": 28,
+    "cells_total": 29,
     "cell_degrees": 0.05,
-    "cells_usable": 14,
+    "cells_usable": 17,
     "required_cells": 20,
-    "cells_with_invasives": 3,
+    "cells_with_invasives": 4,
     "richness_compared_at": 10,
     "required_invasive_cells": 5
    },
    "trend": {
     "status": "insufficient",
-    "usable_years": 15,
+    "usable_years": 16,
     "required_years": 6,
-    "years_with_data": 23,
-    "invasive_records": 6,
+    "years_with_data": 24,
+    "invasive_records": 7,
     "required_invasive_records": 30,
     "required_records_per_year": 15
    },
    "documented_findings": 3
   },
   "mudumalai": {
-   "observations": 1330,
-   "species": 498,
+   "observations": 1509,
+   "species": 524,
    "invasive_species": 18,
    "cooccurrence": {
     "status": "insufficient",
@@ -750,24 +1235,24 @@
    },
    "trend": {
     "status": "ok",
-    "usable_years": 15,
+    "usable_years": 16,
     "required_years": 6,
     "years_with_data": 34,
     "invasive_records": 30,
     "required_invasive_records": 30,
     "required_records_per_year": 15
    },
-   "documented_findings": 4
+   "documented_findings": 5
   },
   "serengeti": {
-   "observations": 813,
-   "species": 303,
-   "invasive_species": 0,
+   "observations": 2149,
+   "species": 444,
+   "invasive_species": 2,
    "cooccurrence": {
     "status": "insufficient",
-    "cells_total": 96,
+    "cells_total": 178,
     "cell_degrees": 0.05,
-    "cells_usable": 24,
+    "cells_usable": 50,
     "required_cells": 20,
     "cells_with_invasives": 0,
     "richness_compared_at": 10,
@@ -775,17 +1260,233 @@
    },
    "trend": {
     "status": "insufficient",
-    "usable_years": 8,
+    "usable_years": 10,
     "required_years": 6,
-    "years_with_data": 18,
-    "invasive_records": 0,
+    "years_with_data": 24,
+    "invasive_records": 2,
     "required_invasive_records": 30,
     "required_records_per_year": 15
    },
    "documented_findings": 0
+  },
+  "everglades": {
+   "observations": 5826,
+   "species": 305,
+   "invasive_species": 17,
+   "cooccurrence": {
+    "status": "insufficient",
+    "cells_total": 142,
+    "cell_degrees": 0.05,
+    "cells_usable": 16,
+    "required_cells": 20,
+    "cells_with_invasives": 15,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "status": "ok",
+    "usable_years": 27,
+    "required_years": 6,
+    "years_with_data": 54,
+    "invasive_records": 2912,
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   },
+   "documented_findings": 5
+  },
+  "smokies": {
+   "observations": 1648,
+   "species": 679,
+   "invasive_species": 17,
+   "cooccurrence": {
+    "status": "ok",
+    "cells_total": 67,
+    "cell_degrees": 0.05,
+    "cells_usable": 26,
+    "spearman_rho": -0.30953653338027165,
+    "required_cells": 20,
+    "cells_with_invasives": 12,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "status": "insufficient",
+    "usable_years": 9,
+    "required_years": 6,
+    "years_with_data": 26,
+    "invasive_records": 27,
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   },
+   "documented_findings": 3
+  }
+ },
+ "analysis_detail": {
+  "bandipur": {
+   "cooccurrence": {
+    "cells_total": 28,
+    "cell_degrees": 0.05,
+    "cells_usable": 14,
+    "required_cells": 20,
+    "cells_with_invasives": 5,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "usable_years": 14,
+    "required_years": 6,
+    "years_with_data": 37,
+    "invasive_records": 16,
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   }
+  },
+  "nagarahole": {
+   "cooccurrence": {
+    "cells_total": 29,
+    "cell_degrees": 0.05,
+    "cells_usable": 17,
+    "required_cells": 20,
+    "cells_with_invasives": 4,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "usable_years": 16,
+    "required_years": 6,
+    "years_with_data": 24,
+    "invasive_records": 7,
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   }
+  },
+  "mudumalai": {
+   "cooccurrence": {
+    "cells_total": 19,
+    "cell_degrees": 0.05,
+    "cells_usable": 9,
+    "required_cells": 20,
+    "cells_with_invasives": 5,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "years": [
+     1958,
+     2026
+    ],
+    "usable_years": 16,
+    "required_years": 6,
+    "years_with_data": 34,
+    "invasive_records": 30,
+    "native_per_observation": {
+     "n": 16,
+     "tau": -0.14166666666666666,
+     "slope": -9.803325909189788e-05,
+     "p_value": 0.45809810020177255
+    },
+    "invasive_per_observation": {
+     "n": 16,
+     "tau": 0.016666666666666666,
+     "slope": 0.0,
+     "p_value": 0.9614478071716754
+    },
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   }
+  },
+  "serengeti": {
+   "cooccurrence": {
+    "cells_total": 178,
+    "cell_degrees": 0.05,
+    "cells_usable": 50,
+    "required_cells": 20,
+    "cells_with_invasives": 0,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "usable_years": 10,
+    "required_years": 6,
+    "years_with_data": 24,
+    "invasive_records": 2,
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   }
+  },
+  "everglades": {
+   "cooccurrence": {
+    "cells_total": 142,
+    "cell_degrees": 0.05,
+    "cells_usable": 16,
+    "required_cells": 20,
+    "cells_with_invasives": 15,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "years": [
+     1992,
+     2026
+    ],
+    "usable_years": 27,
+    "required_years": 6,
+    "years_with_data": 54,
+    "invasive_records": 2912,
+    "native_per_observation": {
+     "n": 27,
+     "tau": 0.14245014245014245,
+     "slope": 0.0011261261261261261,
+     "p_value": 0.30691314464412844
+    },
+    "invasive_per_observation": {
+     "n": 27,
+     "tau": 0.19658119658119658,
+     "slope": 0.007367886178861788,
+     "p_value": 0.1563105372147926
+    },
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   }
+  },
+  "smokies": {
+   "cooccurrence": {
+    "ci95": [
+     -0.6190018482391759,
+     0.1142410194503748
+    ],
+    "cells_total": 67,
+    "cell_degrees": 0.05,
+    "cells_usable": 26,
+    "spearman_rho": -0.30953653338027165,
+    "required_cells": 20,
+    "cells_with_invasives": 12,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "usable_years": 9,
+    "required_years": 6,
+    "years_with_data": 26,
+    "invasive_records": 27,
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   }
   }
  },
  "alerts": [
+  {
+   "park": "bandipur",
+   "species": "Cascabela thevetia",
+   "severity": "medium",
+   "first_record": "2026-06-19"
+  },
+  {
+   "park": "bandipur",
+   "species": "Kalanchoe pinnata",
+   "severity": "medium",
+   "first_record": "2026-08-20"
+  },
   {
    "park": "mudumalai",
    "species": "Cascabela thevetia",
@@ -796,22 +1497,66 @@
  "knowledge_base": {
   "findings": 22,
   "findings_by_certainty": {
-   "experimental": 1,
+   "preliminary": 3,
+   "review": 11,
    "observational": 4,
    "unverified_concern": 3,
-   "preliminary": 3,
-   "review": 11
+   "experimental": 1
   },
   "management_options": 19,
   "management_by_method": {
-   "biological": 3,
-   "cultural": 2,
-   "mechanical": 7,
+   "chemical": 3,
    "integrated": 4,
-   "chemical": 3
+   "cultural": 2,
+   "biological": 3,
+   "mechanical": 7
   },
   "species_with_findings": 13
  },
+ "evidence_coverage": {
+  "bandipur": {
+   "invasive_species": 14,
+   "with_cited_findings": 1,
+   "with_cited_management": 1,
+   "records": 16,
+   "records_of_species_with_findings": 2
+  },
+  "everglades": {
+   "invasive_species": 17,
+   "with_cited_findings": 1,
+   "with_cited_management": 1,
+   "records": 2912,
+   "records_of_species_with_findings": 2129
+  },
+  "mudumalai": {
+   "invasive_species": 18,
+   "with_cited_findings": 4,
+   "with_cited_management": 4,
+   "records": 30,
+   "records_of_species_with_findings": 8
+  },
+  "nagarahole": {
+   "invasive_species": 6,
+   "with_cited_findings": 2,
+   "with_cited_management": 2,
+   "records": 7,
+   "records_of_species_with_findings": 2
+  },
+  "serengeti": {
+   "invasive_species": 2,
+   "with_cited_findings": 0,
+   "with_cited_management": 0,
+   "records": 2,
+   "records_of_species_with_findings": 0
+  },
+  "smokies": {
+   "invasive_species": 34,
+   "with_cited_findings": 2,
+   "with_cited_management": 0,
+   "records": 48,
+   "records_of_species_with_findings": 5
+  }
+ },
  "species_with_photo": 26,
- "database_bytes": 35288755
+ "database_bytes": 44791475
 }

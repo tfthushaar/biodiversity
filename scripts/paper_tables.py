@@ -1,7 +1,8 @@
 # ruff: noqa: E501
 """Print the results tables of paper.md from docs/metrics/dataset_summary.json.
 
-    python scripts/paper_tables.py
+    python scripts/paper_tables.py                  # print every table
+    python scripts/paper_tables.py --inject paper.md  # refresh the tables inside paper.md
 
 Run scripts/dataset_summary.py first. The tables are generated, not typed, so the paper's numbers
 match the data.
@@ -103,13 +104,65 @@ def refused_table() -> str:
     return table(["Reason"] + sources, rows)
 
 
+def coverage_table() -> str:
+    rows = []
+    for slug in ORDER:
+        c = S["evidence_coverage"].get(slug)
+        if not c:
+            continue
+        rows.append([NAMES[slug], n(c["invasive_species"]), n(c["with_cited_findings"]), n(c["with_cited_management"]),
+                     f"{100 * c['records_of_species_with_findings'] / c['records']:.0f}%"])
+    return table(["Park", "Invasive species recorded", "With a cited finding", "With cited management", "Records covered by a finding"], rows)
+
+
+def trend_pair(slug: str) -> tuple[dict, dict]:
+    """(invasive, native) Mann-Kendall results for a park, from the stored analysis."""
+    d = S["analysis_detail"][slug]["trend"]
+    return d["invasive_per_observation"], d["native_per_observation"]
+
+
+TABLES = {
+    "records": records_table,
+    "invasive": invasive_table,
+    "top_species": top_species,
+    "concentration": hotspot_table,
+    "analysis": analysis_table,
+    "refused": refused_table,
+    "coverage": coverage_table,
+}
+
+
+def inject(path: str) -> int:
+    """Replace each block between <!-- table:NAME --> and <!-- /table --> with a fresh table."""
+    import re
+
+    text = Path(path).read_text(encoding="utf-8")
+    count = 0
+
+    def fill(m: re.Match) -> str:
+        nonlocal count
+        count += 1
+        name = m.group(1)
+        return "<!-- table:" + name + " -->" + chr(10) + TABLES[name]() + chr(10) + "<!-- /table -->"
+
+    text = re.sub(r"<!-- table:(\w+) -->.*?<!-- /table -->", fill, text, flags=re.S)
+    Path(path).write_text(text, encoding="utf-8")
+    return count
+
+
 if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) > 2 and sys.argv[1] == "--inject":
+        print(f"updated {inject(sys.argv[2])} tables in {sys.argv[2]}")
+        raise SystemExit(0)
     print("## Records by park and source\n" + records_table())
     print("\n## Invasive records\n" + invasive_table())
     print("\n## Most recorded invasive species\n" + top_species())
     print("\n## Concentration (0.02 degree squares)\n" + hotspot_table())
     print("\n## Analysis readiness\n" + analysis_table())
     print("\n## Records refused\n" + refused_table())
+    print("\n## Evidence coverage\n" + coverage_table())
     kb = S["knowledge_base"]
     print(f"\nKnowledge base: {kb['findings']} findings {kb['findings_by_certainty']}, "
           f"{kb['management_options']} management options {kb['management_by_method']}, "
