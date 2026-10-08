@@ -26,9 +26,11 @@ vi.mock("../components/HotspotMap", () => ({
 }));
 
 import { Impact } from "./Impact";
+import { Alerts } from "./Alerts";
 import { Hotspots } from "./Hotspots";
+import { Overview } from "./Overview";
 import { Sources } from "./Sources";
-import { buildEntries } from "./SpeciesPage";
+import { SpeciesPage, buildEntries } from "./SpeciesPage";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -335,5 +337,141 @@ describe("species list", () => {
   it("includes a species that has guidance even if the checklist does not list it", () => {
     const entries = buildEntries([], [{ id: 1, ...sp("Only here") }] as never, [], []);
     expect(entries.map((e) => e.name)).toEqual(["Only here"]);
+  });
+});
+
+describe("Overview page", () => {
+  const zones = {
+    type: "FeatureCollection",
+    features: [
+      ["bandipur", "Bandipur National Park", 900, 16, 14],
+      ["everglades", "Everglades National Park", 3000, 120, 9],
+      ["serengeti", "Serengeti National Park", 800, 0, 0],
+    ].map(([slug, name, observations, invasive_records, invasive_species]) => ({
+      type: "Feature",
+      geometry: { type: "Point", coordinates: [0, 0] },
+      properties: { slug, name, group: null, country: "XX", observations, species: 50, invasive_records, invasive_species },
+    })),
+  };
+
+  it("offers three clear places to start", async () => {
+    serve({ "/rpc/zones_geojson": zones, "/zone_reports": [], "/alerts": [] });
+    wrap(<Overview />);
+    const start = screen.getByRole("navigation", { name: "Where to start" });
+    const links = within(start).getAllByRole("link");
+    expect(links.map((l) => l.getAttribute("href"))).toEqual(["#/hotspots", "#/species", "#/impact"]);
+    expect(links[0]).toHaveTextContent("Explore hotspots");
+    await screen.findByText("4,700"); // the numbers still load beneath it
+  });
+
+  it("adds up the parks and ranks them by invasive records", async () => {
+    serve({ "/rpc/zones_geojson": zones, "/zone_reports": [], "/alerts": [] });
+    wrap(<Overview />);
+    expect(await screen.findByText("4,700")).toBeInTheDocument(); // observations
+    expect(screen.getByText("136")).toBeInTheDocument(); // invasive records
+    const list = screen.getByRole("list", { name: "Invasive-species records by park" });
+    const labels = [...list.querySelectorAll(".bar-label")].map((e) => e.textContent);
+    expect(labels).toEqual(["Everglades National Park", "Bandipur National Park", "Serengeti National Park"]);
+  });
+
+  it("says when no alert has been raised", async () => {
+    serve({ "/rpc/zones_geojson": zones, "/zone_reports": [], "/alerts": [] });
+    wrap(<Overview />);
+    expect(await screen.findByText(/No early-detection alerts/)).toBeInTheDocument();
+  });
+});
+
+describe("Alerts page", () => {
+  it("explains an empty list in plain terms", async () => {
+    serve({ "/alerts": [] });
+    wrap(<Alerts />);
+    expect(await screen.findByText(/No invasive species has been recorded in any park for the first time/)).toBeInTheDocument();
+  });
+
+  it("shows each alert with its severity, park, species and caveat", async () => {
+    serve({
+      "/alerts": [{
+        id: 1, kind: "edrr", severity: "medium", created_at: "2026-10-01T00:00:00Z", window_start: "2025-11-19T00:00:00Z",
+        evidence: { records: 1, caveat: "First record in the data sources used here." },
+        zones: { slug: "mudumalai", name: "Mudumalai National Park" },
+        species: { scientific_name: "Cascabela thevetia", common_name: null },
+      }],
+    });
+    wrap(<Alerts />);
+    expect(await screen.findByText("Cascabela thevetia")).toBeInTheDocument();
+    expect(screen.getByText("Mudumalai National Park")).toBeInTheDocument();
+    expect(screen.getByText("medium")).toBeInTheDocument();
+    expect(screen.getByText(/1 record so far/)).toBeInTheDocument();
+    expect(screen.getByText(/First record in the data sources used here/)).toBeInTheDocument();
+  });
+});
+
+describe("Species page", () => {
+  const report = (slug: string, name: string, species: { species: string; common_name: string | null; records: number }[]) => ({
+    computed_at: "2026-10-08T00:00:00Z",
+    zones: { slug, name },
+    report: {
+      zone: slug, observations: 100, species: 10,
+      invasive_species: species.map((x) => ({ ...x, first_record: "2020-01-01", last_record: "2024-01-01", sources: 1 })),
+      layers: {} as never,
+    },
+  });
+  const finding = {
+    id: 1, finding_type: "impact", affected: "mammals", certainty: "review", summary: "Reported to reduce mammals.",
+    region_note: "Florida", source_quotes: ["a quote"], citation_text: "A study", citation_url: "https://example.org/a",
+    verified_on: "2026-10-08", species: { scientific_name: "Python bivittatus", common_name: "Burmese python" }, zones: null,
+  };
+
+  it("lists the species recorded in any park, those with research first", async () => {
+    serve({
+      "/zone_reports": [
+        report("bandipur", "Bandipur National Park", [{ species: "Lantana camara", common_name: "common lantana", records: 3 }]),
+        report("everglades", "Everglades National Park", [
+          { species: "Python bivittatus", common_name: "Burmese python", records: 40 },
+          { species: "Anolis sagrei", common_name: "Brown Anole", records: 2 },
+        ]),
+      ],
+      "/impact_findings": [finding],
+      "/mitigation_playbooks": [],
+    });
+    wrap(<SpeciesPage selected={null} />);
+    expect(await screen.findByText(/3 invasive species are recorded in the parks or have cited research/)).toBeInTheDocument();
+    const names = (await screen.findAllByRole("link")).map((a) => a.textContent ?? "").filter((t) => /camara|bivittatus|sagrei/.test(t));
+    expect(names[0]).toContain("Python bivittatus"); // the one with a cited finding leads
+    expect(names).toHaveLength(3);
+  });
+
+  it("filters the list as you type", async () => {
+    serve({
+      "/zone_reports": [report("bandipur", "Bandipur National Park", [
+        { species: "Lantana camara", common_name: "common lantana", records: 3 },
+        { species: "Senna spectabilis", common_name: null, records: 1 },
+      ])],
+      "/impact_findings": [],
+      "/mitigation_playbooks": [],
+    });
+    wrap(<SpeciesPage selected={null} />);
+    const list = within(await screen.findByRole("region", { name: "Species list" }));
+    expect(list.getByText("Lantana camara")).toBeInTheDocument();
+    await userEvent.type(screen.getByRole("searchbox"), "senna");
+    expect(list.queryByText("Lantana camara")).not.toBeInTheDocument();
+    expect(list.getByText("Senna spectabilis")).toBeInTheDocument();
+    await userEvent.clear(screen.getByRole("searchbox"));
+    await userEvent.type(screen.getByRole("searchbox"), "zzz");
+    expect(await screen.findByText(/No species match/)).toBeInTheDocument();
+  });
+
+  it("shows a species' cited findings and says where it was recorded", async () => {
+    serve({
+      "/zone_reports": [report("everglades", "Everglades National Park", [
+        { species: "Python bivittatus", common_name: "Burmese python", records: 40 }])],
+      "/impact_findings": [finding],
+      "/mitigation_playbooks": [],
+    });
+    wrap(<SpeciesPage selected="Python bivittatus" />);
+    expect(await screen.findByRole("heading", { name: "Python bivittatus" })).toBeInTheDocument();
+    expect(screen.getByText("Reported to reduce mammals.")).toBeInTheDocument();
+    expect(screen.getByText("No cited management guidance for this species yet.")).toBeInTheDocument();
+    expect(screen.getAllByText("Everglades National Park").length).toBeGreaterThan(0);
   });
 });
