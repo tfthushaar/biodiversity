@@ -1,6 +1,6 @@
 {
   "_about": "Curated, cited knowledge about the invasive species in the pilot zones. Rule: no verbatim quote, no row. Every quote is machine-checked against the live source by scripts/verify_citations.py. Descriptions are restatements for readers; the quotes are the evidence. Nothing here is a recommendation to act: it summarises what published sources report, with their caveats.",
-  "verified_on": "2026-10-07",
+  "verified_on": "2026-10-08",
   "sources": {
     "gisd_lantana": {
       "citation": "Global Invasive Species Database (2026) Species profile: Lantana camara. IUCN SSC Invasive Species Specialist Group.",
@@ -44,6 +44,52 @@
       "url": "https://doi.org/10.1111/rec.13477",
       "kind": "crossref",
       "doi": "10.1111/rec.13477"
+    },
+    "dorcas2012": {
+      "citation": "Dorcas, M.E., Willson, J.D., Reed, R.N., Snow, R.W. et al. (2012) Severe mammal declines coincide with proliferation of invasive Burmese pythons in Everglades National Park. Proceedings of the National Academy of Sciences.",
+      "url": "https://doi.org/10.1073/pnas.1115226109",
+      "kind": "crossref",
+      "doi": "10.1073/pnas.1115226109"
+    },
+    "nas_python": {
+      "citation": "U.S. Geological Survey (2026) Python bivittatus (Burmese Python): Nonindigenous Aquatic Species fact sheet. Gainesville, Florida.",
+      "url": "https://nas.er.usgs.gov/queries/FactSheet.aspx?speciesID=2552",
+      "kind": "page"
+    },
+    "nas_brown_trout": {
+      "citation": "U.S. Geological Survey (2026) Salmo trutta (Brown Trout): Nonindigenous Aquatic Species fact sheet. Gainesville, Florida.",
+      "url": "https://nas.er.usgs.gov/queries/FactSheet.aspx?speciesID=931",
+      "kind": "page"
+    },
+    "gisd_melaleuca": {
+      "citation": "Global Invasive Species Database (2026) Species profile: Melaleuca quinquenervia. IUCN SSC Invasive Species Specialist Group.",
+      "url": "https://www.iucngisd.org/gisd/speciesname/Melaleuca+quinquenervia",
+      "kind": "page"
+    },
+    "gisd_schinus": {
+      "citation": "Global Invasive Species Database (2026) Species profile: Schinus terebinthifolius. IUCN SSC Invasive Species Specialist Group.",
+      "url": "https://www.iucngisd.org/gisd/speciesname/Schinus+terebinthifolius",
+      "kind": "page"
+    },
+    "gisd_lygodium": {
+      "citation": "Global Invasive Species Database (2026) Species profile: Lygodium microphyllum. IUCN SSC Invasive Species Specialist Group.",
+      "url": "https://www.iucngisd.org/gisd/speciesname/Lygodium+microphyllum",
+      "kind": "page"
+    },
+    "gisd_pueraria": {
+      "citation": "Global Invasive Species Database (2026) Species profile: Pueraria montana var. lobata. IUCN SSC Invasive Species Specialist Group.",
+      "url": "https://www.iucngisd.org/gisd/speciesname/Pueraria+montana+var.+lobata",
+      "kind": "page"
+    },
+    "gisd_microstegium": {
+      "citation": "Global Invasive Species Database (2026) Species profile: Microstegium vimineum. IUCN SSC Invasive Species Specialist Group.",
+      "url": "https://www.iucngisd.org/gisd/speciesname/Microstegium+vimineum",
+      "kind": "page"
+    },
+    "gisd_solanum": {
+      "citation": "Global Invasive Species Database (2026) Species profile: Solanum mauritianum. IUCN SSC Invasive Species Specialist Group.",
+      "url": "https://www.iucngisd.org/gisd/speciesname/Solanum+mauritianum",
+      "kind": "page"
     }
   },
   "playbooks": [
@@ -285,6 +331,74 @@
       "quotes": [
         "Until we fully understand the trade-offs involved, it may therefore be better to manage this social-ecological landscape as a mosaic of restored grassland and Prosopis- invaded patches."
       ]
+    },
+    {
+      "species": "Python bivittatus",
+      "method": "mechanical",
+      "summary": "Removal depends on finding the snakes. Trained scent dogs help locate them in the park, and the first state-sanctioned hunting season captured 37 pythons.",
+      "effectiveness": "low",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "High mercury levels in Everglades pythons rule out eating them as a way to drive removal.",
+      "failure_cases": null,
+      "region_note": "Everglades National Park, Florida. USGS fact sheet summarising published and agency reports.",
+      "source": "nas_python",
+      "quotes": [
+        "The first ever state sanctioned hunting season for pythons captured 37 specimens, ranging in size from hatchlings to ten feet in length",
+        "Everglades National Park Service technicians have trained a beagle, Python Pete, to track the scent of the Burmese python in the Park to aid in removal efforts",
+        "Extremely high levels of mercury found in pythons coming out of the Everglades make them unsafe to eat"
+      ]
+    },
+    {
+      "species": "Melaleuca quinquenervia",
+      "method": "integrated",
+      "summary": "Managers combine herbicides, manual removal, prescribed fire and biological control. Heavy machinery suits few natural areas, and prescribed fire has drawbacks including mass seed release.",
+      "effectiveness": "variable",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "Machinery disturbs soils and non-target native vegetation. Fire can trigger mass seed release by the trees.",
+      "failure_cases": null,
+      "region_note": "Southern Florida. A species profile summarising published studies.",
+      "source": "gisd_melaleuca",
+      "quotes": [
+        "Current management methods for melaleuca include herbicides, manual removal of plants, prescribed fires and bio-control.",
+        "Mechanical removal using heavy equipment is not appropriate in most natural areas because of disturbances to soils and non-target native vegetation",
+        "constraints to this method include impacts on non-target species, the triggering of mass seed release by trees and liability concerns"
+      ]
+    },
+    {
+      "species": "Lygodium microphyllum",
+      "method": "chemical",
+      "summary": "Herbicide can kill the fern back, and the profile describes a Florida trial where it browned nearly all of it. Control stays temporary and harms non-target plants, so treated areas need continual monitoring and spot treatment.",
+      "effectiveness": "variable",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "Herbicidal and mechanical controls damage non-target plants.",
+      "failure_cases": "A trial that killed back the fern was followed by thousands of new plants germinating from a massive spore release.",
+      "region_note": "Florida. A species profile quoting weed-council and research reports.",
+      "source": "gisd_lygodium",
+      "quotes": [
+        "Herbicidal and mechanical controls are expensive, temporary solutions, and are damaging to non-target plants.",
+        "There had been an apparent massive spore release and germination.",
+        "Continual monitoring of the treated areas will be required to identify regrowth of L. microphyllum and to apply spot treatments to keep the fern from re-establishing."
+      ]
+    },
+    {
+      "species": "Solanum mauritianum",
+      "method": "chemical",
+      "summary": "Herbicides kill the plant easily, and manual control by ring-barking trees or pulling seedlings is also used. A biological control insect released in South Africa has proved ineffective.",
+      "effectiveness": "moderate",
+      "evidence_strength": "low",
+      "cost_tier": null,
+      "risks": "Leaf hairs irritate during removal, and all parts of the plant are poisonous to people.",
+      "failure_cases": null,
+      "region_note": "South Africa and other regions; a species profile. Not tested in India.",
+      "source": "gisd_solanum",
+      "quotes": [
+        "Easily killed with herbicides.",
+        "Manual control involves ring-barking trees or removing seedlings by hand",
+        "However, this insect has proved ineffective to date."
+      ]
     }
   ],
   "impact_findings": [
@@ -463,6 +577,135 @@
       "quotes": [
         "pointed to a thicket of canopy Senna trees bearing bright yellow flowers outside his research centre near Mudumalai National Park and said that its bioinvasion is an emerging problem in Tamil Nadu’s protected areas.",
         "Anecdotal evidence points to its spread in other protected areas of southern India too"
+      ]
+    },
+    {
+      "species": "Python bivittatus",
+      "zone": "everglades",
+      "finding_type": "impact",
+      "affected": "raccoons, opossums, bobcats and rabbits",
+      "summary": "Road surveys in Everglades National Park recorded raccoon sightings falling by 99.3%, opossum and bobcat sightings by 98.9% and 87.5%, and no rabbits, as Burmese pythons spread. The authors attribute the declines to predation by pythons.",
+      "certainty": "observational",
+      "region_note": "Everglades National Park, Florida. Nocturnal road surveys from 2003 to 2011. The study shows that the declines coincide with the pythons in time and place and infers predation from that.",
+      "source": "dorcas2012",
+      "quotes": [
+        "a 99.3% decrease in the frequency of raccoon observations, decreases of 98.9% and 87.5% for opossum and bobcat observations, respectively, and failed to detect rabbits",
+        "These findings suggest that predation by pythons has resulted in dramatic declines in mammals within ENP"
+      ]
+    },
+    {
+      "species": "Python bivittatus",
+      "zone": "everglades",
+      "finding_type": "impact",
+      "affected": "wildlife in the park, including endangered species, and turtle and crocodile nests",
+      "summary": "A federal literature summary reports that Burmese pythons have contributed directly to wildlife declines in the park, and that the loss of mammalian predators correlates with less predation on turtle nests.",
+      "certainty": "review",
+      "region_note": "Everglades National Park, Florida. USGS fact sheet summarising published studies.",
+      "source": "nas_python",
+      "quotes": [
+        "Burmese pythons have directly contributed to wildlife populations decreasing within Everglades National Park (ENP), including endangered species",
+        "The decline of mammalian predators is correlated with decreased predation on turtle"
+      ]
+    },
+    {
+      "species": "Melaleuca quinquenervia",
+      "zone": "everglades",
+      "finding_type": "impact",
+      "affected": "native wetland wildlife, plant diversity and sawgrass communities",
+      "summary": "Reported to threaten wildlife habitat in the Everglades, to cut indices of native species in Florida wetlands by as much as 80%, and to convert fire-maintained sawgrass into melaleuca forest.",
+      "certainty": "review",
+      "region_note": "Southern Florida including Everglades National Park. A species profile summarising published studies.",
+      "source": "gisd_melaleuca",
+      "quotes": [
+        "Melaleuca threatens the preservation of critical wildlife habitat in southern Florida including in the Florida Everglades National Park.",
+        "Melaleuca forests provide limited food and habitat value for native wildlife and can reduce indices of native species in Florida wetlands by as much as 80%",
+        "Melaleuca is contributing to significant habitat loss in the Everglades National Park by converting fire-maintained sawgrass communities into Melaleuca forest"
+      ]
+    },
+    {
+      "species": "Schinus terebinthifolia",
+      "zone": "everglades",
+      "finding_type": "impact",
+      "affected": "native vegetation, mangrove swamps and listed plants",
+      "summary": "Reported to shade out and displace native vegetation, forming dense stands that reduce plant and animal diversity, and to threaten mangrove swamp communities in the Everglades.",
+      "certainty": "review",
+      "region_note": "Florida and other regions; a species profile summarising published studies.",
+      "source": "gisd_schinus",
+      "quotes": [
+        "shades out and displaces native vegetation, often forming dense monocultures that reduce the biological diversity of plants and animals in the invaded areas",
+        "Vast monospecific stands of it pose a significant threat to the mangrove swamp communities of the Florida Everglades"
+      ]
+    },
+    {
+      "species": "Lygodium microphyllum",
+      "zone": "everglades",
+      "finding_type": "impact",
+      "affected": "native canopy trees, understory plants and seedlings",
+      "summary": "Reported to colonise without disturbance, dominate native vegetation, and climb over and kill canopy trees.",
+      "certainty": "review",
+      "region_note": "Florida. A species profile quoting extension and weed-council reports.",
+      "source": "gisd_lygodium",
+      "quotes": [
+        "This rapidly spreading weed colonizes new areas without the need of habitat disturbance and frequently completely dominates native vegetation.",
+        "It climbs and blankets other vegetation, ultimately causing mortality to mature canopy and subcanopy trees"
+      ]
+    },
+    {
+      "species": "Pueraria montana",
+      "zone": "smokies",
+      "finding_type": "impact",
+      "affected": "native plants, seedlings and mature trees",
+      "summary": "Widely believed to reduce biodiversity by smothering other vegetation and forming monocultures, and able to kill seedlings and mature trees.",
+      "certainty": "review",
+      "region_note": "United States and elsewhere; a species profile summarising published studies, not measured in the Smokies.",
+      "source": "gisd_pueraria",
+      "quotes": [
+        "Kudzu is widely believed to drastically reduce biodiversity because of its ability to smother other vegetation and develop large-scale monocultures",
+        "It can climb overtop and subsequently kill new seedlings or mature trees",
+        "Few plants can survive once smothered by kudzu and small ecosystems can be radically altered."
+      ]
+    },
+    {
+      "species": "Microstegium vimineum",
+      "zone": "smokies",
+      "finding_type": "impact",
+      "affected": "native herbaceous plants and ground-nesting wildlife",
+      "summary": "Reported to crowd out native herbaceous vegetation in wetlands and forests within three to five years, and to take nesting habitat from quail and other wildlife.",
+      "certainty": "review",
+      "region_note": "Eastern United States; a species profile summarising published studies.",
+      "source": "gisd_microstegium",
+      "quotes": [
+        "Once established, M. vimineum is able to crowd out native herbaceous vegetation in wetlands and forests within three to five years",
+        "Established populations of M. vimineum usurp quality nesting habitat from quail and other wildlife."
+      ]
+    },
+    {
+      "species": "Salmo trutta",
+      "zone": "smokies",
+      "finding_type": "impact",
+      "affected": "native brook trout and other native fishes",
+      "summary": "Reported to reduce native fish populations through predation, displacement and competition, and to displace native brook trout from the best habitat.",
+      "certainty": "review",
+      "region_note": "United States generally. The fact sheet cites studies in Michigan, Pennsylvania and elsewhere; none is from the Smokies.",
+      "source": "nas_brown_trout",
+      "quotes": [
+        "Brown Trout have been implicated in reducing native fish populations (including other salmonids) through predation, displacement, and food competition",
+        "Fausch and White (1981) stated adult Brown Trout displaced adult native Brook Trout from the best habitats in a Michigan stream, and in the northeast in general.",
+        "found that predicted occurrence of Brook Trout was lower in the presence of Brown Trout across a wide range of landscape habitat characteristics."
+      ]
+    },
+    {
+      "species": "Solanum mauritianum",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "native forest margins and other plant species",
+      "summary": "Reported to invade native forest margins and form dense stands that inhibit other species through overcrowding and shading.",
+      "certainty": "review",
+      "region_note": "A species profile summarising studies in South Africa, New Zealand and Australia. Not measured in India.",
+      "source": "gisd_solanum",
+      "quotes": [
+        "Can invade urban areas, native forest margins and pastoral land.",
+        "May form dense stands that inhibit the growth of other species through overcrowding and shading"
       ]
     }
   ]
