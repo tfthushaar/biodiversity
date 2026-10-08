@@ -218,7 +218,7 @@ def test_a_confident_answer_names_the_plant(client):
     body = r.json()
     assert body["answer"] == "Lantana camara" and body["kind"] == "invasive"
     assert body["probability"] > 0.9 and len(body["alternatives"]) == 3
-    assert "not an identification" in body["notice"]
+    assert "decision aid" in body["notice"]
 
 
 def test_an_unsure_answer_is_unknown_but_still_shows_the_leaning(client):
