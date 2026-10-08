@@ -6,6 +6,10 @@ name: Ingest
 #
 # Order of the day: ingest (:05) -> detect (:40) -> analyse (:20 of the next hour).
 #
+# Each source stops cleanly at its time limit and keeps its progress, so a large first load
+# finishes over several runs instead of being cut off. (A runner in the US writing to a database in
+# Asia pays about 0.2 s per round trip, which makes the very first load slow; later runs are small.)
+#
 # Until the DATABASE_URL secret exists this explains itself and exits cleanly. It refuses to add
 # data once the free database is 90% full (a full free database goes read-only), and fails the
 # run so the problem is visible instead of silent.
@@ -66,7 +70,7 @@ jobs:
           MAX: ${{ github.event.inputs.max || '2000' }}
         run: |
           case "$MAX" in ''|*[!0-9]*) echo "::error::max must be a number"; exit 1;; esac
-          python -m biodiv.workers.ingest --source inaturalist --max "$MAX"
+          python -m biodiv.workers.ingest --source inaturalist --max "$MAX" --max-minutes 30
 
       - name: GBIF specimens
         if: steps.pre.outputs.ready == 'true'
@@ -74,7 +78,7 @@ jobs:
           MAX: ${{ github.event.inputs.max || '2000' }}
         run: |
           case "$MAX" in ''|*[!0-9]*) echo "::error::max must be a number"; exit 1;; esac
-          python -m biodiv.workers.ingest --source gbif --max "$MAX"
+          python -m biodiv.workers.ingest --source gbif --max "$MAX" --max-minutes 15
 
       # Always last, and even if a source failed: trims old run logs and reports how full the
       # database is, so a filling database shows up as a warning long before it is an outage.

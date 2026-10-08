@@ -10,6 +10,7 @@ import pytest
 from biodiv.ingestion.gbif_occurrences import GBIF_OCCURRENCE_API
 from biodiv.ingestion.http import PoliteClient
 from biodiv.ingestion.inaturalist import INAT_API
+from biodiv.workers import ingest as ingest_module
 from biodiv.workers.ingest import ingest_zone, load_zones
 from helpers import exact, mock_gbif
 
@@ -159,28 +160,85 @@ async def test_observations_feed_the_effort_normalised_rollups(ingest_db_url, re
         (1, 2, 0.5)]
 
 
-async def test_a_failed_run_is_recorded_and_does_not_advance_the_cursor(ingest_db_url, respx_mock):
+async def test_a_failed_run_is_recorded_and_keeps_the_progress_it_made(ingest_db_url, respx_mock):
     url = ingest_db_url
     mock_gbif(respx_mock, {"Lantana camara": exact(2925303, "Lantana camara")})
     page = [inat_obs(i, "Lantana camara") for i in range(1, 201)]  # one full page
+    broken = {"on": True}
 
     def handler(request):
-        if int(request.url.params["id_above"]) == 0:
+        above = int(request.url.params["id_above"])
+        if above == 0:
             return httpx.Response(200, json={"results": page})
-        return httpx.Response(500)  # the second page fails for good
+        if broken["on"]:
+            return httpx.Response(500)  # the second page fails for good
+        return httpx.Response(200, json={"results": [o for o in page if o["id"] > above]})
 
-    respx_mock.get(f"{INAT_API}/observations").mock(side_effect=handler)
+    route = respx_mock.get(f"{INAT_API}/observations").mock(side_effect=handler)
     with pytest.raises(httpx.HTTPStatusError):
         await run(url)
 
     ((failed, notes),) = q(url, "select failed, notes from ingestion_runs")
     assert failed == 1 and "FAILED" in notes
-    assert q(url, "select count(*) from ingestion_cursors") == [(0,)]  # will retry from the start
     assert q(url, "select count(*) from media_items") == [(200,)]  # the good batch was kept
-    # ...and retrying later cannot duplicate it.
-    mock_inat(respx_mock, [inat_obs(i, "Lantana camara") for i in range(1, 201)])
+    # ...and so was the progress: the next run resumes after it instead of starting over.
+    assert q(url, "select cursor from ingestion_cursors") == [("200",)]
+
+    broken["on"] = False
     retry = await run(url)
-    assert (retry.stored, retry.skipped_dupe) == (0, 200)
+    assert (retry.fetched, retry.stored) == (0, 0)
+    assert route.calls.last.request.url.params["id_above"] == "200"
+    # Starting over from the beginning anyway still cannot duplicate anything.
+    again = await run(url, full=True)
+    assert (again.stored, again.skipped_dupe) == (0, 200)
+
+
+async def test_a_run_that_runs_out_of_time_keeps_its_progress_and_the_next_run_continues(
+    ingest_db_url, respx_mock, monkeypatch
+):
+    url = ingest_db_url
+    mock_gbif(respx_mock, {"Lantana camara": exact(2925303, "Lantana camara")})
+    route = mock_inat(respx_mock, [inat_obs(i, "Lantana camara") for i in range(1, 6)])
+    monkeypatch.setattr(ingest_module, "BATCH_SIZE", 2)
+    asked = {"n": 0}
+
+    def out_of_time(_deadline):
+        asked["n"] += 1
+        return asked["n"] >= 4  # records 1-3 are processed, then time is up
+
+    monkeypatch.setattr(ingest_module, "_out_of_time", out_of_time)
+    first = await run(url, deadline=0.0)
+    assert first.stopped_early and (first.fetched, first.stored) == (3, 3)
+    assert q(url, "select cursor from ingestion_cursors") == [("3",)]
+    ((notes,),) = q(url, "select notes from ingestion_runs")
+    assert "stopped at the time limit" in notes
+
+    monkeypatch.setattr(ingest_module, "_out_of_time", lambda _deadline: False)
+    second = await run(url)
+    assert not second.stopped_early and (second.fetched, second.stored) == (2, 2)
+    assert route.calls.last.request.url.params["id_above"] in {"3", "5"}  # 3, then the empty page
+    assert q(url, "select count(*) from media_items") == [(5,)]
+
+
+async def test_a_species_seen_many_times_costs_one_database_lookup(
+    ingest_db_url, respx_mock, monkeypatch
+):
+    url = ingest_db_url
+    mock_gbif(respx_mock, {"Lantana camara": exact(2925303, "Lantana camara")})
+    mock_inat(respx_mock, [inat_obs(i, "Lantana camara") for i in range(1, 6)])
+    monkeypatch.setattr(ingest_module, "BATCH_SIZE", 2)  # five records over three batches
+    real = ingest_module.upsert_species
+    seen = []
+
+    def counting(*args, **kwargs):
+        seen.append(kwargs.get("name"))
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(ingest_module, "upsert_species", counting)
+    stats = await run(url)
+    assert stats.stored == 5
+    assert seen == ["Lantana camara"]
+    assert q(url, "select count(*), count(distinct species_id) from detections") == [(5, 1)]
 
 
 async def test_an_autocommit_connection_is_required(ingest_db_url):
@@ -223,3 +281,29 @@ async def test_gbif_specimens_skip_the_inaturalist_mirror_and_keep_real_dates(
     ((scope, cursor),) = q(url, "select scope, cursor from ingestion_cursors")
     assert scope == "bandipur:specimens"
     assert cursor == datetime.now(UTC).date().isoformat()  # GBIF cursors are dates
+
+
+async def test_gbif_that_stops_early_does_not_claim_to_have_read_everything(
+    ingest_db_url, respx_mock, monkeypatch
+):
+    """GBIF's cursor is a date meaning 'all of it up to here'. Recording it after a partial run
+    would hide the records that were never reached."""
+    url = ingest_db_url
+    results = [
+        _fixture("gbif_occurrences.json", "inat_mirror"),
+        _fixture("gbif_occurrences.json", "specimen_year_only"),
+    ]
+    respx_mock.get(GBIF_OCCURRENCE_API).mock(
+        return_value=httpx.Response(200, json={"results": results, "endOfRecords": True})
+    )
+    mock_gbif(respx_mock, {})
+    asked = {"n": 0}
+
+    def out_of_time(_deadline):
+        asked["n"] += 1
+        return asked["n"] >= 2  # one record, then time is up
+
+    monkeypatch.setattr(ingest_module, "_out_of_time", out_of_time)
+    stats = await run(url, source="gbif", deadline=0.0)
+    assert stats.stopped_early and stats.fetched == 1
+    assert q(url, "select count(*) from ingestion_cursors") == [(0,)]
