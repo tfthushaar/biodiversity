@@ -55,6 +55,23 @@ Migrations are applied once each and checksummed: editing an already-applied mig
 refused. Add a new numbered file instead. Row-level security allows the public `anon` key to
 read only; all writes use the service role from workers.
 
+### Where Supabase differs from plain Postgres
+
+Both were found by running the migrations against a real Supabase project, and both are handled:
+
+- **PostGIS goes into Supabase's `extensions` schema** (the migration runner does this when that
+  schema exists). Installed into `public`, its tables belong to a Supabase-internal role that the
+  `postgres` user cannot alter, and the REST API would publish about a thousand of its functions.
+  In `extensions` neither is true, so the table-level lockdown in migrations 0013 and 0014 only
+  runs where PostGIS is in `public`.
+- **New tables are public by default.** Supabase grants every new table, sequence and function to
+  the public roles. Migration 0016 removes write rights everywhere and makes new objects private
+  until a migration grants them explicitly. Without it, the migration bookkeeping table was left
+  with insert, update, delete and truncate for the public role.
+
+If you already applied 0013 or 0014 to a local database before this change, the runner will report
+that they changed. Rebuild the local database (it holds nothing that cannot be re-ingested).
+
 ## After deploying: check the public surface
 
 ```bash

@@ -37,12 +37,17 @@ begin
 
   -- PostGIS grants its reference tables to PUBLIC, so PUBLIC must be revoked. Public roles then
   -- get back only the single row that geometry-to-JSON conversion reads.
-  revoke all on spatial_ref_sys from public, anon, authenticated;
-  grant select on spatial_ref_sys to anon, authenticated, service_role;
-  alter table spatial_ref_sys enable row level security;
-  drop policy if exists public_wgs84_only on spatial_ref_sys;
-  create policy public_wgs84_only on spatial_ref_sys
-    for select to anon, authenticated using (srid = 4326);
+  -- Only where the table is in `public`: that is the schema the REST API publishes. On Supabase
+  -- PostGIS lives in `extensions` (see biodiv.workers.migrate), which is not published, and the
+  -- table belongs to a role we cannot alter.
+  if to_regclass('public.spatial_ref_sys') is not null then
+    revoke all on public.spatial_ref_sys from public, anon, authenticated;
+    grant select on public.spatial_ref_sys to anon, authenticated, service_role;
+    alter table public.spatial_ref_sys enable row level security;
+    drop policy if exists public_wgs84_only on public.spatial_ref_sys;
+    create policy public_wgs84_only on public.spatial_ref_sys
+      for select to anon, authenticated using (srid = 4326);
+  end if;
 
   if to_regclass('public.geometry_columns') is not null then
     revoke all on geometry_columns, geography_columns from public, anon, authenticated;

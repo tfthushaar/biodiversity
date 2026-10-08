@@ -38,6 +38,22 @@ def _checksum(sql: str) -> str:
     return hashlib.sha256(sql.encode("utf-8")).hexdigest()
 
 
+def _give_postgis_its_own_schema(conn: psycopg.Connection) -> None:
+    """On Supabase, install PostGIS into the `extensions` schema before migration 0001 does.
+
+    Supabase keeps extension objects in `extensions` and owns them there. Installed into `public`
+    instead, the tables PostGIS adds (spatial_ref_sys) belong to a Supabase-internal role that the
+    `postgres` user cannot alter, and the REST API would publish about a thousand PostGIS functions.
+    In `extensions` none of that is exposed. Plain Postgres has no such schema, so this does nothing
+    there and PostGIS goes into `public` as before (migrations 0013 and 0014 lock that case down).
+    """
+    on_supabase = conn.execute(
+        "select exists (select from pg_namespace where nspname = 'extensions')"
+    ).fetchone()[0]
+    if on_supabase:
+        conn.execute("create extension if not exists postgis with schema extensions")
+
+
 def migrate(
     database_url: str,
     *,
@@ -50,6 +66,7 @@ def migrate(
     with psycopg.connect(database_url) as conn:
         conn.execute(_TRACKING_DDL)
         conn.commit()
+        _give_postgis_its_own_schema(conn)
         done = dict(conn.execute("select version, checksum from schema_migrations").fetchall())
 
         for path in sorted(migrations_dir.glob("*.sql")):

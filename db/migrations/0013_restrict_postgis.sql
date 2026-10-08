@@ -40,11 +40,17 @@ begin
   -- Reference tables PostGIS adds to public; nothing the dashboard needs. PostGIS grants them to
   -- PUBLIC, so revoking from anon alone would change nothing: they must be revoked from PUBLIC.
   -- Our own workers connect as the owner, which keeps access.
-  revoke all on spatial_ref_sys from public, anon, authenticated;
+  -- Only where they are in `public`, the schema the REST API publishes (on Supabase PostGIS is in
+  -- `extensions`, see biodiv.workers.migrate).
+  if to_regclass('public.spatial_ref_sys') is not null then
+    revoke all on public.spatial_ref_sys from public, anon, authenticated;
+  end if;
   if to_regclass('public.geometry_columns') is not null then
     revoke all on geometry_columns, geography_columns from public, anon, authenticated;
   end if;
-  grant select on spatial_ref_sys to service_role;
+  if to_regclass('public.spatial_ref_sys') is not null then
+    grant select on public.spatial_ref_sys to service_role;
+  end if;
   return n;
 end
 $$;

@@ -79,9 +79,13 @@ def main() -> int:
     refused("GET", "/rpc/postgis_full_version", "read PostGIS library versions")
     refused("GET", "/detections_2011?limit=1", "read a partition directly")
     refused("GET", "/schema_migrations?limit=1", "read migration bookkeeping")
+    # Either the table is not published at all (Supabase keeps PostGIS in its own schema), or the
+    # public sees only the WGS84 definition that geometry serialisation reads.
     srs = client.get("/spatial_ref_sys", params={"select": "srid"})
+    not_published = srs.status_code in DENIED or srs.status_code == 404
     only_wgs84 = srs.status_code == 200 and {r["srid"] for r in srs.json()} <= {4326}
-    check(only_wgs84, f"sees at most the WGS84 row of spatial_ref_sys (HTTP {srs.status_code})")
+    check(not_published or only_wgs84,
+          f"exposes at most the WGS84 row of spatial_ref_sys (HTTP {srs.status_code})")
 
     width = max(len(w) for _, w in results)
     for ok, what in results:
