@@ -113,7 +113,10 @@ class IngestStats:
 def load_zones(conn: psycopg.Connection, slugs: list[str] | None) -> list[Zone]:
     rows = conn.execute(
         "select id, slug, country, st_xmin(geom), st_ymin(geom), st_xmax(geom), st_ymax(geom) "
-        "from zones where %s::text[] is null or slug = any(%s::text[]) order by id",
+        "from zones where %s::text[] is null or slug = any(%s::text[]) "
+        # Parks with the fewest stored records first, so a new park fills before the time limit
+        # is spent on parks that are already well covered.
+        "order by (select count(*) from media_items m where m.zone_id = zones.id), id",
         (slugs or None, slugs or None),
     ).fetchall()
     return [Zone(r[0], r[1], r[2], (r[3], r[4], r[5], r[6])) for r in rows]
@@ -151,16 +154,31 @@ def _save_cursor(conn: psycopg.Connection, source_id: int, scope: str, cursor: s
     )
 
 
-def _store(conn: psycopg.Connection, obs: Observation, source_id: int, species_id_fn) -> str:
-    """Store one observation. Returns 'stored', 'duplicate' or 'outside_zone'."""
-    zone = conn.execute(
-        "select id from zones where st_within(st_setsrid(st_makepoint(%s, %s), 4326), geom) "
-        "order by id limit 1",
-        (obs.lon, obs.lat),
-    ).fetchone()
-    if zone is None:
-        return "outside_zone"  # inside a search box but outside every reserve boundary
+def _zones_for(conn: psycopg.Connection, batch: list[Observation]) -> list[int | None]:
+    """The park containing each observation, or None, found with one query for the whole batch.
 
+    A search box is larger than the park inside it, so many records fall outside every boundary.
+    Asking the database about each one separately costs a round trip apiece.
+    """
+    rows = conn.execute(
+        """
+        select o.i,
+               (select z.id from zones z
+                where st_within(st_setsrid(st_makepoint(o.lon, o.lat), 4326), z.geom)
+                order by z.id limit 1)
+        from unnest(%s::float8[], %s::float8[]) with ordinality as o(lon, lat, i)
+        """,
+        ([x.lon for x in batch], [x.lat for x in batch]),
+    ).fetchall()
+    found = dict(rows)
+    return [found.get(i + 1) for i in range(len(batch))]
+
+
+def _store(
+    conn: psycopg.Connection, obs: Observation, source_id: int, species_id_fn, zone_id: int
+) -> str:
+    """Store one observation inside a known park. Returns 'stored' or 'duplicate'."""
+    zone = (zone_id,)
     media = conn.execute(
         """
         insert into media_items (source_id, external_id, uri, image_url, captured_at, geom,
@@ -215,6 +233,15 @@ async def _flush(
     if not batch:
         return
 
+    # Records outside every park boundary are set aside now, before any taxonomy lookups.
+    zone_ids = _zones_for(conn, batch)
+    stats.rejected["outside_zone"] += sum(z is None for z in zone_ids)
+    inside = [(o, z) for o, z in zip(batch, zone_ids, strict=True) if z is not None]
+    batch[:] = [o for o, _ in inside]
+    zone_of = [z for _, z in inside]
+    if not batch:
+        return
+
     # Taxonomy first (network), then one transaction for the whole batch (database).
     await resolve_into_cache(
         gbif, [(o.taxon_name, o.kingdom) for o in batch if o.gbif_taxon_key is None], cache
@@ -239,8 +266,8 @@ async def _flush(
             for year in sorted({o.captured_at.year for o in batch if o.captured_at}):
                 if year >= FIRST_PARTITIONED_YEAR:
                     conn.execute("select ensure_detection_partition(%s)", (year,))
-            for obs in batch:
-                outcome = _store(conn, obs, source_id, species_id)
+            for obs, zone_id in zip(batch, zone_of, strict=True):
+                outcome = _store(conn, obs, source_id, species_id, zone_id)
                 if outcome == "stored":
                     stats.stored += 1
                 elif outcome == "duplicate":
