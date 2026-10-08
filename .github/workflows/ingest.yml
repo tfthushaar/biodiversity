@@ -90,6 +90,11 @@ jobs:
           python -m biodiv.workers.ingest --source usgs_nas --max 30000 --max-minutes 15 \
             --max-stored-per-zone 25000
 
+      # One licensed photo, with its credit, for each invasive species recorded since the last run.
+      - name: Species photos
+        if: steps.pre.outputs.ready == 'true' && always()
+        run: python -m biodiv.workers.enrich_species --limit 80
+
       # Always last, and even if a source failed: trims old run logs and reports how full the
       # database is, so a filling database shows up as a warning long before it is an outage.
       - name: Trim run logs and report storage

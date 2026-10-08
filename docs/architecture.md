@@ -23,6 +23,7 @@ it.
 | Ingest (`workers/ingest.py`) | GitHub Actions | no | every 6 hours, `ingest.yml` |
 | Detect (`workers/detect.py`) | GitHub Actions | no | every 6 hours, `infer.yml` |
 | Analyse (`workers/analyse.py`) | GitHub Actions | no | four times a day, `analytics.yml` |
+| Species photos (`workers/enrich_species.py`) | GitHub Actions | no | after every ingest, for species without one |
 | Retention (`workers/retention.py`) | GitHub Actions | no | after every ingest |
 | Citation check (`scripts/verify_citations.py`) | GitHub Actions | no | weekly, `verify-citations.yml` |
 | Database and public REST API | Supabase | yes | |

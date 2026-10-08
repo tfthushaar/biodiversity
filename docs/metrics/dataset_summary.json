@@ -1,5 +1,5 @@
 {
- "computed_at": "2026-10-08T15:16:11+00:00",
+ "computed_at": "2026-10-08T15:24:10+00:00",
  "parks": [
   {
    "slug": "bandipur",
@@ -1813,6 +1813,6 @@
    "records_of_species_with_findings": 5
   }
  },
- "species_with_photo": 26,
+ "species_with_photo": 97,
  "database_bytes": 48322227
 }
