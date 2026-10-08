@@ -51,6 +51,18 @@ itself when the service is unreachable.
    Every claim carries a verbatim quote, and `scripts/verify_citations.py` re-checks each quote
    against the live source.
 
+## Running against a remote database
+
+The scheduled jobs run on GitHub's runners in the United States and the database is in Asia, so
+every round trip costs about 0.2 s. That barely matters for the small incremental runs, but it
+slows the first load, which is why ingestion is built to be interrupted:
+
+- the iNaturalist cursor is saved after every batch, so a cut-off run resumes where it stopped;
+- a species seen many times in a run is looked up once;
+- `--max-minutes` ends a run cleanly before the workflow's own time limit, and the next run
+  continues. GBIF's cursor is a date meaning "everything up to here", so it is only recorded when a
+  run reads to the end.
+
 ## Security model
 
 The public `anon` role is read-only and is the only credential in the browser. The database, not a
@@ -60,9 +72,10 @@ credential that lives only in GitHub Actions secrets. See [api.md](api.md).
 
 ## What is not built or not live yet
 
-- **Nothing is deployed.** The accounts (Supabase, Vercel, optionally Render) have to be created by
-  a person; the steps and fallbacks are in [free-tier-gate.md](free-tier-gate.md). Until the
-  `DATABASE_URL` secret exists, every scheduled workflow explains itself and exits cleanly.
+- **It is deployed, on free tiers only:** the database on Supabase, the dashboard on Vercel and the
+  API on Render, with the scheduled jobs on GitHub Actions. The setup steps and the fallbacks if a
+  signup ever asks for a card are in [free-tier-gate.md](free-tier-gate.md). Without the
+  `DATABASE_URL` secret every scheduled workflow explains itself and exits cleanly, so a fork is safe.
 - **IUCN threat links** wait for an API token, which is human-reviewed. See [iucn.md](iucn.md).
 - **The statistical impact layers report "not enough data"** on today's records, by design. See
   [impact.md](impact.md).

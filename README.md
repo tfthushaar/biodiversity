@@ -7,6 +7,16 @@ about it**, on a dashboard for researchers, NGOs and policymakers.
 
 > Project by K N Thushaar Rangan, Yashas S, Amogh P A and G Ritzia.
 
+## Live
+
+| | |
+|---|---|
+| Dashboard | <https://biodiversity-ecru.vercel.app> |
+| API (photo analysis, GraphQL), with interactive docs | <https://biodiversity-4xvo.onrender.com/docs> |
+
+The data refreshes itself every few hours. The API runs on a free host that sleeps when idle, so a
+request after a quiet spell can take about a minute; the dashboard does not depend on it.
+
 ## Everything is free, with no credit card
 
 | Part | Host |
