@@ -1,0 +1,817 @@
+{
+ "computed_at": "2026-10-08T13:41:11+00:00",
+ "parks": [
+  {
+   "slug": "bandipur",
+   "name": "Bandipur National Park",
+   "country": "IN",
+   "area_km2": 949
+  },
+  {
+   "slug": "nagarahole",
+   "name": "Nagarahole National Park",
+   "country": "IN",
+   "area_km2": 680
+  },
+  {
+   "slug": "mudumalai",
+   "name": "Mudumalai National Park",
+   "country": "IN",
+   "area_km2": 336
+  },
+  {
+   "slug": "serengeti",
+   "name": "Serengeti National Park",
+   "country": "TZ",
+   "area_km2": 12947
+  },
+  {
+   "slug": "everglades",
+   "name": "Everglades National Park",
+   "country": "US",
+   "area_km2": 6237
+  },
+  {
+   "slug": "smokies",
+   "name": "Great Smoky Mountains National Park",
+   "country": "US",
+   "area_km2": 2107
+  }
+ ],
+ "records_by_park_and_source": [
+  {
+   "park": "bandipur",
+   "source": "GBIF occurrences",
+   "records": 210
+  },
+  {
+   "park": "bandipur",
+   "source": "iNaturalist",
+   "records": 688
+  },
+  {
+   "park": "everglades",
+   "source": "iNaturalist",
+   "records": 182
+  },
+  {
+   "park": "mudumalai",
+   "source": "GBIF occurrences",
+   "records": 96
+  },
+  {
+   "park": "mudumalai",
+   "source": "iNaturalist",
+   "records": 1412
+  },
+  {
+   "park": "nagarahole",
+   "source": "GBIF occurrences",
+   "records": 18
+  },
+  {
+   "park": "nagarahole",
+   "source": "iNaturalist",
+   "records": 1377
+  },
+  {
+   "park": "serengeti",
+   "source": "GBIF occurrences",
+   "records": 84
+  },
+  {
+   "park": "serengeti",
+   "source": "iNaturalist",
+   "records": 1523
+  }
+ ],
+ "total_records": 5590,
+ "species_recorded": 1354,
+ "records_by_year": {
+  "bandipur": {
+   "1881": 10,
+   "1901": 1,
+   "1970": 1,
+   "1975": 2,
+   "1976": 1,
+   "1978": 36,
+   "1979": 4,
+   "1980": 33,
+   "1981": 70,
+   "1982": 8,
+   "1983": 1,
+   "1984": 11,
+   "1989": 20,
+   "1990": 6,
+   "1991": 3,
+   "1995": 3,
+   "1997": 4,
+   "2003": 6,
+   "2004": 1,
+   "2005": 1,
+   "2007": 5,
+   "2008": 7,
+   "2010": 30,
+   "2013": 3,
+   "2014": 12,
+   "2015": 10,
+   "2016": 33,
+   "2017": 4,
+   "2018": 51,
+   "2019": 55,
+   "2020": 13,
+   "2021": 30,
+   "2022": 32,
+   "2023": 63,
+   "2024": 97,
+   "2025": 98,
+   "2026": 133
+  },
+  "nagarahole": {
+   "1980": 1,
+   "1985": 3,
+   "1998": 4,
+   "1999": 22,
+   "2004": 1,
+   "2005": 1,
+   "2007": 3,
+   "2010": 9,
+   "2011": 7,
+   "2012": 26,
+   "2013": 68,
+   "2014": 40,
+   "2015": 90,
+   "2016": 29,
+   "2017": 29,
+   "2018": 110,
+   "2019": 25,
+   "2020": 43,
+   "2021": 64,
+   "2022": 201,
+   "2023": 88,
+   "2024": 243,
+   "2025": 208,
+   "2026": 80
+  },
+  "mudumalai": {
+   "1922": 1,
+   "1947": 13,
+   "1957": 1,
+   "1958": 22,
+   "1962": 2,
+   "1963": 1,
+   "1968": 1,
+   "1973": 5,
+   "1975": 1,
+   "1979": 4,
+   "1981": 3,
+   "1989": 25,
+   "1997": 2,
+   "2005": 6,
+   "2006": 1,
+   "2008": 5,
+   "2009": 2,
+   "2010": 7,
+   "2011": 12,
+   "2012": 56,
+   "2013": 27,
+   "2014": 110,
+   "2015": 60,
+   "2016": 36,
+   "2017": 34,
+   "2018": 31,
+   "2019": 25,
+   "2020": 8,
+   "2021": 37,
+   "2022": 164,
+   "2023": 212,
+   "2024": 171,
+   "2025": 284,
+   "2026": 139
+  },
+  "serengeti": {
+   "1976": 1,
+   "1990": 3,
+   "1991": 7,
+   "1992": 1,
+   "1996": 1,
+   "1997": 1,
+   "2005": 4,
+   "2008": 2,
+   "2009": 9,
+   "2010": 1,
+   "2011": 10,
+   "2012": 148,
+   "2013": 32,
+   "2014": 66,
+   "2015": 54,
+   "2016": 25,
+   "2017": 170,
+   "2018": 988,
+   "2022": 84
+  },
+  "everglades": {
+   "1990": 1,
+   "2004": 5,
+   "2007": 6,
+   "2008": 48,
+   "2009": 58,
+   "2010": 7,
+   "2011": 53,
+   "2012": 4
+  },
+  "smokies": {}
+ },
+ "records_refused_by_reason": {
+  "iNaturalist": {
+   "outside_zone": 6171,
+   "imprecise_location": 5224,
+   "obscured_location": 4745,
+   "not_species_level": 13
+  },
+  "GBIF occurrences": {
+   "not_species_level": 1984,
+   "imprecise_location": 306,
+   "no_date": 261,
+   "outside_zone": 238,
+   "obscured_location": 3
+  }
+ },
+ "invasive_records_by_park": {
+  "bandipur": 16,
+  "everglades": 4,
+  "mudumalai": 30,
+  "nagarahole": 7,
+  "serengeti": 1
+ },
+ "invasive_species_by_park": {
+  "bandipur": [
+   {
+    "species": "Asclepias curassavica",
+    "common_name": "tropical milkweed",
+    "records": 2,
+    "first_year": 1981,
+    "last_year": 2023
+   },
+   {
+    "species": "Lantana camara",
+    "common_name": "common lantana",
+    "records": 2,
+    "first_year": 2010,
+    "last_year": 2025
+   },
+   {
+    "species": "Bidens pilosa",
+    "common_name": null,
+    "records": 1,
+    "first_year": 1978,
+    "last_year": 1978
+   },
+   {
+    "species": "Cascabela thevetia",
+    "common_name": "Be-still tree",
+    "records": 1,
+    "first_year": 2026,
+    "last_year": 2026
+   },
+   {
+    "species": "Crassocephalum crepidioides",
+    "common_name": "redflower ragleaf",
+    "records": 1,
+    "first_year": 2018,
+    "last_year": 2018
+   },
+   {
+    "species": "Cyperus rotundus",
+    "common_name": null,
+    "records": 1,
+    "first_year": 1981,
+    "last_year": 1981
+   },
+   {
+    "species": "Datura stramonium",
+    "common_name": "jimsonweed",
+    "records": 1,
+    "first_year": 2019,
+    "last_year": 2019
+   },
+   {
+    "species": "Kalanchoe pinnata",
+    "common_name": "Air Plant",
+    "records": 1,
+    "first_year": 2026,
+    "last_year": 2026
+   },
+   {
+    "species": "Opuntia stricta",
+    "common_name": "shell mound pricklypear",
+    "records": 1,
+    "first_year": 2020,
+    "last_year": 2020
+   },
+   {
+    "species": "Oxalis corniculata",
+    "common_name": "Creeping Woodsorrel",
+    "records": 1,
+    "first_year": 2003,
+    "last_year": 2003
+   },
+   {
+    "species": "Ricinus communis",
+    "common_name": "castor bean",
+    "records": 1,
+    "first_year": 2010,
+    "last_year": 2010
+   },
+   {
+    "species": "Senna occidentalis",
+    "common_name": "Coffee Senna",
+    "records": 1,
+    "first_year": 2010,
+    "last_year": 2010
+   },
+   {
+    "species": "Synedrella nodiflora",
+    "common_name": null,
+    "records": 1,
+    "first_year": 1978,
+    "last_year": 1978
+   },
+   {
+    "species": "Tridax procumbens",
+    "common_name": "Tridax Daisy",
+    "records": 1,
+    "first_year": 2020,
+    "last_year": 2020
+   }
+  ],
+  "nagarahole": [
+   {
+    "species": "Solanum seaforthianum",
+    "common_name": "Brazilian Nightshade",
+    "records": 2,
+    "first_year": 2024,
+    "last_year": 2024
+   },
+   {
+    "species": "Chromolaena odorata",
+    "common_name": "Siam weed",
+    "records": 1,
+    "first_year": 2024,
+    "last_year": 2024
+   },
+   {
+    "species": "Datura metel",
+    "common_name": "metel devil's trumpet",
+    "records": 1,
+    "first_year": 2024,
+    "last_year": 2024
+   },
+   {
+    "species": "Ipomoea carnea",
+    "common_name": "Bush Morning Glory",
+    "records": 1,
+    "first_year": 2024,
+    "last_year": 2024
+   },
+   {
+    "species": "Lantana camara",
+    "common_name": "common lantana",
+    "records": 1,
+    "first_year": 2022,
+    "last_year": 2022
+   },
+   {
+    "species": "Solanum viarum",
+    "common_name": "tropical soda-apple",
+    "records": 1,
+    "first_year": 2025,
+    "last_year": 2025
+   }
+  ],
+  "mudumalai": [
+   {
+    "species": "Opuntia stricta",
+    "common_name": "shell mound pricklypear",
+    "records": 5,
+    "first_year": 1997,
+    "last_year": 2025
+   },
+   {
+    "species": "Chromolaena odorata",
+    "common_name": "Siam weed",
+    "records": 3,
+    "first_year": 2015,
+    "last_year": 2024
+   },
+   {
+    "species": "Lantana camara",
+    "common_name": "common lantana",
+    "records": 3,
+    "first_year": 2024,
+    "last_year": 2024
+   },
+   {
+    "species": "Argemone mexicana",
+    "common_name": "Mexican prickly poppy",
+    "records": 2,
+    "first_year": 2024,
+    "last_year": 2025
+   },
+   {
+    "species": "Asclepias curassavica",
+    "common_name": "tropical milkweed",
+    "records": 2,
+    "first_year": 2025,
+    "last_year": 2025
+   },
+   {
+    "species": "Muntingia calabura",
+    "common_name": "calabur tree",
+    "records": 2,
+    "first_year": 2024,
+    "last_year": 2024
+   },
+   {
+    "species": "Solanum seaforthianum",
+    "common_name": "Brazilian Nightshade",
+    "records": 2,
+    "first_year": 2019,
+    "last_year": 2025
+   },
+   {
+    "species": "Cascabela thevetia",
+    "common_name": "Be-still tree",
+    "records": 1,
+    "first_year": 2025,
+    "last_year": 2025
+   },
+   {
+    "species": "Croton bonplandianus",
+    "common_name": "Bonpland's croton",
+    "records": 1,
+    "first_year": 2024,
+    "last_year": 2024
+   },
+   {
+    "species": "Datura metel",
+    "common_name": "metel devil's trumpet",
+    "records": 1,
+    "first_year": 2018,
+    "last_year": 2018
+   },
+   {
+    "species": "Mimosa pudica",
+    "common_name": "Sensitive Plant",
+    "records": 1,
+    "first_year": 2024,
+    "last_year": 2024
+   },
+   {
+    "species": "Parthenium hysterophorus",
+    "common_name": "Santa Maria feverfew",
+    "records": 1,
+    "first_year": 2024,
+    "last_year": 2024
+   },
+   {
+    "species": "Ricinus communis",
+    "common_name": "castor bean",
+    "records": 1,
+    "first_year": 1997,
+    "last_year": 1997
+   },
+   {
+    "species": "Scoparia dulcis",
+    "common_name": null,
+    "records": 1,
+    "first_year": 1958,
+    "last_year": 1958
+   },
+   {
+    "species": "Senna occidentalis",
+    "common_name": "Coffee Senna",
+    "records": 1,
+    "first_year": 2024,
+    "last_year": 2024
+   },
+   {
+    "species": "Solanum mauritianum",
+    "common_name": "bugweed",
+    "records": 1,
+    "first_year": 2025,
+    "last_year": 2025
+   },
+   {
+    "species": "Solanum viarum",
+    "common_name": "tropical soda-apple",
+    "records": 1,
+    "first_year": 2016,
+    "last_year": 2016
+   },
+   {
+    "species": "Tithonia diversifolia",
+    "common_name": "Mexican sunflower",
+    "records": 1,
+    "first_year": 2005,
+    "last_year": 2005
+   }
+  ],
+  "serengeti": [
+   {
+    "species": "Datura stramonium",
+    "common_name": "jimsonweed",
+    "records": 1,
+    "first_year": 2018,
+    "last_year": 2018
+   }
+  ],
+  "everglades": [
+   {
+    "species": "Anolis sagrei",
+    "common_name": "Brown Anole",
+    "records": 2,
+    "first_year": 2009,
+    "last_year": 2011
+   },
+   {
+    "species": "Ludwigia peruviana",
+    "common_name": "Peruvian primrose-willow",
+    "records": 1,
+    "first_year": 2008,
+    "last_year": 2008
+   },
+   {
+    "species": "Osteopilus septentrionalis",
+    "common_name": "Cuban Tree Frog",
+    "records": 1,
+    "first_year": 2010,
+    "last_year": 2010
+   }
+  ],
+  "smokies": []
+ },
+ "hotspots": {
+  "bandipur": {
+   "0.01": {
+    "cell_degrees": 0.01,
+    "occupied_cells": 8,
+    "records": 16,
+    "busiest_cell_records": 4,
+    "share_in_top_10_percent_of_cells": 0.25,
+    "cells_with_one_record": 3
+   },
+   "0.02": {
+    "cell_degrees": 0.02,
+    "occupied_cells": 7,
+    "records": 16,
+    "busiest_cell_records": 7,
+    "share_in_top_10_percent_of_cells": 0.438,
+    "cells_with_one_record": 3
+   },
+   "0.05": {
+    "cell_degrees": 0.05,
+    "occupied_cells": 7,
+    "records": 16,
+    "busiest_cell_records": 7,
+    "share_in_top_10_percent_of_cells": 0.438,
+    "cells_with_one_record": 3
+   }
+  },
+  "nagarahole": {
+   "0.01": {
+    "cell_degrees": 0.01,
+    "occupied_cells": 6,
+    "records": 7,
+    "busiest_cell_records": 2,
+    "share_in_top_10_percent_of_cells": 0.286,
+    "cells_with_one_record": 5
+   },
+   "0.02": {
+    "cell_degrees": 0.02,
+    "occupied_cells": 6,
+    "records": 7,
+    "busiest_cell_records": 2,
+    "share_in_top_10_percent_of_cells": 0.286,
+    "cells_with_one_record": 5
+   },
+   "0.05": {
+    "cell_degrees": 0.05,
+    "occupied_cells": 5,
+    "records": 7,
+    "busiest_cell_records": 3,
+    "share_in_top_10_percent_of_cells": 0.429,
+    "cells_with_one_record": 4
+   }
+  },
+  "mudumalai": {
+   "0.01": {
+    "cell_degrees": 0.01,
+    "occupied_cells": 10,
+    "records": 30,
+    "busiest_cell_records": 12,
+    "share_in_top_10_percent_of_cells": 0.4,
+    "cells_with_one_record": 6
+   },
+   "0.02": {
+    "cell_degrees": 0.02,
+    "occupied_cells": 9,
+    "records": 30,
+    "busiest_cell_records": 16,
+    "share_in_top_10_percent_of_cells": 0.533,
+    "cells_with_one_record": 6
+   },
+   "0.05": {
+    "cell_degrees": 0.05,
+    "occupied_cells": 5,
+    "records": 30,
+    "busiest_cell_records": 18,
+    "share_in_top_10_percent_of_cells": 0.6,
+    "cells_with_one_record": 2
+   }
+  },
+  "serengeti": {
+   "0.01": {
+    "cell_degrees": 0.01,
+    "occupied_cells": 1,
+    "records": 1,
+    "busiest_cell_records": 1,
+    "share_in_top_10_percent_of_cells": 1.0,
+    "cells_with_one_record": 1
+   },
+   "0.02": {
+    "cell_degrees": 0.02,
+    "occupied_cells": 1,
+    "records": 1,
+    "busiest_cell_records": 1,
+    "share_in_top_10_percent_of_cells": 1.0,
+    "cells_with_one_record": 1
+   },
+   "0.05": {
+    "cell_degrees": 0.05,
+    "occupied_cells": 1,
+    "records": 1,
+    "busiest_cell_records": 1,
+    "share_in_top_10_percent_of_cells": 1.0,
+    "cells_with_one_record": 1
+   }
+  },
+  "everglades": {
+   "0.01": {
+    "cell_degrees": 0.01,
+    "occupied_cells": 4,
+    "records": 4,
+    "busiest_cell_records": 1,
+    "share_in_top_10_percent_of_cells": 0.25,
+    "cells_with_one_record": 4
+   },
+   "0.02": {
+    "cell_degrees": 0.02,
+    "occupied_cells": 4,
+    "records": 4,
+    "busiest_cell_records": 1,
+    "share_in_top_10_percent_of_cells": 0.25,
+    "cells_with_one_record": 4
+   },
+   "0.05": {
+    "cell_degrees": 0.05,
+    "occupied_cells": 4,
+    "records": 4,
+    "busiest_cell_records": 1,
+    "share_in_top_10_percent_of_cells": 0.25,
+    "cells_with_one_record": 4
+   }
+  }
+ },
+ "analysis": {
+  "bandipur": {
+   "observations": 758,
+   "species": 346,
+   "invasive_species": 12,
+   "cooccurrence": {
+    "status": "insufficient",
+    "cells_total": 28,
+    "cell_degrees": 0.05,
+    "cells_usable": 14,
+    "required_cells": 20,
+    "cells_with_invasives": 5,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "status": "insufficient",
+    "usable_years": 13,
+    "required_years": 6,
+    "years_with_data": 36,
+    "invasive_records": 14,
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   },
+   "documented_findings": 5
+  },
+  "nagarahole": {
+   "observations": 1131,
+   "species": 309,
+   "invasive_species": 5,
+   "cooccurrence": {
+    "status": "insufficient",
+    "cells_total": 28,
+    "cell_degrees": 0.05,
+    "cells_usable": 14,
+    "required_cells": 20,
+    "cells_with_invasives": 3,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "status": "insufficient",
+    "usable_years": 15,
+    "required_years": 6,
+    "years_with_data": 23,
+    "invasive_records": 6,
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   },
+   "documented_findings": 3
+  },
+  "mudumalai": {
+   "observations": 1330,
+   "species": 498,
+   "invasive_species": 18,
+   "cooccurrence": {
+    "status": "insufficient",
+    "cells_total": 19,
+    "cell_degrees": 0.05,
+    "cells_usable": 9,
+    "required_cells": 20,
+    "cells_with_invasives": 5,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "status": "ok",
+    "usable_years": 15,
+    "required_years": 6,
+    "years_with_data": 34,
+    "invasive_records": 30,
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   },
+   "documented_findings": 4
+  },
+  "serengeti": {
+   "observations": 813,
+   "species": 303,
+   "invasive_species": 0,
+   "cooccurrence": {
+    "status": "insufficient",
+    "cells_total": 96,
+    "cell_degrees": 0.05,
+    "cells_usable": 24,
+    "required_cells": 20,
+    "cells_with_invasives": 0,
+    "richness_compared_at": 10,
+    "required_invasive_cells": 5
+   },
+   "trend": {
+    "status": "insufficient",
+    "usable_years": 8,
+    "required_years": 6,
+    "years_with_data": 18,
+    "invasive_records": 0,
+    "required_invasive_records": 30,
+    "required_records_per_year": 15
+   },
+   "documented_findings": 0
+  }
+ },
+ "alerts": [
+  {
+   "park": "mudumalai",
+   "species": "Cascabela thevetia",
+   "severity": "medium",
+   "first_record": "2025-11-19"
+  }
+ ],
+ "knowledge_base": {
+  "findings": 22,
+  "findings_by_certainty": {
+   "experimental": 1,
+   "observational": 4,
+   "unverified_concern": 3,
+   "preliminary": 3,
+   "review": 11
+  },
+  "management_options": 19,
+  "management_by_method": {
+   "biological": 3,
+   "cultural": 2,
+   "mechanical": 7,
+   "integrated": 4,
+   "chemical": 3
+  },
+  "species_with_findings": 13
+ },
+ "species_with_photo": 26,
+ "database_bytes": 35288755
+}
