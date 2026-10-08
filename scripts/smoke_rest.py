@@ -63,6 +63,11 @@ def main() -> int:
     check(pts.status_code == 200 and pts.json().get("type") == "FeatureCollection",
           "records_geojson() returns a FeatureCollection")
 
+    st = client.post("/rpc/storage_status", json={})
+    body = st.json() if st.status_code == 200 else {}
+    check(st.status_code == 200 and 0 < body.get("db_bytes", 0) and body.get("budget_bytes", 0) > 0,
+          "storage_status() reports database size and budget")
+
     # What must not be possible.
     refused("POST", "/zones", "insert a zone", json={"slug": "x", "name": "x", "country": "IN"})
     refused("PATCH", "/species?id=gt.0", "update species", json={"common_name": "x"})

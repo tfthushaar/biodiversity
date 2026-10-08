@@ -203,6 +203,12 @@ export interface SourceHealth {
   items: number;
 }
 
+/** How full the free-tier database is. */
+export interface StorageStatus {
+  db_bytes: number;
+  budget_bytes: number;
+}
+
 export interface InvasiveSpecies {
   species_id: number;
   establishment_means: string | null;

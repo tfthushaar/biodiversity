@@ -64,3 +64,25 @@ python scripts/smoke_rest.py https://YOUR-REF.supabase.co/rest/v1 --key YOUR_ANO
 It confirms the dashboard's data is readable and that writes, internal functions and PostGIS
 functions are refused. Use the **anon** key. The service-role key must never leave the workers'
 secrets. See [api.md](api.md).
+
+## Staying inside the free database (500 MB)
+
+Supabase's free plan puts a project into read-only mode when the database reaches its limit, which
+would silently stop every later run. So the limit is watched, not hoped about:
+
+- `storage_status()` (migration 0015) reports the database size against the 500 MB budget. The
+  dashboard's Sources page shows it as a meter.
+- `python -m biodiv.workers.ingest` refuses to add records once the database is 90% full and exits
+  with status 3, so the scheduled run turns red instead of quietly doing nothing.
+- `python -m biodiv.workers.retention` runs after every ingest. It removes old ingestion-run logs
+  (keeping each source's newest 50, and anything under 90 days old) and prints a warning at 80% and
+  an error at 90%.
+- It never deletes observations, detections or findings. Those are the product. If they ever fill
+  the budget the answer is a human decision: narrower zones, or a paid plan.
+
+The database size comes from `pg_database_size`. Supabase's own dashboard shows its own figure, which
+may differ slightly, so the 10% margin is deliberate. Compare the two on a real project before
+relying on it.
+
+Only detection boxes and source URLs are stored, never images, so the original plan's thumbnail
+budget does not apply. Today's database, with about 2,400 observations, is under 30 MB.

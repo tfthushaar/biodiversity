@@ -32,6 +32,14 @@ describe("Meter", () => {
   });
 });
 
+describe("Meter as a limit", () => {
+  it("never calls a full ceiling 'met': reaching a limit is not success", () => {
+    render(<Meter label="Database" value={500} target={500} unit="MB" limit />);
+    expect(screen.getByText(/of 500 MB/)).toBeInTheDocument();
+    expect(screen.queryByText(/met/)).not.toBeInTheDocument();
+  });
+});
+
 describe("QueryView", () => {
   function Probe({ fn }: { fn: () => Promise<string> }) {
     const query = useQuery({ queryKey: ["probe"], queryFn: fn, retry: false });

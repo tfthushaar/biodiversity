@@ -1,5 +1,5 @@
-import { useSources } from "../api/hooks";
-import { ErrorState, Loading } from "../components/basics";
+import { useSources, useStorage } from "../api/hooks";
+import { ErrorState, Loading, Meter } from "../components/basics";
 import { safeUrl } from "../components/evidence";
 import { fmtAgo, fmtInt, humanise, pluralise } from "../lib/format";
 
@@ -7,6 +7,8 @@ const DOCS = "https://github.com/tfthushaar/biodiversity/blob/main/docs/data-qua
 
 export function Sources() {
   const sources = useSources();
+  const storage = useStorage();
+  const MB = 1024 * 1024;
   return (
     <>
       <h1>Data sources and what they can support</h1>
@@ -76,6 +78,29 @@ export function Sources() {
           </div>
         </div>
       )}
+
+      <h2>How much room is left</h2>
+      <div className="card">
+        {storage.data ? (
+          <>
+            <Meter
+              label="Free-tier database"
+              value={Math.round(storage.data.db_bytes / MB)}
+              target={Math.round(storage.data.budget_bytes / MB)}
+              unit="MB"
+              limit
+            />
+            <p className="hint" style={{ marginBottom: 0 }}>
+              The data workers stop adding records at 90% full, because a full free database goes read-only.
+              Old run logs are trimmed automatically; the records themselves never are.
+            </p>
+          </>
+        ) : storage.isError ? (
+          <p className="muted" style={{ margin: 0 }}>The storage figure is unavailable right now.</p>
+        ) : (
+          <Loading what="storage" />
+        )}
+      </div>
 
       <h2>What this data cannot tell you</h2>
       <div className="card">

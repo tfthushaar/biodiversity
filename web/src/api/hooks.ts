@@ -8,6 +8,7 @@ import type {
   Playbook,
   RecordsGeoJSON,
   SourceHealth,
+  StorageStatus,
   ZoneReportRow,
   ZonesGeoJSON,
 } from "./types";
@@ -68,6 +69,8 @@ export const usePlaybooks = () =>
 
 export const useModels = () =>
   useQuery(q<ModelVersion[]>(["models"], "/model_versions?select=id,name,task,weights_uri,metrics&order=id"));
+
+export const useStorage = () => useQuery(q<StorageStatus>(["storage"], "/rpc/storage_status"));
 
 export const useSources = () => useQuery(q<SourceHealth[]>(["sources"], "/source_health?order=id"));
 

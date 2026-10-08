@@ -88,6 +88,12 @@ def test_the_geojson_functions_work_for_the_public_role(anon):
     assert points == {"type": "FeatureCollection", "features": []}  # none yet, but valid
 
 
+def test_the_public_can_see_how_full_the_database_is(anon):
+    status = anon.execute("select storage_status()").fetchone()[0]
+    assert set(status) == {"db_bytes", "budget_bytes"}  # two numbers and nothing else
+    assert status["budget_bytes"] == 500 * 1024 * 1024 and status["db_bytes"] > 0
+
+
 def test_the_point_query_is_capped_whatever_the_caller_asks_for(ingest_db_url):
     from helpers import World, day
 

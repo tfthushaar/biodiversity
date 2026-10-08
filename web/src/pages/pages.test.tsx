@@ -175,6 +175,23 @@ describe("Sources page", () => {
   });
 });
 
+describe("Sources storage", () => {
+  const MB = 1024 * 1024;
+  it("shows how much of the free database is used", async () => {
+    serve({ "/source_health": [], "/rpc/storage_status": { db_bytes: 27 * MB, budget_bytes: 500 * MB } });
+    wrap(<Sources />);
+    expect(await screen.findByText(/of 500 MB/)).toBeInTheDocument();
+    expect(screen.getByRole("meter", { name: "Free-tier database" })).toHaveAttribute("aria-valuenow", "27");
+  });
+
+  it("says when the figure is unavailable instead of showing a made-up one", async () => {
+    serve({ "/source_health": [] });
+    wrap(<Sources />);
+    expect(await screen.findByText(/storage figure is unavailable/)).toBeInTheDocument();
+    expect(screen.queryByRole("meter")).not.toBeInTheDocument();
+  });
+});
+
 describe("species list", () => {
   const sp = (name: string, common: string | null = null) => ({ species: { scientific_name: name, common_name: common } });
 

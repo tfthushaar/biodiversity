@@ -20,13 +20,6 @@ about it**, on a dashboard for researchers, NGOs and policymakers.
 
 See [docs/free-tier-gate.md](docs/free-tier-gate.md) for the signup checklist and fallbacks.
 
-## How it differs from the original report
-
-Real-time GPU streaming does not exist at zero cost, so ingestion and inference run as scheduled
-batch workers (near-real-time, not streaming). TimescaleDB is replaced by native Postgres
-partitioning (`pg_partman`) because Supabase deprecates the extension. Poaching detection is out
-of scope; the analytical focus is invasive species and their ecosystem impact.
-
 ## Quick start
 
 ```bash
@@ -79,6 +72,27 @@ mistakes made while measuring that: [docs/models.md](docs/models.md).
 Each run is incremental and idempotent, and polite to the source APIs (rate-limited, retried
 with backoff). Read [docs/data-quality.md](docs/data-quality.md) before interpreting any numbers:
 it records what the data can and cannot support.
+
+## Scheduled jobs
+
+Once the `DATABASE_URL` secret exists, GitHub Actions keeps the data fresh on its own:
+[ingest](.github/workflows/ingest.yml) every 6 hours, then [detect](.github/workflows/infer.yml),
+then [analyse](.github/workflows/analytics.yml). Ingestion stops itself before the free database
+fills (see [docs/free-tier-gate.md](docs/free-tier-gate.md)). Until the secret exists each
+workflow explains itself and exits cleanly.
+
+## Documentation
+
+| | |
+|---|---|
+| [docs/architecture.md](docs/architecture.md) | How the pieces fit, what runs where, what is not built yet |
+| [docs/free-tier-gate.md](docs/free-tier-gate.md) | Account checklist, secrets, staying inside free limits |
+| [docs/dashboard.md](docs/dashboard.md) | The pages, configuration, deploying, design decisions |
+| [docs/api.md](docs/api.md) | The public REST path, the API, and what the public cannot do |
+| [docs/models.md](docs/models.md) | The detector and classifiers, with measured accuracy and caveats |
+| [docs/impact.md](docs/impact.md) | How invasive-species impact is analysed and why it often says "not enough data" |
+| [docs/data-quality.md](docs/data-quality.md) | What the data can and cannot support |
+| [docs/iucn.md](docs/iucn.md) | The IUCN threat link, waiting on an API token |
 
 ## Layout
 

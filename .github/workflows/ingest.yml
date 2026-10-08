@@ -1,0 +1,83 @@
+name: Ingest
+
+# Pulls new community observations (iNaturalist) and museum/herbarium specimens (GBIF) for the
+# monitored zones. Incremental: each run continues from where the last one got to, and storing
+# the same record twice is impossible. Free: GitHub-hosted runners are unlimited on public repos.
+#
+# Order of the day: ingest (:05) -> detect (:40) -> analyse (:20 of the next hour).
+#
+# Until the DATABASE_URL secret exists this explains itself and exits cleanly. It refuses to add
+# data once the free database is 90% full (a full free database goes read-only), and fails the
+# run so the problem is visible instead of silent.
+
+on:
+  schedule:
+    - cron: "5 */6 * * *"   # every 6 hours
+  workflow_dispatch:
+    inputs:
+      max:
+        description: "Maximum records per zone per source"
+        default: "2000"
+
+concurrency:
+  group: ingest
+  cancel-in-progress: false  # never kill a run halfway through a batch
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Check prerequisites
+        id: pre
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::notice::DATABASE_URL secret not set yet; nothing to do."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.pre.outputs.ready == 'true'
+        uses: actions/checkout@v7
+      - if: steps.pre.outputs.ready == 'true'
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - if: steps.pre.outputs.ready == 'true'
+        run: pip install -e .
+
+      # The name-matching cache saves thousands of lookups per run. It is only a cache: losing it
+      # makes the next run slower, never wrong.
+      - if: steps.pre.outputs.ready == 'true'
+        uses: actions/cache@v6
+        with:
+          path: data/gbif_match_cache.json
+          key: gbif-match-${{ github.run_id }}
+          restore-keys: gbif-match-
+
+      - name: iNaturalist
+        if: steps.pre.outputs.ready == 'true'
+        env:
+          # Via the environment, never spliced into the shell script.
+          MAX: ${{ github.event.inputs.max || '2000' }}
+        run: |
+          case "$MAX" in ''|*[!0-9]*) echo "::error::max must be a number"; exit 1;; esac
+          python -m biodiv.workers.ingest --source inaturalist --max "$MAX"
+
+      - name: GBIF specimens
+        if: steps.pre.outputs.ready == 'true'
+        env:
+          MAX: ${{ github.event.inputs.max || '2000' }}
+        run: |
+          case "$MAX" in ''|*[!0-9]*) echo "::error::max must be a number"; exit 1;; esac
+          python -m biodiv.workers.ingest --source gbif --max "$MAX"
+
+      # Always last, and even if a source failed: trims old run logs and reports how full the
+      # database is, so a filling database shows up as a warning long before it is an outage.
+      - name: Trim run logs and report storage
+        if: steps.pre.outputs.ready == 'true' && always()
+        run: python -m biodiv.workers.retention

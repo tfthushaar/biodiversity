@@ -79,14 +79,17 @@ export function Meter({
   value,
   target,
   unit,
+  limit = false,
 }: {
   label: string;
   value: number;
   target: number;
   unit: string;
+  /** The target is a ceiling to stay under, not a requirement to reach. */
+  limit?: boolean;
 }) {
   const pct = target > 0 ? Math.min(1, value / target) : 0;
-  const met = value >= target;
+  const met = !limit && value >= target;
   return (
     <div className="meter">
       <div className="meter-head">

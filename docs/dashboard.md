@@ -14,7 +14,7 @@ sleeps. See [api.md](api.md) for why the database, not a server, is the security
 | Species | One invasive species: where it was recorded, what research reports, what management has been tried | `invasive_status`, `impact_findings`, `mitigation_playbooks` |
 | Alerts | Early detections: an invasive species recorded in a zone for the first time | `alerts` |
 | Models | Measured accuracy of each model, with the caveats that go with it | `model_versions` |
-| Sources | Where the data came from, its licence, and why records were refused | `source_health` |
+| Sources | Where the data came from, its licence, why records were refused, and how full the free database is | `source_health`, `storage_status()` |
 
 The Models page has a "try it on a photo" panel. It needs the optional analysis service
 (`VITE_API_URL`); without one the panel says so instead of offering a button that cannot work.

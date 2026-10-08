@@ -45,6 +45,7 @@ from biodiv.ingestion.gbif_occurrences import (
 from biodiv.ingestion.http import PoliteClient
 from biodiv.ingestion.inaturalist import INAT_API, iter_observations, parse_observation
 from biodiv.ingestion.observations import Observation, validate
+from biodiv.workers.retention import STOP_AT, storage
 
 log = logging.getLogger(__name__)
 
@@ -298,6 +299,15 @@ async def _amain(args: argparse.Namespace) -> int:
     cache = load_cache(cache_path)
     rate = 1.0 if args.source == "inaturalist" else 5.0  # iNaturalist asks for ~1 req/s
     total = IngestStats()
+    with psycopg.connect(settings.database_url, autocommit=True) as gate:
+        room = storage(gate)
+    if room.fraction >= args.stop_at:
+        print(
+            f"not ingesting: {room.describe()} is at or past the {args.stop_at:.0%} limit. "
+            "Free-plan databases go read-only when full; see docs/free-tier-gate.md.",
+            file=sys.stderr,
+        )
+        return 3
     try:
         async with (
             PoliteClient(user_agent=settings.user_agent, per_second=rate) as raw_http,
@@ -332,6 +342,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--full", action="store_true", help="ignore the saved cursor")
     p.add_argument("--gbif-dataset", choices=["specimens", "ebird"], default="specimens")
     p.add_argument("--cache", default=str(DEFAULT_CACHE))
+    p.add_argument("--stop-at", type=float, default=STOP_AT,
+                   help="refuse to ingest once the database is this full (fraction of the budget)")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)  # one line per request is noise
