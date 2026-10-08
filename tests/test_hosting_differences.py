@@ -70,7 +70,7 @@ def test_nothing_is_public_by_default_even_when_the_host_grants_everything(empty
 
         # What the dashboard needs is still there.
         conn.execute("set local role anon")
-        assert conn.execute("select count(*) from zones").fetchone()[0] == 4
+        assert conn.execute("select count(*) from zones").fetchone()[0] == 6
         assert conn.execute("select zones_geojson()").fetchone()[0]["features"]
 
 

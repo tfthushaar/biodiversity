@@ -70,7 +70,7 @@ def test_the_public_sees_only_the_wgs84_definition(anon):
 
 
 def test_the_dashboards_own_data_is_readable(anon):
-    assert anon.execute("select count(*) from zones").fetchone()[0] == 4
+    assert anon.execute("select count(*) from zones").fetchone()[0] == 6
     for table in ("species", "invasive_status", "alerts", "mitigation_playbooks",
                   "impact_findings", "zone_reports", "source_health", "invasive_records",
                   "zone_invasive_summary", "invasion_index_monthly", "native_trend_monthly",
@@ -80,9 +80,9 @@ def test_the_dashboards_own_data_is_readable(anon):
 
 def test_the_geojson_functions_work_for_the_public_role(anon):
     zones = anon.execute("select zones_geojson()").fetchone()[0]
-    assert zones["type"] == "FeatureCollection" and len(zones["features"]) == 4
+    assert zones["type"] == "FeatureCollection" and len(zones["features"]) == 6
     slugs = {f["properties"]["slug"] for f in zones["features"]}
-    assert slugs == {"bandipur", "nagarahole", "mudumalai", "serengeti"}
+    assert slugs == {"bandipur", "nagarahole", "mudumalai", "serengeti", "everglades", "smokies"}
     assert zones["features"][0]["geometry"]["type"] in ("MultiPolygon", "Polygon")
     points = anon.execute("select records_geojson('bandipur', 'invasive', 10)").fetchone()[0]
     assert points == {"type": "FeatureCollection", "features": []}  # none yet, but valid

@@ -79,7 +79,8 @@ def test_zones_are_valid_real_sized_polygons(conn):
     rows = conn.execute(
         "select slug, st_isvalid(geom), st_area(geom::geography) / 1e6 from zones order by slug"
     ).fetchall()
-    assert [r[0] for r in rows] == ["bandipur", "mudumalai", "nagarahole", "serengeti"]
+    assert [r[0] for r in rows] == [
+        "bandipur", "everglades", "mudumalai", "nagarahole", "serengeti", "smokies"]
     for slug, valid, km2 in rows:
         assert valid, slug
         assert km2 > 100, f"{slug} is only {km2:.1f} km2, looks degenerate"
@@ -185,7 +186,7 @@ def test_invasion_index_is_normalised_by_effort(conn):
 def test_public_key_can_read_but_not_write(conn):
     conn.execute("set local role anon")
 
-    assert _one(conn, "select count(*) from zones") == 4
+    assert _one(conn, "select count(*) from zones") == 6
     assert _one(conn, "select count(*) from detections") == 0  # parent: readable
 
     for sql in (

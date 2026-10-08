@@ -29,6 +29,7 @@ from biodiv.ingestion.griis import (
 from biodiv.ingestion.http import PoliteClient
 
 DEFAULT_CACHE = Path("data") / "gbif_match_cache.json"
+CHUNK = 300  # species written per transaction
 
 
 @dataclass
@@ -52,6 +53,9 @@ async def import_griis(
     entries = await resolve_records(records, GbifClient(http), cache)
 
     stats = ImportStats(records=len(records), doubtful_skipped=doubtful, species=len(entries))
+    # Written in chunks rather than one transaction. Over a distant database a large checklist
+    # takes many minutes, and a single transaction would hold locks on the species table for all
+    # of it, stalling the scheduled ingest (which found out the hard way).
     with conn.transaction():
         source_id = conn.execute(
             """
@@ -68,25 +72,28 @@ async def import_griis(
             (source_id, resource),
         ).fetchone()[0]
 
-        for e in entries:
-            species_id = upsert_species(
-                conn, gbif_key=e.gbif_key, name=e.name, kingdom=e.kingdom, rank=e.rank
-            )
-            upsert_invasive_status(
-                conn,
-                species_id=species_id,
-                country=e.country,
-                is_invasive=e.is_invasive,
-                establishment_means=e.establishment_means,
-                occurrence_status=e.occurrence_status,
-                habitat=e.habitat,
-                source="GRIIS",
-                source_ref=f"{resource}:{e.source_ref}",
-            )
-            stats.gbif_matched += e.gbif_key is not None
-            stats.gbif_unmatched += e.gbif_key is None
-            stats.invasive += bool(e.is_invasive)
+    for start in range(0, len(entries), CHUNK):
+        with conn.transaction():
+            for e in entries[start : start + CHUNK]:
+                species_id = upsert_species(
+                    conn, gbif_key=e.gbif_key, name=e.name, kingdom=e.kingdom, rank=e.rank
+                )
+                upsert_invasive_status(
+                    conn,
+                    species_id=species_id,
+                    country=e.country,
+                    is_invasive=e.is_invasive,
+                    establishment_means=e.establishment_means,
+                    occurrence_status=e.occurrence_status,
+                    habitat=e.habitat,
+                    source="GRIIS",
+                    source_ref=f"{resource}:{e.source_ref}",
+                )
+                stats.gbif_matched += e.gbif_key is not None
+                stats.gbif_unmatched += e.gbif_key is None
+                stats.invasive += bool(e.is_invasive)
 
+    with conn.transaction():
         conn.execute(
             "update ingestion_runs set finished_at = now(), fetched = %s, notes = %s where id = %s",
             (stats.species, f"{resource}: {stats.doubtful_skipped} doubtful skipped", run_id),
