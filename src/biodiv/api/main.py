@@ -30,7 +30,11 @@ app.include_router(GraphQLRouter(schema, context_getter=get_context), prefix="/g
                    tags=["graphql"])
 
 
-@app.get("/health", tags=["meta"])
+@app.api_route("/health", methods=["GET", "HEAD"], tags=["meta"])
 def health() -> dict[str, str]:
-    """Liveness probe, also used by the keep-alive workflow to warm the service."""
+    """Liveness probe, also used by the keep-alive workflow to warm the service.
+
+    Answers HEAD as well as GET: uptime monitors usually ask for headers only, and a 405 there
+    reads as "down" even though the service is fine.
+    """
     return {"status": "ok", "version": __version__}
