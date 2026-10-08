@@ -237,8 +237,8 @@ def zone_report(conn: psycopg.Connection, zone_slug: str) -> dict[str, Any]:
             "documented": {
                 "status": "ok",
                 "findings": documented_findings(conn, zone_slug),
-                "note": "Only what cited sources report. Species-level IUCN threat links are "
-                        "pending an API token (docs/iucn.md).",
+                "note": "Findings come from the cited sources only. IUCN Red List threat links are "
+                        "held back until IUCN permits republication (docs/iucn.md).",
             },
             "cooccurrence": cooccurrence(conn, zone_slug).as_dict(),
             "trend": trend(conn, zone_slug).as_dict(),
