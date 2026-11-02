@@ -25,7 +25,9 @@
     "roundglass_senna": {
       "citation": "Vinayan, P.A. (2021) Gone Rogue: The Golden Shower Turns Invasive in the Western Ghats. Round Glass Sustain, updated 3 November 2021.",
       "url": "https://roundglasssustain.com/conservation/golden-shower-invasive",
-      "kind": "page"
+      "fetch_url": "http://web.archive.org/web/20260416080321/https://roundglasssustain.com/conservation/golden-shower-invasive",
+      "kind": "page",
+      "note": "The site answers 404 to requests from GitHub's servers, so quotes are verified against an Internet Archive copy of the same article."
     },
     "mongabay_senna": {
       "citation": "Menon, A. (2023) Wayanad's soured relationship with Senna. Mongabay-India, 13 November 2023.",

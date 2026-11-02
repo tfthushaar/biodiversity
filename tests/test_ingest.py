@@ -11,7 +11,7 @@ from biodiv.ingestion.gbif_occurrences import GBIF_OCCURRENCE_API
 from biodiv.ingestion.http import PoliteClient
 from biodiv.ingestion.inaturalist import INAT_API
 from biodiv.workers import ingest as ingest_module
-from biodiv.workers.ingest import ingest_zone, load_zones
+from biodiv.workers.ingest import IngestStats, exit_code, ingest_zone, ingest_zones, load_zones
 from helpers import exact, mock_gbif
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -321,3 +321,36 @@ async def test_a_zone_that_has_reached_its_cap_is_skipped(ingest_db_url, respx_m
     assert q(url, "select count(*) from ingestion_runs") == [(1,)]
     more = await run(url, full=True, max_stored=4)  # room again
     assert more.fetched == 3
+
+
+async def test_a_source_outage_in_one_park_does_not_stop_the_others(ingest_db_url, respx_mock):
+    """A provider error in one park is recorded and the next park still runs."""
+    url = ingest_db_url
+    mock_gbif(respx_mock, {"Lantana camara": exact(2925303, "Lantana camara")})
+    ((bandipur_west,),) = q(url, "select st_xmin(geom) from zones where slug = 'bandipur'")
+    page = [inat_obs(1, "Lantana camara")]
+
+    def handler(request):
+        if abs(float(request.url.params["swlng"]) - bandipur_west) < 1e-6:
+            return httpx.Response(530)  # the source is down for this park
+        above = int(request.url.params["id_above"])
+        return httpx.Response(200, json={"results": [o for o in page if o["id"] > above]})
+
+    respx_mock.get(f"{INAT_API}/observations").mock(side_effect=handler)
+    with psycopg.connect(url, autocommit=True) as conn:
+        zones = load_zones(conn, ["bandipur", "mudumalai"])
+        async with client() as raw, client() as gb:
+            total, failed = await ingest_zones(
+                conn, zones, source="inaturalist", raw_http=raw, gbif_http=gb, cache={}
+            )
+
+    assert failed == ["bandipur"]
+    assert total.fetched == 1  # Mudumalai was still read
+    assert exit_code(total, failed) == 0
+    assert q(url, "select count(*) from ingestion_runs where failed = 1") == [(1,)]
+
+
+def test_a_run_turns_red_only_when_nothing_could_be_read():
+    assert exit_code(IngestStats(fetched=5), ["bandipur"]) == 0
+    assert exit_code(IngestStats(), ["bandipur", "mudumalai"]) == 1
+    assert exit_code(IngestStats(), []) == 0  # every park at its cap: nothing to do

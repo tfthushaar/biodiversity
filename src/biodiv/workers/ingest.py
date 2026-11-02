@@ -23,6 +23,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+import httpx
 import psycopg
 
 from biodiv.core.repo import upsert_species
@@ -410,12 +411,56 @@ async def ingest_zone(
     return stats
 
 
+async def ingest_zones(
+    conn: psycopg.Connection,
+    zones: list[Zone],
+    *,
+    deadline: float | None = None,
+    **zone_args: Any,
+) -> tuple[IngestStats, list[str]]:
+    """Ingest each zone in turn and return the combined stats with the slugs that failed.
+
+    A source that is down for one zone (a 5xx from the provider, a dropped connection) is already
+    recorded by `ingest_zone` in `ingestion_runs`. The other zones still run, because an outage at
+    the provider should not stop parks it does not affect. Errors in our own code or in the
+    database are not caught.
+    """
+    total = IngestStats()
+    failed: list[str] = []
+    for zone in zones:
+        if _out_of_time(deadline):
+            log.info("time limit reached; the remaining zones wait for the next run")
+            total.stopped_early = True
+            break
+        try:
+            s = await ingest_zone(conn, zone, deadline=deadline, **zone_args)
+        except httpx.HTTPError as exc:
+            log.warning("%s: the source did not answer (%s: %s); the next run tries again",
+                        zone.slug, type(exc).__name__, exc)
+            failed.append(zone.slug)
+            continue
+        log.info(
+            "%s: fetched %d, stored %d, duplicates %d, rejected %s",
+            zone.slug, s.fetched, s.stored, s.skipped_dupe, dict(s.rejected),
+        )
+        total.merge(s)
+    return total, failed
+
+
+def exit_code(total: IngestStats, failed: list[str]) -> int:
+    """Failed zones turn the run red only when nothing at all could be read from the source.
+
+    A partial outage is reported as a warning and recorded in `ingestion_runs`; the next run
+    retries the same records, so nothing is lost.
+    """
+    return 1 if failed and total.fetched == 0 else 0
+
+
 async def _amain(args: argparse.Namespace) -> int:
     settings = get_settings()
     cache_path = Path(args.cache)
     cache = load_cache(cache_path)
     rate = {"inaturalist": 1.0, "usgs_nas": 2.0}.get(args.source, 5.0)  # iNaturalist asks ~1/s
-    total = IngestStats()
     deadline = time.monotonic() + args.max_minutes * 60 if args.max_minutes else None
     species_ids: dict = {}
     with psycopg.connect(settings.database_url, autocommit=True) as gate:
@@ -433,22 +478,12 @@ async def _amain(args: argparse.Namespace) -> int:
             PoliteClient(user_agent=settings.user_agent, per_second=10.0, max_concurrency=8) as gb,
         ):
             with psycopg.connect(settings.database_url, autocommit=True) as conn:
-                for zone in load_zones(conn, args.zone):
-                    if _out_of_time(deadline):
-                        log.info("time limit reached; the remaining zones wait for the next run")
-                        total.stopped_early = True
-                        break
-                    s = await ingest_zone(
-                        conn, zone, source=args.source, raw_http=raw_http, gbif_http=gb,
-                        cache=cache, max_results=args.max, full=args.full,
-                        gbif_dataset=args.gbif_dataset, deadline=deadline, species_ids=species_ids,
-                        max_stored=args.max_stored_per_zone,
-                    )
-                    log.info(
-                        "%s: fetched %d, stored %d, duplicates %d, rejected %s",
-                        zone.slug, s.fetched, s.stored, s.skipped_dupe, dict(s.rejected),
-                    )
-                    total.merge(s)
+                total, failed = await ingest_zones(
+                    conn, load_zones(conn, args.zone), deadline=deadline,
+                    source=args.source, raw_http=raw_http, gbif_http=gb, cache=cache,
+                    max_results=args.max, full=args.full, gbif_dataset=args.gbif_dataset,
+                    species_ids=species_ids, max_stored=args.max_stored_per_zone,
+                )
     finally:
         save_cache(cache_path, cache)
     print(
@@ -456,7 +491,11 @@ async def _amain(args: argparse.Namespace) -> int:
         f"duplicates {total.skipped_dupe}, rejected {dict(total.rejected)}"
         + ("; stopped at the time limit, the next run continues" if total.stopped_early else "")
     )
-    return 0
+    if failed:
+        # "::warning::" shows as an annotation on the workflow run.
+        print(f"::warning::{args.source} did not answer for {', '.join(failed)}; "
+              "those parks are tried again on the next run", file=sys.stderr)
+    return exit_code(total, failed)
 
 
 def main(argv: list[str] | None = None) -> int:

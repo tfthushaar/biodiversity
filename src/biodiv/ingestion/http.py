@@ -14,7 +14,9 @@ from typing import Any
 
 import httpx
 
-RETRY_STATUS = frozenset({429, 500, 502, 503, 504})
+# 520 to 524 and 530 are Cloudflare's "the site behind me did not answer" codes. USGS sits behind
+# Cloudflare and returned 530 for a few minutes on two nights, so they are treated like a 503.
+RETRY_STATUS = frozenset({408, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524, 530})
 MAX_RETRY_AFTER = 60.0
 
 

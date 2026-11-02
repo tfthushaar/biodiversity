@@ -123,6 +123,18 @@ async def test_gives_up_after_the_retry_budget(respx_mock):
     assert route.call_count == 3
 
 
+@pytest.mark.parametrize("status", [408, 520, 522, 524, 530])
+async def test_retries_the_errors_a_proxy_returns_when_the_site_behind_it_is_down(
+    respx_mock, status
+):
+    route = respx_mock.get("https://x.test/a").mock(
+        side_effect=[httpx.Response(status), httpx.Response(200, json={"ok": 1})]
+    )
+    async with _client() as http:
+        assert await http.get_json("https://x.test/a") == {"ok": 1}
+    assert route.call_count == 2
+
+
 async def test_client_errors_are_not_retried(respx_mock):
     route = respx_mock.get("https://x.test/a").mock(return_value=httpx.Response(404))
     async with _client() as http:
