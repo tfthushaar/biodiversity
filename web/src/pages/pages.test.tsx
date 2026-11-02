@@ -94,6 +94,20 @@ describe("Impact page", () => {
     expect(screen.getByText(/of 30 records/)).toBeInTheDocument();
   });
 
+  it("names the most recorded invasive species and keeps a long list behind a control", async () => {
+    const busy = report("Everglades National Park", "everglades");
+    busy.report.invasive_species = Array.from({ length: 12 }, (_, i) => ({
+      species: `Species ${String.fromCharCode(65 + i)}`, common_name: null, records: 100 - i,
+      first_record: "2020-01-01", last_record: "2020-01-01", sources: 1,
+    }));
+    serve({ "/zone_reports": [busy] });
+    wrap(<Impact />);
+    expect(await screen.findByText(/12 invasive species recorded\. The most recorded are Species A, /)).toBeInTheDocument();
+    expect(screen.getByText(/Show the other 4/)).toBeInTheDocument();
+    expect(screen.getByText(/Species I, Species J, Species K, Species L\./)).toBeInTheDocument();
+    expect(screen.queryByText(/The most recorded are .*Species I/)).not.toBeInTheDocument();
+  });
+
   it("explains an empty analysis instead of showing nothing", async () => {
     serve({ "/zone_reports": [] });
     wrap(<Impact />);

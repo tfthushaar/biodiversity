@@ -6,6 +6,9 @@ import { FindingCard } from "../components/cards";
 import { fmtAgo, fmtInt } from "../lib/format";
 import { linear } from "../lib/scale";
 
+// Past this many, the rest of the species names sit behind a "Show" control.
+const TOP_SPECIES = 8;
+
 const num = (d: Record<string, unknown>, k: string): number => (typeof d[k] === "number" ? (d[k] as number) : 0);
 
 export function Impact() {
@@ -65,16 +68,26 @@ function ZoneLayers({ report, name }: { report: ZoneReport; name: string }) {
   const here = documented.findings.filter((f) => f.recorded_in_zone);
   const reported = documented.findings.filter((f) => !f.recorded_in_zone);
 
+  const invasive = report.invasive_species.map((s) => s.species);
+  const shown = invasive.slice(0, TOP_SPECIES);
+  const rest = invasive.slice(TOP_SPECIES);
+
   return (
     <>
       <p>
         <strong>{name}</strong>: {fmtInt(report.observations)} observations of {fmtInt(report.species)} species;{" "}
-        {report.invasive_species.length === 0
+        {invasive.length === 0
           ? "no invasive species recorded."
-          : `${report.invasive_species.length} invasive ${report.invasive_species.length === 1 ? "species" : "species"} recorded: ${report.invasive_species
-              .map((s) => s.species)
-              .join(", ")}.`}
+          : rest.length === 0
+            ? `${invasive.length} invasive species recorded: ${shown.join(", ")}.`
+            : `${invasive.length} invasive species recorded. The most recorded are ${shown.join(", ")}.`}
       </p>
+      {rest.length > 0 && (
+        <details className="hint">
+          <summary>Show the other {rest.length}</summary>
+          <p>{rest.join(", ")}.</p>
+        </details>
+      )}
 
       <Layer n={1} title="Documented findings" question="What do cited sources report about these species here?">
         {documented.findings.length === 0 ? (
