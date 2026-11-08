@@ -1,11 +1,12 @@
-"""GBIF occurrence connector.
+"""GBIF connector for preserved specimens.
 
-In practice GBIF here is dominated by two datasets we deliberately do NOT ingest by default:
-iNaturalist research-grade observations (already fetched directly, so ingesting them again would
-double-count) and eBird (hundreds of thousands of bird records: too large for a free database
-and birds only). The default is museum and herbarium specimens, which carry the *historical*
-record of where a species was first collected and so complement the live feeds. eBird remains
-available as an explicit, capped opt-in.
+Only preserved specimens are used: museum and herbarium material whose identification can be
+traced to a collection, and which carry the historical record of where a species was collected.
+GBIF's other records are left out because their provenance is not specific enough to stand behind:
+human observations and unspecified occurrences (iNaturalist's are fetched directly, and counting
+them twice would double them), machine observations such as eBird, and material samples such as
+DNA extracts. Unspecified occurrences made up most of the invasive-species records that GBIF
+first supplied, which is why the filter is this narrow.
 """
 
 from __future__ import annotations
@@ -20,9 +21,9 @@ from biodiv.ingestion.observations import Observation, short_license, usable_ima
 GBIF_OCCURRENCE_API = "https://api.gbif.org/v1/occurrence/search"
 
 INATURALIST_DATASET = "50c9509d-22c7-4a22-a47d-8c48425ef4a7"
-EBIRD_DATASET = "4fa7b334-ce0d-4e88-aaae-2e0c138d049e"
 
-DEFAULT_BASIS = ("PRESERVED_SPECIMEN", "MATERIAL_SAMPLE", "OCCURRENCE")
+SPECIMEN = "PRESERVED_SPECIMEN"
+DEFAULT_BASIS = (SPECIMEN,)
 MAX_OFFSET = 100_000  # GBIF's search endpoint refuses to page past this
 
 
@@ -74,7 +75,6 @@ async def iter_occurrences(
     bbox: tuple[float, float, float, float],
     *,
     basis_of_record: Sequence[str] = DEFAULT_BASIS,
-    dataset_key: str | None = None,
     last_interpreted: str | None = None,
     max_results: int = 5000,
     page_size: int = 300,
@@ -88,10 +88,7 @@ async def iter_occurrences(
         "hasGeospatialIssue": "false",
         "occurrenceStatus": "PRESENT",
     }
-    if dataset_key:
-        params["datasetKey"] = dataset_key
-    else:
-        params["basisOfRecord"] = list(basis_of_record)
+    params["basisOfRecord"] = list(basis_of_record)
     if last_interpreted:
         params["lastInterpreted"] = f"{last_interpreted},*"
 

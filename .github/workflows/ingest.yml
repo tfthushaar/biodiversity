@@ -1,10 +1,11 @@
 name: Ingest
 
-# Pulls new community observations (iNaturalist) and museum/herbarium specimens (GBIF) for the
-# monitored zones. Incremental: each run continues from where the last one got to, and storing
-# the same record twice is impossible. Free: GitHub-hosted runners are unlimited on public repos.
+# Pulls new community observations (iNaturalist), preserved museum and herbarium specimens (GBIF)
+# and curated non-native aquatic records (USGS NAS) for the monitored zones. Incremental: each run
+# continues from where the last one got to, and storing the same record twice is impossible.
+# Free: GitHub-hosted runners are unlimited on public repos.
 #
-# Order of the day: ingest (:05) -> detect (:40) -> analyse (:20 of the next hour).
+# Order of the day: ingest at :05, then analyse at :20 of the following hour.
 #
 # Each source stops cleanly at its time limit and keeps its progress, so a large first load
 # finishes over several runs instead of being cut off. (A runner in the US writing to a database in

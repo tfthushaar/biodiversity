@@ -1,6 +1,6 @@
 name: Analyse
 
-# Refreshes the rollups and early-detection alerts. Runs after the detect workflow. Until the
+# Refreshes the rollups and early-detection alerts. Runs after the ingest workflow. Until the
 # DATABASE_URL secret exists it explains itself and exits cleanly.
 
 on:

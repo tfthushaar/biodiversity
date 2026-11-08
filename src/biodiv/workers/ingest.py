@@ -1,8 +1,8 @@
 """Fetch observations for monitored zones and store them.
 
     python -m biodiv.workers.ingest --source inaturalist [--zone bandipur ...] [--max 5000]
-    python -m biodiv.workers.ingest --source gbif --gbif-dataset specimens
-    python -m biodiv.workers.ingest --source gbif --gbif-dataset ebird --max 2000
+    python -m biodiv.workers.ingest --source gbif
+    python -m biodiv.workers.ingest --source usgs_nas
 
 Incremental by default: each (source, zone) remembers where it got to. Re-running stores
 nothing twice. Records that fail validation are counted by reason, not silently dropped.
@@ -38,9 +38,8 @@ from biodiv.ingestion.gbif import (
     save_cache,
 )
 from biodiv.ingestion.gbif_occurrences import (
-    DEFAULT_BASIS,
-    EBIRD_DATASET,
     GBIF_OCCURRENCE_API,
+    SPECIMEN,
     is_inaturalist_mirror,
     iter_occurrences,
     parse_occurrence,
@@ -79,8 +78,8 @@ SOURCES = {
         "iNaturalist contributors",
     ),
     "gbif": SourceSpec(
-        "GBIF occurrences", GBIF_OCCURRENCE_API, "Per record (CC); see media_items.license",
-        "Occurrence data via GBIF.org",
+        "GBIF specimens", GBIF_OCCURRENCE_API, "Per record (CC); see media_items.license",
+        "Preserved specimen records via GBIF.org",
     ),
     "usgs_nas": SourceSpec(
         "USGS NAS", usgs_nas.NAS_API, usgs_nas.NAS_LICENSE,
@@ -123,12 +122,24 @@ def load_zones(conn: psycopg.Connection, slugs: list[str] | None) -> list[Zone]:
     return [Zone(r[0], r[1], r[2], (r[3], r[4], r[5], r[6])) for r in rows]
 
 
+# Names a source went by before. A database that still holds the old name keeps its records and
+# cursors: the row is renamed in place, so nothing is read or stored twice.
+FORMER_NAMES = {"GBIF specimens": ("GBIF occurrences",)}
+
+
 def _ensure_source(conn: psycopg.Connection, spec: SourceSpec) -> int:
+    for former in FORMER_NAMES.get(spec.name, ()):
+        conn.execute(
+            "update sources set name = %s, attribution = %s where name = %s "
+            "and not exists (select 1 from sources where name = %s)",
+            (spec.name, spec.attribution, former, spec.name),
+        )
     return conn.execute(
         """
         insert into sources (name, kind, base_url, license, attribution)
         values (%s, 'api', %s, %s, %s)
-        on conflict (name) do update set base_url = excluded.base_url
+        on conflict (name) do update set base_url = excluded.base_url,
+                                         attribution = excluded.attribution
         returning id
         """,
         (spec.name, spec.base_url, spec.license, spec.attribution),
@@ -292,7 +303,6 @@ async def ingest_zone(
     cache: TaxonCache,
     max_results: int = 5000,
     full: bool = False,
-    gbif_dataset: str = "specimens",
     deadline: float | None = None,
     species_ids: dict | None = None,
     max_stored: int | None = None,
@@ -317,7 +327,7 @@ async def ingest_zone(
     elif source == "usgs_nas":
         scope = f"{zone.slug}:nas"
     else:
-        scope = f"{zone.slug}:{gbif_dataset}"
+        scope = f"{zone.slug}:specimens"
     row = conn.execute(
         "select cursor from ingestion_cursors where source_id = %s and scope = %s",
         (source_id, scope),
@@ -345,15 +355,9 @@ async def ingest_zone(
         raw = usgs_nas.iter_occurrences(
             raw_http, usgs_nas.ZONE_COUNTIES[zone.slug], max_results=max_results
         )
-    elif gbif_dataset == "ebird":
-        raw = iter_occurrences(
-            raw_http, zone.bbox, dataset_key=EBIRD_DATASET, last_interpreted=cursor,
-            max_results=max_results,
-        )
     else:
         raw = iter_occurrences(
-            raw_http, zone.bbox, basis_of_record=DEFAULT_BASIS, last_interpreted=cursor,
-            max_results=max_results,
+            raw_http, zone.bbox, last_interpreted=cursor, max_results=max_results,
         )
 
     species_ids = {} if species_ids is None else species_ids
@@ -367,6 +371,10 @@ async def ingest_zone(
                 new_cursor = str(max(int(new_cursor or 0), rec["id"]))
             elif source == "gbif" and is_inaturalist_mirror(rec):
                 stats.rejected["duplicate_of_inaturalist"] += 1
+                continue
+            elif source == "gbif" and rec.get("basisOfRecord") != SPECIMEN:
+                # The query asks for specimens only. This holds if GBIF ever answers with more.
+                stats.rejected["not_a_specimen"] += 1
                 continue
             obs = PARSERS[source](rec)
             if obs is None:
@@ -481,7 +489,7 @@ async def _amain(args: argparse.Namespace) -> int:
                 total, failed = await ingest_zones(
                     conn, load_zones(conn, args.zone), deadline=deadline,
                     source=args.source, raw_http=raw_http, gbif_http=gb, cache=cache,
-                    max_results=args.max, full=args.full, gbif_dataset=args.gbif_dataset,
+                    max_results=args.max, full=args.full,
                     species_ids=species_ids, max_stored=args.max_stored_per_zone,
                 )
     finally:
@@ -504,7 +512,6 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--zone", action="append", help="zone slug; repeat for several (default: all)")
     p.add_argument("--max", type=int, default=5000, help="max records per zone per run")
     p.add_argument("--full", action="store_true", help="ignore the saved cursor")
-    p.add_argument("--gbif-dataset", choices=["specimens", "ebird"], default="specimens")
     p.add_argument("--cache", default=str(DEFAULT_CACHE))
     p.add_argument("--max-stored-per-zone", type=int, default=None,
                    help="skip a zone once this source has stored this many records there")

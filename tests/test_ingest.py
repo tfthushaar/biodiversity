@@ -259,11 +259,12 @@ async def test_gbif_specimens_skip_the_inaturalist_mirror_and_keep_real_dates(
     url = ingest_db_url
     lon, lat = INSIDE_BANDIPUR
     specimen = _fixture("gbif_occurrences.json", "specimen_full_date") | {
-        "decimalLongitude": lon, "decimalLatitude": lat}
+        "decimalLongitude": lon, "decimalLatitude": lat, "basisOfRecord": "PRESERVED_SPECIMEN"}
     results = [
         _fixture("gbif_occurrences.json", "inat_mirror"),
         specimen,
-        _fixture("gbif_occurrences.json", "specimen_year_only"),
+        _fixture("gbif_occurrences.json", "specimen_year_only") | {
+            "basisOfRecord": "PRESERVED_SPECIMEN"},
     ]
     respx_mock.get(GBIF_OCCURRENCE_API).mock(
         return_value=httpx.Response(200, json={"results": results, "endOfRecords": True})
@@ -281,6 +282,45 @@ async def test_gbif_specimens_skip_the_inaturalist_mirror_and_keep_real_dates(
     ((scope, cursor),) = q(url, "select scope, cursor from ingestion_cursors")
     assert scope == "bandipur:specimens"
     assert cursor == datetime.now(UTC).date().isoformat()  # GBIF cursors are dates
+
+
+async def test_a_database_with_the_former_source_name_keeps_its_records(ingest_db_url):
+    """GBIF specimens were first stored as 'GBIF occurrences'. The row is renamed, not replaced."""
+    url = ingest_db_url
+    with psycopg.connect(url, autocommit=True) as conn:
+        old = conn.execute(
+            "insert into sources (name, kind) values ('GBIF occurrences', 'api') returning id"
+        ).fetchone()[0]
+        again = ingest_module._ensure_source(conn, ingest_module.SOURCES["gbif"])
+        assert again == old
+        assert conn.execute("select name from sources where id = %s", (old,)).fetchone() == (
+            "GBIF specimens",)
+        left = conn.execute("select count(*) from sources where name like 'GBIF%'").fetchone()
+        assert left == (1,)
+
+
+async def test_gbif_records_that_are_not_preserved_specimens_are_refused(
+    ingest_db_url, respx_mock
+):
+    """Specimens trace to a collection. Sightings of unspecified origin and DNA extracts do not."""
+    url = ingest_db_url
+    lon, lat = INSIDE_BANDIPUR
+    base = _fixture("gbif_occurrences.json", "specimen_full_date") | {
+        "decimalLongitude": lon, "decimalLatitude": lat}
+    results = [base | {"key": 1, "basisOfRecord": "PRESERVED_SPECIMEN"},
+               base | {"key": 2, "basisOfRecord": "OCCURRENCE"},
+               base | {"key": 3, "basisOfRecord": "MATERIAL_SAMPLE"},
+               base | {"key": 4, "basisOfRecord": "HUMAN_OBSERVATION"}]
+    route = respx_mock.get(GBIF_OCCURRENCE_API).mock(
+        return_value=httpx.Response(200, json={"results": results, "endOfRecords": True}))
+    mock_gbif(respx_mock, {})
+
+    stats = await run(url, source="gbif")
+    assert (stats.fetched, stats.stored) == (4, 1)
+    assert dict(stats.rejected) == {"not_a_specimen": 3}
+    assert q(url, "select m.external_id from media_items m") == [("1",)]
+    # The request itself asks for specimens only, so GBIF never sends the others.
+    assert route.calls.last.request.url.params.get_list("basisOfRecord") == ["PRESERVED_SPECIMEN"]
 
 
 async def test_gbif_that_stops_early_does_not_claim_to_have_read_everything(

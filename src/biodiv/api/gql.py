@@ -38,7 +38,6 @@ class Species:
     scientific_name: str
     common_name: str | None
     kingdom: str | None
-    iucn_category: str | None
     invasive_in_india: bool | None
     establishment_means: str | None
 
@@ -120,7 +119,7 @@ class Query:
     def species(self, info: Info, search: str | None = None, invasive_only: bool = False,
                 limit: int = 50) -> list[Species]:
         rows = _rows(info, """
-            select s.scientific_name, s.common_name, s.kingdom, s.iucn_category,
+            select s.scientific_name, s.common_name, s.kingdom,
                    i.is_invasive and i.origin_class = 'alien', i.establishment_means
             from species s
             left join invasive_status i on i.species_id = s.id and i.country = 'IN'

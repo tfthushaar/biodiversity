@@ -3,12 +3,15 @@ name: Detect
 # Runs MegaDetector over images waiting in the database. Free: GitHub-hosted runners are
 # unlimited on public repos, and the model runs on CPU through ONNX Runtime.
 #
-# Needs, once: the DATABASE_URL secret (Supabase session-pooler string) and the model published
-# as a release (docs/models.md). Until then this workflow explains itself and exits cleanly.
+# Started by hand only. Every source the platform reads delivers records, not images waiting to be
+# processed, so a schedule would find an empty queue on every run. The detector is evaluated on
+# the Caltech Camera Traps photos instead (docs/models.md). Run this when camera-trap images are
+# added to the database.
+#
+# Needs: the DATABASE_URL secret (Supabase session-pooler string) and the model published as a
+# release (docs/models.md). Without them this workflow explains itself and exits cleanly.
 
 on:
-  schedule:
-    - cron: "40 */6 * * *"   # every 6 hours
   workflow_dispatch:
     inputs:
       limit:

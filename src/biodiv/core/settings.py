@@ -13,8 +13,6 @@ class Settings(BaseSettings):
     supabase_service_role_key: str = ""
     database_url: str = ""
 
-    iucn_api_token: str = ""
-    ebird_api_key: str = ""
 
     # Models for the live demo endpoint. Unset means that endpoint reports itself unavailable.
     megadetector_onnx: str = ""
