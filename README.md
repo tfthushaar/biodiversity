@@ -142,7 +142,7 @@ added. Without the secret each workflow reports that it has nothing to do and ex
 | [docs/impact.md](docs/impact.md) | How impact is analysed and why the statistics often wait for more data |
 | [docs/data-quality.md](docs/data-quality.md) | What the data supports and where it falls short |
 | [docs/free-tier-gate.md](docs/free-tier-gate.md) | Accounts, secrets and staying inside free limits |
-| [paper.md](paper.md) | A draft paper describing the method and results, as of 8 October 2026 (it predates the paper-only rules and is being revised) |
+| [paper.md](paper.md) | A paper for readers: the method, the results and the peer-reviewed evidence behind each finding. Its records and analyses are those of 8 October 2026, and its evidence base was last checked on 9 November 2026 |
 
 ## Layout
 

@@ -11,9 +11,15 @@ match the data.
 from __future__ import annotations
 
 import json
+from collections import Counter
 from pathlib import Path
 
+from biodiv.knowledge.verify import citation_text
+
 S = json.loads(Path("docs/metrics/dataset_summary.json").read_text(encoding="utf-8"))
+# The evidence base is read from the verified knowledge file, so the paper states what the platform
+# enforces: peer-reviewed papers only, each claim quoted from the paper's abstract.
+KB = json.loads(Path("db/seeds/knowledge.json").read_text(encoding="utf-8"))
 NAMES = {p["slug"]: p["name"].replace(" National Park", "") for p in S["parks"]}
 COUNTRY = {p["slug"]: p["country"] for p in S["parks"]}
 AREA = {p["slug"]: p["area_km2"] for p in S["parks"]}
@@ -122,6 +128,45 @@ def coverage_table() -> str:
     return table(["Park", "Invasive species recorded", "With a cited finding", "With cited management", "Records covered by a finding"], rows)
 
 
+DESIGN = {
+    "experimental": ("controlled experiment", "controlled experiments"),
+    "observational": ("field study", "field studies"),
+    "review": ("review", "reviews"),
+    "modelled": ("model projection", "model projections"),
+}
+
+
+def design_phrase(counts: Counter) -> str:
+    """"10 field studies, 6 controlled experiments and 1 model projection", most common first."""
+    parts = [f"{c} {DESIGN[k][0 if c == 1 else 1]}" for k, c in counts.most_common()]
+    return parts[0] if len(parts) == 1 else ", ".join(parts[:-1]) + " and " + parts[-1]
+
+
+def kb_rows() -> list[dict]:
+    """Every finding and management row of the knowledge file, with the study design of each."""
+    rows = [{**r, "design": r["certainty"], "kind": "finding"} for r in KB["impact_findings"]]
+    rows += [{**r, "design": r["study_design"], "kind": "management"} for r in KB["playbooks"]]
+    return rows
+
+
+def evidence_table() -> str:
+    by: dict[str, list[dict]] = {}
+    for r in kb_rows():
+        by.setdefault(r["species"], []).append(r)
+    rows = []
+    for species, items in sorted(by.items(), key=lambda kv: (-len({r["source"] for r in kv[1]}), kv[0])):
+        designs = Counter(r["design"] for r in items)
+        rows.append([f"*{species}*", str(len({r["source"] for r in items})),
+                     str(sum(r["kind"] == "finding" for r in items)),
+                     str(sum(r["kind"] == "management" for r in items)), design_phrase(designs)])
+    return table(["Species", "Papers", "Findings", "Management rows", "Study designs of the rows"], rows, "lrrrl")
+
+
+def evidence_references() -> str:
+    """The reference list of the evidence base, one paper per line, by first author."""
+    return "\n\n".join(sorted(citation_text(s) for s in KB["sources"].values()))
+
+
 def trend_pair(slug: str) -> tuple[dict, dict]:
     """(invasive, native) Mann-Kendall results for a park, from the stored analysis."""
     d = S["analysis_detail"][slug]["trend"]
@@ -136,6 +181,7 @@ TABLES = {
     "analysis": analysis_table,
     "refused": refused_table,
     "coverage": coverage_table,
+    "evidence": evidence_table,
 }
 
 

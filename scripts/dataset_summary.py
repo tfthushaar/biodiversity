@@ -172,12 +172,6 @@ def summarise(conn: psycopg.Connection) -> dict:
         "management_options": rows(conn, "select count(*) from mitigation_playbooks")[0][0],
         "management_by_method": dict(
             rows(conn, "select method, count(*) from mitigation_playbooks group by 1")),
-        "quotes": rows(conn, "select coalesce(sum(jsonb_array_length(source_quotes)), 0) from "
-                             "(select source_quotes from impact_findings union all "
-                             "select source_quotes from mitigation_playbooks) q")[0][0],
-        "sources": rows(conn, "select count(distinct citation_url) from "
-                              "(select citation_url from impact_findings union all "
-                              "select citation_url from mitigation_playbooks) q")[0][0],
         "species_with_findings": rows(
             conn, "select count(distinct invasive_species_id) from impact_findings")[0][0],
     }

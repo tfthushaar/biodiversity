@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import re
 import sys
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
@@ -34,15 +35,6 @@ def p_value(p: float) -> str:
     if p < 0.001:
         return "<0.001"
     return f"{p:.3f}" if p < 0.1 else f"{p:.2f}"
-
-
-def cert_phrase() -> str:
-    names = {"review": "{n} summarising reviews or species profiles", "observational": "{n} field observations",
-             "preliminary": "{n} preliminary", "unverified_concern": "{n} unverified concerns",
-             "experimental": "{n} controlled experiment"}
-    got = S["knowledge_base"]["findings_by_certainty"]
-    parts = [names[k].format(n=got[k]) for k in names if got.get(k)]
-    return ", ".join(parts[:-1]) + " and " + parts[-1]
 
 
 def count_tests() -> int:
@@ -94,11 +86,11 @@ def values() -> dict[str, str]:
     co = S["analysis_detail"]["smokies"]["cooccurrence"]
     fetched = S["records_fetched_by_source"]
     refused_n = sum(S["records_refused_by_reason"]["USGS NAS"].values())
-    kb = S["knowledge_base"]
-    certainty = kb["findings_by_certainty"]
-    # Both figures come from the snapshot with everything else. The knowledge file moves on, and a
-    # paper must not mix its numbers with the snapshot's.
-    quotes = kb["quotes"]
+    kb_rows = T.kb_rows()
+    kb_species = {r["species"] for r in kb_rows}
+    recorded = {x["species"] for rows in S["invasive_species_by_park"].values() for x in rows}
+    years = [s["year"] for s in T.KB["sources"].values()]
+    verified = datetime.fromisoformat(T.KB["verified_on"])
     ever_inv, ever_obs = T.trend_pair("everglades")
     mud_inv, mud_obs = T.trend_pair("mudumalai")
     inv_total = sum(S["invasive_records_by_park"].values())
@@ -112,12 +104,6 @@ def values() -> dict[str, str]:
         return sum(x["records"] for z in india for x in S["invasive_species_by_park"].get(z, [])
                    if x["species"] == name)
 
-    cov = S["evidence_coverage"]
-    in_find = [cov[z]["with_cited_findings"] for z in india]
-    in_spp = [cov[z]["invasive_species"] for z in india]
-    alerts = S["alerts"]
-    alert_text = "; ".join(
-        f"{a['species']} in {T.NAMES[a['park']]} (first record {a['first_record'][:7]})" for a in alerts)
     ad = S["analysis_detail"]
     ev_co = ad["everglades"]["cooccurrence"]
     sm_inv, sm_nat = T.trend_pair("smokies")
@@ -158,13 +144,7 @@ def values() -> dict[str, str]:
         "SHARE_HIGH_PARK": T.NAMES[hi],
         "LANTANA_RECORDS": str(sp_records("Lantana camara")),
         "SENNA_RECORDS": str(sp_records("Senna spectabilis")),
-        "EVER_COVER_PCT": f"{100 * cov['everglades']['records_of_species_with_findings'] / cov['everglades']['records']:.0f}",
-        "IN_FIND_MIN": str(min(in_find)),
-        "IN_FIND_MAX": str(max(in_find)),
-        "IN_SPP_MIN": str(min(in_spp)),
-        "IN_SPP_MAX": str(max(in_spp)),
-        "ALERT_COUNT": str(len(alerts)),
-        "ALERT_TEXT": alert_text,
+        "INV_SPECIES_TOTAL": str(len(recorded)),
         "EVER_Y0": str(S["analysis_detail"]["everglades"]["trend"]["years"][0]),
         "EVER_Y1": str(S["analysis_detail"]["everglades"]["trend"]["years"][1]),
         "MUD_Y0": str(S["analysis_detail"]["mudumalai"]["trend"]["years"][0]),
@@ -198,13 +178,19 @@ def values() -> dict[str, str]:
         "MUD_TAU": f"{mud_inv['tau']:.2f}",
         "MUD_P": p_value(mud_inv["p_value"]),
         "MUD_NP": p_value(mud_obs["p_value"]),
-        "KB_FINDINGS": str(kb["findings"]),
-        "KB_PLAYBOOKS": str(kb["management_options"]),
-        "KB_QUOTES": str(quotes),
-        "KB_SOURCES": str(kb["sources"]),
-        "KB_CERT": cert_phrase(),
-        "KB_REVIEW": str(certainty.get("review", 0)),
-        "KB_EXP": str(certainty.get("experimental", 0)),
+        "KB_PAPERS": str(len(T.KB["sources"])),
+        "KB_JOURNALS": str(len({s["journal"] for s in T.KB["sources"].values()})),
+        "KB_Y0": str(min(years)),
+        "KB_Y1": str(max(years)),
+        "KB_FINDINGS": str(len(T.KB["impact_findings"])),
+        "KB_MANAGEMENT": str(len(T.KB["playbooks"])),
+        "KB_QUOTES": str(sum(len(r["quotes"]) for r in kb_rows)),
+        "KB_SPECIES": str(len(kb_species)),
+        "KB_RECORDED": str(len(kb_species & recorded)),
+        "KB_VERIFIED": f"{verified.day} {verified:%B %Y}",
+        "KB_FINDING_DESIGNS": T.design_phrase(Counter(r["design"] for r in kb_rows if r["kind"] == "finding")),
+        "KB_MANAGEMENT_DESIGNS": T.design_phrase(Counter(r["design"] for r in kb_rows if r["kind"] == "management")),
+        "KB_REFERENCES": T.evidence_references(),
     }
 
 

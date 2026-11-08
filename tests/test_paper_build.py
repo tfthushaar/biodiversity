@@ -27,9 +27,28 @@ def test_every_token_is_filled_and_every_table_is_present(built):
 
 
 def test_the_paper_has_the_sections_a_paper_needs(built):
-    for heading in ("## Abstract", "## 1. Introduction", "## 2. Methods", "## 3. Results",
-                    "## 4. Observations", "## 5. Conclusion", "## References"):
+    for heading in ("## Abstract", "## 1. Introduction", "## 2. Data and methods", "## 3. Results",
+                    "## 4. Discussion", "## 5. Conclusion", "## References"):
         assert heading in built
+
+
+def test_the_paper_describes_its_findings_and_not_how_the_platform_is_built(built):
+    """A reader of the paper needs the study, and none of the file paths, commands or services."""
+    words = ("scripts/", "python -m", "GitHub Actions", "Supabase", "Vercel", "Render",
+             "free tier", "free-tier", "ONNX", "migration", "`")
+    for developer_word in words:
+        assert developer_word not in built, f"developer detail in the paper: {developer_word!r}"
+
+
+def test_the_evidence_base_in_the_paper_is_the_verified_knowledge_file(built):
+    import json
+
+    kb = json.loads((ROOT / "db" / "seeds" / "knowledge.json").read_text(encoding="utf-8"))
+    assert f"{len(kb['sources'])} peer-reviewed papers" in built
+    refs = built.split("### Papers in the evidence base", 1)[1]
+    for source in kb["sources"].values():
+        assert f"doi:{source['doi']}" in refs
+    assert "species profiles, fact sheets" in built  # named as sources that were not used
 
 
 def test_documents_contain_no_em_dashes():
