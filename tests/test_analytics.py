@@ -84,6 +84,15 @@ def test_where_invasives_are_denser_native_richness_is_lower_when_that_is_true(w
     assert "does not show cause" in result.caution
 
 
+def test_the_cells_behind_the_correlation_are_returned_for_the_scatter_plot(world):
+    build_grid(world, diversity_for=lambda k: max(1, 8 - k))
+    d = cooccurrence(world.conn, "bandipur").detail
+    assert len(d["points"]) == d["cells_usable"] == 36
+    share, richness, invasive = d["points"][0]
+    assert 0 <= share <= 1 and richness > 0 and invasive >= 0
+    assert [p[2] for p in d["points"]] == sorted((p[2] for p in d["points"]), reverse=True)
+
+
 def test_no_relationship_gives_an_interval_that_includes_zero(world):
     rng = random.Random(4)
     build_grid(world, diversity_for=lambda k: rng.randint(2, 8))  # unrelated to k
@@ -137,6 +146,16 @@ def test_a_rising_invasive_share_and_falling_native_share_is_detected(world):
     assert inv["tau"] == pytest.approx(1.0) and inv["p_value"] < 0.01 and inv["slope"] > 0
     assert nat["tau"] < 0 and nat["slope"] < 0
     assert "does not show a change in abundance" in r.caution
+
+
+def test_the_yearly_figures_behind_the_trend_are_returned_for_the_line_chart(world):
+    build_years(world, range(2012, 2020), lambda y: 4 * (y - 2012))
+    series = trend(world.conn, "bandipur").detail["series"]
+    assert [s["year"] for s in series] == list(range(2012, 2020))
+    last = series[-1]
+    assert last["observations"] == 40 and last["invasive"] == 28
+    assert last["invasive_per_observation"] == pytest.approx(0.7)
+    assert last["native_per_observation"] == pytest.approx(0.3)
 
 
 def test_too_few_years_is_refused(world):

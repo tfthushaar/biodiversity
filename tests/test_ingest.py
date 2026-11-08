@@ -12,7 +12,7 @@ from biodiv.ingestion.http import PoliteClient
 from biodiv.ingestion.inaturalist import INAT_API
 from biodiv.workers import ingest as ingest_module
 from biodiv.workers.ingest import IngestStats, exit_code, ingest_zone, ingest_zones, load_zones
-from helpers import exact, mock_gbif
+from helpers import exact, give_paper, mock_gbif
 
 FIXTURES = Path(__file__).parent / "fixtures"
 INSIDE_BANDIPUR = (76.63, 11.67)  # lon, lat
@@ -282,6 +282,34 @@ async def test_gbif_specimens_skip_the_inaturalist_mirror_and_keep_real_dates(
     ((scope, cursor),) = q(url, "select scope, cursor from ingestion_cursors")
     assert scope == "bandipur:specimens"
     assert cursor == datetime.now(UTC).date().isoformat()  # GBIF cursors are dates
+
+
+async def test_an_invasive_species_that_no_paper_backs_is_not_recorded(ingest_db_url, respx_mock):
+    """GRIIS lists both plants as invasive in India. Only Senna has a paper, so only Senna is
+    stored. A native species GRIIS does not list is untouched."""
+    url = ingest_db_url
+    with psycopg.connect(url, autocommit=True) as conn:
+        for key, name in ((2925303, "Lantana camara"), (2968573, "Senna spectabilis")):
+            sid = conn.execute(
+                "insert into species (gbif_taxon_key, scientific_name, kingdom) "
+                "values (%s, %s, 'Plantae') returning id", (key, name)).fetchone()[0]
+            conn.execute(
+                "insert into invasive_status (species_id, country, is_invasive, "
+                "establishment_means) values (%s, 'IN', true, 'Alien')", (sid,))
+            if name == "Senna spectabilis":
+                give_paper(conn, sid)
+    mock_gbif(respx_mock, {"Lantana camara": exact(2925303, "Lantana camara"),
+                           "Senna spectabilis": exact(2968573, "Senna spectabilis"),
+                           "Axis axis": exact(2441029, "Axis axis")})
+    mock_inat(respx_mock, [inat_obs(100, "Lantana camara"), inat_obs(101, "Senna spectabilis"),
+                           inat_obs(102, "Axis axis")])
+
+    stats = await run(url)
+    assert (stats.fetched, stats.stored) == (3, 2)
+    assert dict(stats.rejected) == {"invasive_without_paper": 1}
+    stored = q(url, "select s.scientific_name from detections d "
+                    "join species s on s.id = d.species_id order by 1")
+    assert stored == [("Axis axis",), ("Senna spectabilis",)]
 
 
 async def test_a_database_with_the_former_source_name_keeps_its_records(ingest_db_url):

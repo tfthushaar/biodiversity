@@ -67,10 +67,17 @@ def top_species(k: int = 5) -> str:
     return table(["Park", "Species", "Records", "Years"], rows, "llrl")
 
 
-def hotspot_table(cell: str = "0.02") -> str:
+def hotspots_of(slug: str) -> dict | None:
+    """Concentration in 2 km squares. A snapshot taken before the grid was set in kilometres
+    holds the same squares under the key "0.02" (degrees)."""
+    by_size = S["hotspots"].get(slug, {})
+    return by_size.get("2") or by_size.get("0.02")
+
+
+def hotspot_table() -> str:
     rows = []
     for slug in ORDER:
-        h = S["hotspots"].get(slug, {}).get(cell)
+        h = hotspots_of(slug)
         if h:
             rows.append([NAMES[slug], n(h["records"]), n(h["occupied_cells"]), n(h["busiest_cell_records"]),
                          f"{100 * h['share_in_top_10_percent_of_cells']:.0f}%", n(h["cells_with_one_record"])])
@@ -159,7 +166,7 @@ if __name__ == "__main__":
     print("## Records by park and source\n" + records_table())
     print("\n## Invasive records\n" + invasive_table())
     print("\n## Most recorded invasive species\n" + top_species())
-    print("\n## Concentration (0.02 degree squares)\n" + hotspot_table())
+    print("\n## Concentration (2 km squares)\n" + hotspot_table())
     print("\n## Analysis readiness\n" + analysis_table())
     print("\n## Records refused\n" + refused_table())
     print("\n## Evidence coverage\n" + coverage_table())

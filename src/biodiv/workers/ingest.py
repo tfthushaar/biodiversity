@@ -186,11 +186,33 @@ def _zones_for(conn: psycopg.Connection, batch: list[Observation]) -> list[int |
     return [found.get(i + 1) for i in range(len(batch))]
 
 
+def unresearched_invasives(conn: psycopg.Connection, zone_id: int) -> frozenset[int]:
+    """Species GRIIS lists as alien and invasive in a park's country that no peer-reviewed paper
+    backs. They are not recorded: nothing is shown about a species without a paper."""
+    rows = conn.execute(
+        """
+        select i.species_id
+        from zones z
+        join invasive_status i on i.country = z.country and i.is_invasive
+                              and i.origin_class = 'alien'
+        where z.id = %s
+          and i.species_id not in (select species_id from researched_species)
+        """,
+        (zone_id,),
+    ).fetchall()
+    return frozenset(r[0] for r in rows)
+
+
 def _store(
-    conn: psycopg.Connection, obs: Observation, source_id: int, species_id_fn, zone_id: int
+    conn: psycopg.Connection, obs: Observation, source_id: int, species_id_fn, zone_id: int,
+    refuse: frozenset[int] = frozenset(),
 ) -> str:
-    """Store one observation inside a known park. Returns 'stored' or 'duplicate'."""
+    """Store one observation inside a known park. Returns 'stored', 'duplicate' or the reason it
+    was refused."""
     zone = (zone_id,)
+    species = species_id_fn(obs)
+    if species in refuse:
+        return "invasive_without_paper"
     media = conn.execute(
         """
         insert into media_items (source_id, external_id, uri, image_url, captured_at, geom,
@@ -211,7 +233,7 @@ def _store(
                                 geom, zone_id, origin)
         values (%s, %s, %s, %s, 1.0, st_setsrid(st_makepoint(%s, %s), 4326), %s, 'observer')
         """,
-        (media[0], obs.captured_at, species_id_fn(obs), obs.taxon_name, obs.lon, obs.lat, zone[0]),
+        (media[0], obs.captured_at, species, obs.taxon_name, obs.lon, obs.lat, zone[0]),
     )
     return "stored"
 
@@ -224,6 +246,7 @@ async def _flush(
     cache: TaxonCache,
     stats: IngestStats,
     species_ids: dict | None = None,
+    refuse: frozenset[int] = frozenset(),
 ) -> None:
     if not batch:
         return
@@ -280,7 +303,7 @@ async def _flush(
                 if year >= FIRST_PARTITIONED_YEAR:
                     conn.execute("select ensure_detection_partition(%s)", (year,))
             for obs, zone_id in zip(batch, zone_of, strict=True):
-                outcome = _store(conn, obs, source_id, species_id, zone_id)
+                outcome = _store(conn, obs, source_id, species_id, zone_id, refuse)
                 if outcome == "stored":
                     stats.stored += 1
                 elif outcome == "duplicate":
@@ -361,6 +384,7 @@ async def ingest_zone(
         )
 
     species_ids = {} if species_ids is None else species_ids
+    refuse = unresearched_invasives(conn, zone.id)
     try:
         async for rec in raw:
             if _out_of_time(deadline):
@@ -388,12 +412,12 @@ async def ingest_zone(
                 continue
             batch.append(obs)
             if len(batch) >= BATCH_SIZE:
-                await _flush(conn, batch, source_id, gbif, cache, stats, species_ids)
+                await _flush(conn, batch, source_id, gbif, cache, stats, species_ids, refuse)
                 if source == "inaturalist" and new_cursor is not None:
                     # Records arrive in ascending id order and everything up to here is stored or
                     # refused, so a run that is cut off later resumes from here, not from the start.
                     _save_cursor(conn, source_id, scope, new_cursor)
-        await _flush(conn, batch, source_id, gbif, cache, stats, species_ids)
+        await _flush(conn, batch, source_id, gbif, cache, stats, species_ids, refuse)
         if source != "inaturalist":
             # The date cursor means "everything up to this day". Stopping early leaves a gap, so it
             # is not recorded; the next run starts again and skips what is already stored.

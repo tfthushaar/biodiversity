@@ -59,9 +59,14 @@ def main() -> int:
     fc = client.get("/rpc/zones_geojson")
     check(fc.status_code == 200 and fc.json().get("type") == "FeatureCollection",
           "zones_geojson() returns a FeatureCollection")
-    pts = client.get("/rpc/records_geojson", params={"p_kind": "invasive", "p_limit": 5})
-    check(pts.status_code == 200 and pts.json().get("type") == "FeatureCollection",
-          "records_geojson() returns a FeatureCollection")
+    grid = client.get("/rpc/hotspot_grid", params={"p_zone": "bandipur", "p_km": 5})
+    check(grid.status_code == 200 and "cells" in grid.json(), "hotspot_grid() returns squares")
+    years = client.get("/rpc/invasive_by_year", params={"p_zone": "bandipur"})
+    check(years.status_code == 200 and isinstance(years.json(), list),
+          "invasive_by_year() returns a list")
+    profile = client.get("/rpc/species_profile", params={"p_species": "Python bivittatus"})
+    check(profile.status_code == 200 and "by_park" in profile.json(),
+          "species_profile() returns a profile")
 
     st = client.post("/rpc/storage_status", json={})
     body = st.json() if st.status_code == 200 else {}
@@ -79,6 +84,10 @@ def main() -> int:
     refused("GET", "/rpc/postgis_full_version", "read PostGIS library versions")
     refused("GET", "/detections_2011?limit=1", "read a partition directly")
     refused("GET", "/schema_migrations?limit=1", "read migration bookkeeping")
+    # Nothing is public that counts records of species no paper backs.
+    refused("GET", "/invasion_index_monthly?limit=1", "read the invasion-index rollup")
+    refused("GET", "/native_trend_monthly?limit=1", "read the native-trend rollup")
+    refused("GET", "/rpc/records_geojson", "call the removed individual-records function")
     # Either the table is not published at all (Supabase keeps PostGIS in its own schema), or the
     # public sees only the WGS84 definition that geometry serialisation reads.
     srs = client.get("/spatial_ref_sys", params={"select": "srid"})

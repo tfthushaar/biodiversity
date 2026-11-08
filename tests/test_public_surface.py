@@ -73,7 +73,7 @@ def test_the_dashboards_own_data_is_readable(anon):
     assert anon.execute("select count(*) from zones").fetchone()[0] == 6
     for table in ("species", "invasive_status", "alerts", "mitigation_playbooks",
                   "impact_findings", "zone_reports", "source_health", "invasive_records",
-                  "zone_invasive_summary", "invasion_index_monthly", "native_trend_monthly",
+                  "zone_invasive_summary", "researched_species",
                   "model_versions", "sources", "ingestion_runs"):
         anon.execute(f"select * from {table} limit 1").fetchall()
 
@@ -84,8 +84,6 @@ def test_the_geojson_functions_work_for_the_public_role(anon):
     slugs = {f["properties"]["slug"] for f in zones["features"]}
     assert slugs == {"bandipur", "nagarahole", "mudumalai", "serengeti", "everglades", "smokies"}
     assert zones["features"][0]["geometry"]["type"] in ("MultiPolygon", "Polygon")
-    points = anon.execute("select records_geojson('bandipur', 'invasive', 10)").fetchone()[0]
-    assert points == {"type": "FeatureCollection", "features": []}  # none yet, but valid
 
 
 def test_the_public_can_see_how_full_the_database_is(anon):
@@ -102,23 +100,50 @@ def test_no_table_holds_data_the_platform_may_not_republish(anon):
     assert "iucn_category" not in cols
 
 
-def test_the_point_query_is_capped_whatever_the_caller_asks_for(ingest_db_url):
+def test_the_public_sees_only_species_a_paper_backs(ingest_db_url):
+    """No paper, no species: the API names a species, and its invasive status, only for those a
+    verified paper backs (migration 0024)."""
+    from helpers import World
+
+    with psycopg.connect(ingest_db_url) as conn:
+        w = World(conn)
+        w.species("Lantana camara", invasive=True)  # has a paper
+        w.species("Senna spectabilis", invasive=True, paper=False)  # GRIIS lists it, no paper
+        w.species("Axis axis")  # a native
+        conn.commit()
+        assert conn.execute("select count(*) from species").fetchone()[0] == 3  # the owner sees all
+        conn.execute("set local role anon")
+        assert [r[0] for r in conn.execute("select scientific_name from species")] == [
+            "Lantana camara"]
+        assert conn.execute("select count(*) from invasive_status").fetchone()[0] == 1
+        assert [r[0] for r in conn.execute("select species_id from researched_species")] == [
+            w.species_ids["Lantana camara"]]
+
+
+def test_a_species_without_a_paper_is_not_an_invasive_record(ingest_db_url):
     from helpers import World, day
 
     with psycopg.connect(ingest_db_url) as conn:
         w = World(conn)
         w.species("Lantana camara", invasive=True)
-        for i in range(12):
-            w.observe("Lantana camara", day(2020, 1 + i % 12), 76.5 + i * 0.001, 11.7)
+        w.species("Senna spectabilis", invasive=True, paper=False)
+        w.observe("Lantana camara", day(2020))
+        w.observe("Senna spectabilis", day(2020))
         conn.commit()
-        conn.execute("set local role anon")
-        for asked, expected in ((5, 5), (0, 1), (-3, 1), (10**9, 12)):
-            fc = conn.execute("select records_geojson('bandipur', 'invasive', %s)",
-                              (asked,)).fetchone()[0]
-            assert len(fc["features"]) == expected
-        feature = fc["features"][0]
-        assert feature["properties"]["class"] == "invasive"
-        assert feature["geometry"]["type"] == "Point"
+        names = [r[0] for r in conn.execute(
+            "select s.scientific_name from invasive_records r "
+            "join species s on s.id = r.species_id")]
+    assert names == ["Lantana camara"]
+
+
+def test_the_rollups_and_the_individual_records_function_are_not_public(anon):
+    for sql in ("select * from invasion_index_monthly", "select * from native_trend_monthly"):
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            anon.execute(sql)
+        anon.rollback()  # a refused statement aborts the transaction
+        anon.execute("set local role anon")
+    assert anon.execute("select to_regprocedure('records_geojson(text,text,integer)')"
+                        ).fetchone()[0] is None
 
 
 def test_restricting_postgis_is_repeatable_and_does_not_break_the_public_functions(ingest_db_url):

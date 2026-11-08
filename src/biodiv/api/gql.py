@@ -109,8 +109,10 @@ class Query:
     def zones(self, info: Info) -> list[Zone]:
         rows = _rows(info, """
             select z.slug, z.name, z.country, z.group_name,
-                   (select count(*) from detections d where d.zone_id = z.id),
-                   (select count(distinct species_id) from detections d where d.zone_id = z.id),
+                   (select count(*) from detections d where d.zone_id = z.id
+                      and d.species_id in (select species_id from researched_species)),
+                   (select count(distinct species_id) from detections d where d.zone_id = z.id
+                      and d.species_id in (select species_id from researched_species)),
                    (select count(*) from invasive_records r where r.zone_id = z.id)
             from zones z order by z.id""", ())
         return _build(Zone, rows)
@@ -123,7 +125,8 @@ class Query:
                    i.is_invasive and i.origin_class = 'alien', i.establishment_means
             from species s
             left join invasive_status i on i.species_id = s.id and i.country = 'IN'
-            where (%s::text is null or s.scientific_name ilike '%%' || %s || '%%'
+            where s.id in (select species_id from researched_species)
+              and (%s::text is null or s.scientific_name ilike '%%' || %s || '%%'
                    or s.common_name ilike '%%' || %s || '%%')
               and (not %s or (i.is_invasive and i.origin_class = 'alien'))
             order by s.scientific_name limit %s""",
@@ -148,7 +151,8 @@ class Query:
             left join zones z on z.id = d.zone_id
             left join species s on s.id = d.species_id
             left join invasive_status i on i.species_id = d.species_id and i.country = z.country
-            where (%s::text is null or lower(s.scientific_name) = lower(%s)
+            where d.species_id in (select species_id from researched_species)
+              and (%s::text is null or lower(s.scientific_name) = lower(%s)
                    or lower(s.common_name) = lower(%s))
               and (%s::text is null or z.slug = %s)
               and (%s::real is null or d.confidence >= %s)

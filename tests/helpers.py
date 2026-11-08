@@ -32,6 +32,18 @@ def exact(key, canonical, **extra):
     }
 
 
+def give_paper(conn, species_id):
+    """A verified finding about a species. Its study design is 'modelled', which no alert treats as
+    documented harm, so giving a species a paper never changes an alert's severity."""
+    conn.execute(
+        "insert into impact_findings (invasive_species_id, finding_type, affected, summary, "
+        "certainty, region_note, source_quotes, citation_text, citation_url, citation_doi, "
+        "citation_year, citation_journal, verified_on) values (%s, 'impact', 'test', 'test', "
+        "'modelled', 'test', '[\"a quote long enough to count\"]', 'A paper', "
+        "'https://doi.org/10.1234/paper', '10.1234/paper', 2021, 'Journal', '2026-01-01') "
+        "on conflict do nothing", (species_id,))
+
+
 class World:
     """Builds small, fully known datasets in a zone."""
 
@@ -47,26 +59,39 @@ class World:
         self.species_ids = {}
         self.n = 0
 
-    def species(self, name, *, invasive=None, means=None):
+    def add_source(self, name):
+        return self.conn.execute(
+            "insert into sources (name, kind) values (%s, 'dataset') returning id", (name,)
+        ).fetchone()[0]
+
+    def species(self, name, *, invasive=None, means=None, kingdom="Plantae", paper=None):
+        """A species in the zone. An invasive one gets a verified paper by default, because the
+        platform records an invasive species only when a paper backs it; pass paper=False for one
+        that has none."""
         if name not in self.species_ids:
             sid = self.conn.execute(
                 "insert into species (scientific_name, kingdom) "
-                "values (%s, 'Plantae') returning id", (name,)).fetchone()[0]
+                "values (%s, %s) returning id", (name, kingdom)).fetchone()[0]
             self.species_ids[name] = sid
             if invasive is not None or means:
                 self.conn.execute(
                     "insert into invasive_status (species_id, country, is_invasive, "
                     "establishment_means) values (%s, %s, %s, %s)",
                     (sid, self.country, invasive, means or "Alien"))
+            if paper is True or (invasive and paper is not False):
+                give_paper(self.conn, sid)
         return self.species_ids[name]
 
-    def observe(self, name, when, lon=76.5, lat=11.7):
+    def add_paper(self, name):
+        give_paper(self.conn, self.species_ids[name])
+
+    def observe(self, name, when, lon=76.5, lat=11.7, source=None):
         self.n += 1
         sid = self.species_ids[name]
         media = self.conn.execute(
             "insert into media_items (source_id, external_id, uri, captured_at, zone_id, geom) "
             "values (%s, %s, 'u', %s, %s, st_setsrid(st_makepoint(%s, %s), 4326)) returning id",
-            (self.source, f"o{self.n}", when, self.zone_id, lon, lat)).fetchone()[0]
+            (source or self.source, f"o{self.n}", when, self.zone_id, lon, lat)).fetchone()[0]
         self.conn.execute(
             "insert into detections (media_item_id, captured_at, species_id, confidence, geom, "
             "zone_id, origin) values (%s, %s, %s, 1.0, st_setsrid(st_makepoint(%s, %s), 4326), "

@@ -1,8 +1,8 @@
 """What invasive species do to the native ecosystem of a zone, in three layers of decreasing
 certainty. Each layer says what it is, and refuses to answer when the data cannot support one.
 
-  1. Documented findings. What cited sources report. No inference by us. Includes preliminary
-     findings and plain worries, labelled as such.
+  1. Documented findings. What peer-reviewed papers report, each with the paper it comes from.
+     No inference by us, and nothing without a paper.
   2. Co-occurrence. Where invasive records are denser, is native richness lower? Correlational:
      observer effort and access confound it, so richness is rarefied to a common sample size.
   3. Trend. Is the invasive share rising over the years while native records fall? Even a clear
@@ -36,14 +36,17 @@ MIN_YEARS = 6  # years with enough effort for a trend
 MIN_RECORDS_PER_YEAR = 15  # observations in a zone-year for it to count
 MIN_INVASIVE_RECORDS = 30  # invasive records needed in a zone for a trend
 
+MAX_POINTS = 400  # cells returned for the scatter plot
+
 CAUTION_COOCCURRENCE = (
-    "This is a correlation and does not show cause. Invasives and natives may both depend on "
-    "disturbance, access or where observers go. Richness is rarefied to reduce the effect of "
-    "effort, and some of that effect remains."
+    "A correlation says the two measures move together and does not show cause. The records "
+    "do not tell us whether both depend on something else, such as access or where observers go. "
+    "Richness is compared at a fixed number of native records to reduce the effect of effort, and "
+    "some of that effect can remain."
 )
 CAUTION_TREND = (
-    "A trend in records reflects recorded presence over time. It does not show a change in "
-    "abundance or its cause, and observer numbers and habits change over the years."
+    "A trend in records describes recorded presence over time. It does not show a change in "
+    "abundance or its cause, because the records hold no measure of either."
 )
 
 
@@ -111,11 +114,14 @@ def cooccurrence(conn: psycopg.Connection, zone_slug: str) -> LayerResult:
     rows = conn.execute(
         """
         select floor(st_x(m.geom) / %s)::int, floor(st_y(m.geom) / %s)::int, d.species_id,
-               coalesce(i.is_invasive and i.origin_class = 'alien', false),
+               coalesce(i.is_invasive and i.origin_class = 'alien', false)
+                 and rs.species_id is not null,
                coalesce(i.origin_class in ('alien', 'uncertain'), false)
         from detections d
         join media_items m on m.id = d.media_item_id
         left join invasive_status i on i.species_id = d.species_id and i.country = %s
+        left join (select distinct species_id from researched_species) rs
+               on rs.species_id = d.species_id
         where d.zone_id = %s and m.geom is not null and d.species_id is not null
         """,
         (CELL_DEGREES, CELL_DEGREES, country, zone_id),
@@ -131,12 +137,12 @@ def cooccurrence(conn: psycopg.Connection, zone_slug: str) -> LayerResult:
             c["native"][species_id] += 1
 
     usable = []
-    for c in cells.values():
+    for (cx, cy), c in cells.items():
         richness = rarefied_richness(list(c["native"].values()), RAREFY_TO)
         if richness is not None:
-            usable.append((c["invasive"] / c["all"], richness, c["invasive"]))
+            usable.append((c["invasive"] / c["all"], richness, c["invasive"], cx, cy))
 
-    with_invasives = sum(1 for _, _, inv in usable if inv > 0)
+    with_invasives = sum(1 for _, _, inv, _, _ in usable if inv > 0)
     base = {"cells_total": len(cells), "cells_usable": len(usable), "cell_degrees": CELL_DEGREES,
             "richness_compared_at": RAREFY_TO, "cells_with_invasives": with_invasives,
             "required_cells": MIN_CELLS, "required_invasive_cells": MIN_INVASIVE_CELLS}
@@ -157,9 +163,14 @@ def cooccurrence(conn: psycopg.Connection, zone_slug: str) -> LayerResult:
     if rho is None:
         return LayerResult("cooccurrence", "insufficient", "no variation to correlate", needs,
                            detail=base)
+    # The cells behind the correlation, for the scatter plot: invasive share, rarefied native
+    # richness and the number of invasive records. The most-invaded cells are kept if there are
+    # more than the chart can show.
+    shown = sorted(usable, key=lambda u: -u[2])[:MAX_POINTS]
+    points = [[round(u[0], 4), round(u[1], 3), u[2]] for u in shown]
     return LayerResult("cooccurrence", "ok", caution=CAUTION_COOCCURRENCE, detail={
-        **base, "spearman_rho": rho,
-        "ci95": bootstrap_interval(share, richness)})
+        **base, "spearman_rho": rho, "ci95": bootstrap_interval(share, richness),
+        "points": points})
 
 
 # ---------------------------------------------------------------------------- layer 3
@@ -173,12 +184,15 @@ def trend(conn: psycopg.Connection, zone_slug: str) -> LayerResult:
         """
         select extract(year from m.captured_at)::int as yr,
                count(distinct m.id) as effort,
-               count(*) filter (where i.is_invasive and i.origin_class = 'alien') as invasive,
+               count(*) filter (where i.is_invasive and i.origin_class = 'alien'
+                                and rs.species_id is not null) as invasive,
                count(*) filter (where d.species_id is not null
                                 and coalesce(i.origin_class, 'native') = 'native') as native
         from media_items m
         join detections d on d.media_item_id = m.id
         left join invasive_status i on i.species_id = d.species_id and i.country = %s
+        left join (select distinct species_id from researched_species) rs
+               on rs.species_id = d.species_id
         where m.zone_id = %s and m.captured_at is not null
         group by 1 order by 1
         """,
@@ -204,8 +218,11 @@ def trend(conn: psycopg.Connection, zone_slug: str) -> LayerResult:
     invasive_index = [r[2] / r[1] for r in usable]  # invasive records per observation
     native_index = [r[3] / r[1] for r in usable]
     inv, nat = mann_kendall(t, invasive_index), mann_kendall(t, native_index)
+    series = [{"year": r[0], "observations": r[1], "invasive": r[2], "native": r[3],
+               "invasive_per_observation": round(r[2] / r[1], 5),
+               "native_per_observation": round(r[3] / r[1], 5)} for r in usable]
     return LayerResult("trend", "ok", caution=CAUTION_TREND, detail={
-        **detail, "years": [min(t), max(t)],
+        **detail, "years": [min(t), max(t)], "series": series,
         "invasive_per_observation": asdict(inv) if inv else None,
         "native_per_observation": asdict(nat) if nat else None})
 
@@ -239,8 +256,8 @@ def zone_report(conn: psycopg.Connection, zone_slug: str) -> dict[str, Any]:
             "documented": {
                 "status": "ok",
                 "findings": documented_findings(conn, zone_slug),
-                "note": "Findings come from the cited sources only. IUCN Red List threat links are "
-                        "held back until IUCN permits republication (docs/iucn.md).",
+                "note": "Findings come from peer-reviewed papers only, each shown with its paper "
+                        "and the words it rests on.",
             },
             "cooccurrence": cooccurrence(conn, zone_slug).as_dict(),
             "trend": trend(conn, zone_slug).as_dict(),

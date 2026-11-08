@@ -91,7 +91,9 @@ def species_context(conn: psycopg.Connection, name: str) -> SpeciesContext | Non
                  where f.invasive_species_id = s.id and f.verified_on is not null)
         from species s
         left join invasive_status i on i.species_id = s.id and i.country = 'IN'
-        where lower(s.scientific_name) = lower(%s) order by s.id limit 1
+        where lower(s.scientific_name) = lower(%s)
+          and s.id in (select species_id from researched_species)
+        order by s.id limit 1
         """,
         (name,),
     ).fetchone()

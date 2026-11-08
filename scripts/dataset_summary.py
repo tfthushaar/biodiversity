@@ -24,15 +24,15 @@ def rows(conn, sql, params=None):
     return conn.execute(sql, params).fetchall()
 
 
-def hotspot_concentration(conn, slug: str, cell: float) -> dict | None:
-    result = conn.execute("select hotspot_cells(%s, %s, null)", (slug, cell)).fetchone()[0]
+def hotspot_concentration(conn, slug: str, km: float) -> dict | None:
+    result = conn.execute("select hotspot_grid(%s, %s)", (slug, km)).fetchone()[0]
     counts = sorted((c["records"] for c in result["cells"]), reverse=True)
     if not counts:
         return None
     total = sum(counts)
     top = max(1, round(len(counts) * 0.1))
     return {
-        "cell_degrees": result["cell"],
+        "cell_km": result["km"],
         "occupied_cells": len(counts),
         "records": total,
         "busiest_cell_records": counts[0],
@@ -115,10 +115,10 @@ def summarise(conn: psycopg.Connection) -> dict:
         n = out["invasive_records_by_park"].get(p["slug"], 0)
         if n == 0:
             continue
-        for cell in (0.01, 0.02, 0.05):
-            h = hotspot_concentration(conn, p["slug"], cell)
+        for km in (1, 2, 5):  # squares this many kilometres on a side
+            h = hotspot_concentration(conn, p["slug"], km)
             if h:
-                out["hotspots"].setdefault(p["slug"], {})[str(cell)] = h
+                out["hotspots"].setdefault(p["slug"], {})[str(km)] = h
 
     out["analysis"] = {
         z: {
@@ -172,6 +172,12 @@ def summarise(conn: psycopg.Connection) -> dict:
         "management_options": rows(conn, "select count(*) from mitigation_playbooks")[0][0],
         "management_by_method": dict(
             rows(conn, "select method, count(*) from mitigation_playbooks group by 1")),
+        "quotes": rows(conn, "select coalesce(sum(jsonb_array_length(source_quotes)), 0) from "
+                             "(select source_quotes from impact_findings union all "
+                             "select source_quotes from mitigation_playbooks) q")[0][0],
+        "sources": rows(conn, "select count(distinct citation_url) from "
+                              "(select citation_url from impact_findings union all "
+                              "select citation_url from mitigation_playbooks) q")[0][0],
         "species_with_findings": rows(
             conn, "select count(distinct invasive_species_id) from impact_findings")[0][0],
     }

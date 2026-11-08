@@ -15,13 +15,13 @@ def gql(ingest_db_url):
     """A client wired to a database holding a small, known world."""
     with psycopg.connect(ingest_db_url) as conn:
         w = World(conn)
-        w.species("Panthera pardus")
+        w.species("Panthera pardus", paper=True)  # the API serves only species a paper backs
         conn.execute("update species set common_name = 'Leopard' where scientific_name = "
                      "'Panthera pardus'")
         w.species("Lantana camara", invasive=True)
         conn.execute("update species set common_name = 'common lantana' where scientific_name = "
                      "'Lantana camara'")
-        w.species("Axis axis")
+        w.species("Axis axis", paper=True)
         w.observe("Panthera pardus", day(2026, 8, 1), 76.6, 11.7)
         w.observe("Panthera pardus", day(2026, 8, 20), 76.6, 11.7)
         w.observe("Panthera pardus", day(2024, 2, 1), 76.6, 11.7)

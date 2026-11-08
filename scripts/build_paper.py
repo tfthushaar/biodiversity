@@ -11,7 +11,6 @@ The build fails if a token has no value.
 
 from __future__ import annotations
 
-import json
 import re
 import sys
 from datetime import datetime
@@ -21,7 +20,6 @@ sys.path.insert(0, str(Path(__file__).parent))
 import paper_tables as T  # noqa: E402
 
 S = T.S
-KB = json.loads(Path("db/seeds/knowledge.json").read_text(encoding="utf-8"))
 
 
 def by_source(name: str) -> int:
@@ -92,13 +90,15 @@ def check_claims() -> None:
 
 def values() -> dict[str, str]:
     snap = datetime.fromisoformat(S["computed_at"])
-    ever = S["hotspots"]["everglades"]["0.02"]
+    ever = T.hotspots_of("everglades")
     co = S["analysis_detail"]["smokies"]["cooccurrence"]
     fetched = S["records_fetched_by_source"]
     refused_n = sum(S["records_refused_by_reason"]["USGS NAS"].values())
     kb = S["knowledge_base"]
     certainty = kb["findings_by_certainty"]
-    quotes = sum(len(r["quotes"]) for r in KB["playbooks"] + KB["impact_findings"])
+    # Both figures come from the snapshot with everything else. The knowledge file moves on, and a
+    # paper must not mix its numbers with the snapshot's.
+    quotes = kb["quotes"]
     ever_inv, ever_obs = T.trend_pair("everglades")
     mud_inv, mud_obs = T.trend_pair("mudumalai")
     inv_total = sum(S["invasive_records_by_park"].values())
@@ -125,7 +125,7 @@ def values() -> dict[str, str]:
     mix = S["invasive_records_by_period_and_source"]["everglades"]
     pre = mix.get("to 2009", {})
     late = mix.get("2020 on", {})
-    smk_hot = S["hotspots"]["smokies"]["0.02"]
+    smk_hot = T.hotspots_of("smokies")
     n_tests = N_TESTS
     return {
         "N_TESTS": str(n_tests),
@@ -201,7 +201,7 @@ def values() -> dict[str, str]:
         "KB_FINDINGS": str(kb["findings"]),
         "KB_PLAYBOOKS": str(kb["management_options"]),
         "KB_QUOTES": str(quotes),
-        "KB_SOURCES": str(len(KB["sources"])),
+        "KB_SOURCES": str(kb["sources"]),
         "KB_CERT": cert_phrase(),
         "KB_REVIEW": str(certainty.get("review", 0)),
         "KB_EXP": str(certainty.get("experimental", 0)),
