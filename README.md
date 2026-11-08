@@ -116,7 +116,8 @@ backs it. [docs/evidence.md](docs/evidence.md) explains how to add a species and
 Each run is incremental and safe to repeat, and each source is queried politely (rate limited,
 retried with backoff, and a park whose source does not answer is recorded and retried at the next
 run while the other parks carry on). A cap per park and source keeps the free database from
-filling, and ingestion stops at 90% of the database budget.
+filling, and ingestion stops at 90% of the database budget. iNaturalist is read oldest first, so a
+park that reaches its cap holds nothing newer (see [docs/data-quality.md](docs/data-quality.md)).
 
 Species are named by small trained heads on a shared DINOv2 backbone: an invasive-plant classifier
 (ten invasives and native look-alikes, with an explicit "unknown") and a camera-trap animal
@@ -142,7 +143,7 @@ added. Without the secret each workflow reports that it has nothing to do and ex
 | [docs/impact.md](docs/impact.md) | How impact is analysed and why the statistics often wait for more data |
 | [docs/data-quality.md](docs/data-quality.md) | What the data supports and where it falls short |
 | [docs/free-tier-gate.md](docs/free-tier-gate.md) | Accounts, secrets and staying inside free limits |
-| [paper.md](paper.md) | A paper for readers: the method, the results and the peer-reviewed evidence behind each finding. Its records and analyses are those of 8 October 2026, and its evidence base was last checked on 9 November 2026 |
+| [paper.md](paper.md) | A paper for readers: the method, the results and the peer-reviewed evidence behind each finding. Its records and analyses are those of 8 November 2026, and its evidence base was last checked on 9 November 2026 |
 
 ## Layout
 

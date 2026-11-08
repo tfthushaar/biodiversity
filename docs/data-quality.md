@@ -5,10 +5,9 @@ follow for anyone reading the dashboard. The tables are generated from the datab
 `scripts/paper_tables.py --inject docs/data-quality.md`, using the summary that
 `scripts/dataset_summary.py` writes to `docs/metrics/dataset_summary.json`.
 
-The tables below are a snapshot of 8 October 2026. Two rules came after it: GBIF supplies preserved
-specimens only, and a species counts as invasive only when a peer-reviewed paper backs it
-([evidence.md](evidence.md)). Remove the records stored before those rules with
-`scripts/prune_gbif_records.py` and `scripts/prune_unresearched.py`, then regenerate the tables.
+The tables below are a snapshot of 8 November 2026, taken after the records stored before two
+rules were removed: GBIF supplies preserved specimens only, and a species counts as invasive only
+when a peer-reviewed paper backs it ([evidence.md](evidence.md)).
 
 ## What a record must satisfy
 
@@ -41,26 +40,26 @@ USGS records add their own rules: only the "accurate" coordinate class passes, s
 <!-- table:records -->
 | Park | Country | Area (km2) | iNaturalist | GBIF | USGS NAS | Records |
 |---|---|---:|---:|---:|---:|---:|
-| Bandipur | IN | 949 | 688 | 210 | - | 898 |
-| Nagarahole | IN | 680 | 1,428 | 18 | - | 1,446 |
-| Mudumalai | IN | 336 | 1,413 | 96 | - | 1,509 |
-| Serengeti | TZ | 12,947 | 2,553 | 84 | - | 2,637 |
-| Everglades | US | 6,237 | 1,838 | 689 | 4,613 | 7,140 |
-| Great Smoky Mountains | US | 2,107 | 2,393 | 1,156 | 65 | 3,614 |
-| **Total** |  |  | 10,313 | 2,253 | 4,678 | 17,244 |
+| Bandipur | IN | 949 | 686 | 204 | - | 890 |
+| Nagarahole | IN | 680 | 1,433 | 7 | - | 1,440 |
+| Mudumalai | IN | 336 | 1,401 | 80 | - | 1,481 |
+| Serengeti | TZ | 12,947 | 8,290 | 846 | - | 9,136 |
+| Everglades | US | 6,237 | 8,169 | 3,432 | 4,198 | 15,799 |
+| Great Smoky Mountains | US | 2,107 | 8,164 | 4,451 | 54 | 12,669 |
+| **Total** |  |  | 28,143 | 9,020 | 4,252 | 41,415 |
 <!-- /table -->
 
 **Table 2.** Records refused, by reason. USGS figures come from the most complete single scan of
 each park's counties, because that source re-reads every record on each run.
 
 <!-- table:refused -->
-| Reason | iNaturalist | GBIF occurrences | USGS NAS |
+| Reason | iNaturalist | GBIF specimens | USGS NAS |
 |---|---:|---:|---:|
-| outside zone | 8,824 | 1,730 | 13,411 |
-| imprecise location | 7,328 | 655 | 2,424 |
-| obscured location | 6,762 | 58 | 0 |
-| not species level | 71 | 3,216 | 0 |
-| no date | 0 | 925 | 6 |
+| outside zone | 23,910 | 58,365 | 13,413 |
+| imprecise location | 16,662 | 25,917 | 2,424 |
+| not species level | 250 | 32,757 | 0 |
+| no date | 0 | 29,724 | 6 |
+| obscured location | 16,034 | 977 | 0 |
 | not established | 0 | 0 | 36 |
 <!-- /table -->
 
@@ -103,16 +102,26 @@ twice. The `(source, external_id)` key stores it once.
 **8. The dashboard is narrower than the GRIIS lists.** Only 14 species have a peer-reviewed paper on
 file, so only those appear as invasive species. A species with many records and no paper does not
 appear until a paper backs it. This keeps every claim sourced and means a count here is smaller than
-a count of everything GRIIS lists.
+a count of everything GRIIS lists. Applying the rule removed 1,213 records of 192 species, 959 of
+them in the Everglades and 205 in Great Smoky Mountains.
+
+**9. Three parks lack recent iNaturalist records.** iNaturalist is read oldest first, and at most
+8,000 records are stored per park (`--max-stored-per-zone` in the ingest workflow). The Everglades,
+Great Smoky Mountains and Serengeti reached that limit. On 8 November 2026 their iNaturalist
+records ended in January 2019, February 2019 and March 2024. For these parks the counts describe the
+earlier years better than the recent ones, and any change over time mixes a change in the records
+with a change in what was fetched. The Everglades invasive trend is the clearest case: no
+iNaturalist record of the park is dated 2020 or later, and the invasive share of all records is
+55% from 2020 on against 10% in 2010 to 2019.
 
 ## Sources left out on purpose
 
 - **GBIF's iNaturalist dataset.** iNaturalist is fetched directly, so including it again would
   double-count.
-- **GBIF records that are not preserved specimens.** Of the first 10,001 GBIF records stored, 559
-  were unspecified occurrences and 239 were material samples such as DNA extracts. Unspecified
-  occurrences made up most of the invasive records GBIF first supplied. The query now asks for
-  preserved specimens only, and eBird, which GBIF also carries, is no longer an option.
+- **GBIF records that are not preserved specimens.** Of the 9,751 GBIF records stored, 731 were not
+  specimens: 485 unspecified occurrences, 239 material samples such as DNA extracts and 7 that GBIF
+  no longer holds. They were removed. The query now asks for preserved specimens only, and eBird,
+  which GBIF also carries, is no longer an option.
 - **IUCN Red List data.** The terms of use prohibit redistribution without written permission, and
   nothing on the dashboard read the 4,362 threat links that were imported, so the importer and the
   table were removed (migration 0021).
@@ -120,8 +129,9 @@ a count of everything GRIIS lists.
 
 ## Evidence coverage
 
-Cited findings exist for only some of the species recorded in each park. Where one species
-dominates a park's records, as the Burmese python does in the Everglades, a single species'
+Every invasive species recorded has at least one paper behind it. A species can have a paper on its
+management and none on its effect, or the reverse, so the columns below can differ. Where one
+species dominates a park's records, as the Burmese python does in the Everglades, a single species'
 evidence covers most records.
 
 **Table 3.** Invasive species recorded in each park and how many have cited evidence.
@@ -129,12 +139,11 @@ evidence covers most records.
 <!-- table:coverage -->
 | Park | Invasive species recorded | With a cited finding | With cited management | Records covered by a finding |
 |---|---:|---:|---:|---:|
-| Bandipur | 14 | 1 | 1 | 12% |
-| Nagarahole | 6 | 2 | 2 | 29% |
-| Mudumalai | 18 | 4 | 4 | 27% |
-| Serengeti | 2 | 0 | 0 | 0% |
-| Everglades | 27 | 1 | 1 | 68% |
-| Great Smoky Mountains | 44 | 2 | 0 | 5% |
+| Bandipur | 1 | 1 | 1 | 100% |
+| Nagarahole | 2 | 2 | 2 | 100% |
+| Mudumalai | 3 | 3 | 3 | 100% |
+| Everglades | 4 | 2 | 3 | 99% |
+| Great Smoky Mountains | 4 | 4 | 3 | 100% |
 <!-- /table -->
 
 ## What this means for use
