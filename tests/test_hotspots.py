@@ -9,6 +9,21 @@ import pytest
 from helpers import World, day
 
 
+def grid_spot(conn, zone="bandipur", across=0, up=0, lon=76.5, lat=11.7, km=2.0):
+    """The centre of a 2 km square near (lon, lat), `across` squares east and `up` squares north.
+
+    The squares sit on a fixed grid, so a test places its points from the grid. Points placed by
+    hand can land on either side of an edge between two squares. The square chosen is in the middle
+    of a 50 km block (25 squares a side), so squares a few steps apart still share one 50 km square.
+    """
+    lat0 = conn.execute("select center_lat from zones where slug = %s", (zone,)).fetchone()[0]
+    dlat = km / 110.574
+    dlon = km / (111.320 * math.cos(math.radians(lat0)))
+    cx = math.floor(lon / dlon / 25) * 25 + 12 + across
+    cy = math.floor(lat / dlat / 25) * 25 + 12 + up
+    return (cx + 0.5) * dlon, (cy + 0.5) * dlat
+
+
 @pytest.fixture
 def populated(ingest_db_url):
     with psycopg.connect(ingest_db_url) as conn:
@@ -16,11 +31,13 @@ def populated(ingest_db_url):
         w.species("Lantana camara", invasive=True)
         w.species("Senna spectabilis", invasive=True)
         w.species("Axis axis")  # native here: never part of a hotspot
+        here = grid_spot(conn)
+        quiet = grid_spot(conn, across=2, up=2)  # a second, quieter square
         for _ in range(3):
-            w.observe("Lantana camara", day(2020), 76.501, 11.701)
-        w.observe("Senna spectabilis", day(2023), 76.505, 11.705)
-        w.observe("Lantana camara", day(2019), 76.601, 11.801)  # a second, quieter cell
-        w.observe("Axis axis", day(2020), 76.501, 11.701)
+            w.observe("Lantana camara", day(2020), *here)
+        w.observe("Senna spectabilis", day(2023), *here)
+        w.observe("Lantana camara", day(2019), *quiet)
+        w.observe("Axis axis", day(2020), *here)
         conn.commit()
         conn.execute("set local role anon")
         yield conn
@@ -47,7 +64,8 @@ def test_records_are_grouped_into_cells_busiest_first(populated):
     assert [c["records"] for c in got["cells"]] == [4, 1]
     top = got["cells"][0]
     assert top["species_count"] == 2
-    assert top["west"] <= 76.501 < top["east"] and top["south"] <= 11.701 < top["north"]
+    lon, lat = grid_spot(populated)
+    assert top["west"] <= lon < top["east"] and top["south"] <= lat < top["north"]
 
 
 def test_each_cell_lists_its_species_most_recorded_first(populated):
@@ -114,10 +132,11 @@ def test_sources_years_and_kingdoms_each_narrow_the_result(ingest_db_url):
         w.species("Lantana camara", invasive=True)
         w.species("Python bivittatus", invasive=True, kingdom="Animalia")
         museum = w.add_source("GBIF specimens")
-        w.observe("Lantana camara", day(2019), 76.501, 11.701)
-        w.observe("Lantana camara", day(2024), 76.501, 11.701)
-        w.observe("Lantana camara", day(2024), 76.501, 11.701, source=museum)
-        w.observe("Python bivittatus", day(2024), 76.501, 11.701)
+        here = grid_spot(conn)
+        w.observe("Lantana camara", day(2019), *here)
+        w.observe("Lantana camara", day(2024), *here)
+        w.observe("Lantana camara", day(2024), *here, source=museum)
+        w.observe("Python bivittatus", day(2024), *here)
         conn.commit()
         conn.execute("set local role anon")
 

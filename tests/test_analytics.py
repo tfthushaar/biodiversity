@@ -201,7 +201,9 @@ def test_general_findings_appear_only_for_species_recorded_in_the_zone(world):
     load(world, [finding("Lantana camara", None, "General finding")])
     assert documented_findings(world.conn, "bandipur") == []  # not recorded here
     world.observe("Lantana camara", day(2020))
-    (f,) = documented_findings(world.conn, "bandipur")
+    # The world gives each species a paper of its own, so pick out the finding this test loaded.
+    found = documented_findings(world.conn, "bandipur")
+    (f,) = [x for x in found if x["summary"] == "General finding"]
     assert f["recorded_in_zone"] is True and f["records_in_zone"] == 1
 
 
