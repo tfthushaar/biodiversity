@@ -27,14 +27,11 @@ def by_source(name: str) -> int:
     return sum(r["records"] for r in S["records_by_park_and_source"] if r["source"] == name)
 
 
-def trend(slug: str, series: str) -> dict:
-    return S["analysis_detail"][slug]["trend"][series]
-
-
 def p_value(p: float) -> str:
+    """"p < 0.001" or "p = 0.009", ready to sit in a sentence."""
     if p < 0.001:
-        return "<0.001"
-    return f"{p:.3f}" if p < 0.1 else f"{p:.2f}"
+        return "p < 0.001"
+    return f"p = {p:.3f}" if p < 0.1 else f"p = {p:.2f}"
 
 
 def count_tests() -> int:
@@ -49,41 +46,118 @@ def count_tests() -> int:
 N_TESTS = count_tests()
 
 
+# What the two clean-up scripts reported when they removed the records stored before the paper-only
+# rules (scripts/prune_unresearched.py and scripts/prune_gbif_records.py, 9 November 2026). The
+# database no longer holds those records, so the figures are kept here and not recomputed.
+CLEANUP = {
+    "PRUNED_RECORDS": 1213,  # records of invasive species with no paper
+    "PRUNED_SPECIES": 192,
+    "PRUNED_EVER": 959,
+    "PRUNED_SMOKIES": 205,
+    "GBIF_HELD": 9751,       # GBIF records held before the specimen-only rule
+    "GBIF_PRUNED": 731,      # of which these were not preserved specimens
+}
+INAT_CAP = 8000  # iNaturalist records stored per park (.github/workflows/ingest.yml)
+
+REASON_WORDS = {
+    "outside_zone": "outside the park boundary",
+    "imprecise_location": "position too imprecise",
+    "obscured_location": "position deliberately obscured",
+    "not_species_level": "not identified to a species",
+    "no_date": "no full date",
+    "not_established": "failed introduction",
+}
+PERIODS = ("to 2009", "2010 to 2019", "2020 on")
+
+
+def reasons(source: str, k: int = 3) -> str:
+    top = list(S["records_refused_by_reason"][source].items())[:k]
+    return T.listing([f"{REASON_WORDS.get(r, r.replace('_', ' '))} ({T.n(c)})" for r, c in top])
+
+
+def month(day: str) -> str:
+    return f"{datetime.fromisoformat(day):%B %Y}"
+
+
+def capped_parks() -> dict[str, str]:
+    """Parks whose iNaturalist records reached the storage cap, with the date of the latest one.
+    iNaturalist is read oldest first, so a park at the cap holds nothing after that date."""
+    return {r["park"]: r["latest"] for r in S["records_by_park_and_source"]
+            if r["source"] == "iNaturalist" and r["records"] >= INAT_CAP}
+
+
+def invasive_share_by_period() -> dict[str, float]:
+    mix = S["invasive_records_by_period_and_source"]["everglades"]
+    every = S["records_by_period_and_source"]["everglades"]
+    return {p: sum(mix.get(p, {}).values()) / sum(every[p].values()) for p in PERIODS}
+
+
+def usgs_share_of_invasive(period: str) -> float:
+    mix = S["invasive_records_by_period_and_source"]["everglades"][period]
+    return mix.get("USGS NAS", 0) / sum(mix.values())
+
+
 def check_claims() -> None:
-    """The template states directions and significance. Fail the build if the data no longer
-    supports a statement, so the prose is revised and not left to contradict the numbers."""
+    """The template states directions, orders and significance. Fail the build if the data no
+    longer supports a statement, so the prose is revised and not left to contradict the numbers."""
     ad, bonf = S["analysis_detail"], 0.05 / N_TESTS
     sm, ev = ad["smokies"], ad["everglades"]
     ev_inv, ev_nat = T.trend_pair("everglades")
-    sm_inv, sm_nat = T.trend_pair("smokies")
-    mu_inv, mu_nat = T.trend_pair("mudumalai")
+    inv = S["invasive_records_by_park"]
+    india = [z for z in T.ORDER if T.COUNTRY[z] == "IN"]
+    ever_total = inv["everglades"]
+    mix = S["invasive_records_by_period_and_source"]["everglades"]
+    every = S["records_by_period_and_source"]["everglades"]
+    usgs = sum(v.get("USGS NAS", 0) for v in mix.values())
+    top = S["invasive_species_by_park"]["everglades"][0]
+    share = invasive_share_by_period()
+    usgs_by_period = [usgs_share_of_invasive(p) for p in PERIODS]
+    kb_species = {r["species"] for r in T.kb_rows()}
+    recorded = {x["species"] for rows in S["invasive_species_by_park"].values() for x in rows}
+    all_share = {z: inv.get(z, 0) / sum(r["records"] for r in S["records_by_park_and_source"] if r["park"] == z)
+                 for z in T.ORDER}
     claims = {
         "Smokies correlation is positive with an interval above zero": sm["cooccurrence"]["ci95"][0] > 0,
         "Everglades correlation is positive with an interval including zero":
             ev["cooccurrence"]["spearman_rho"] > 0 and ev["cooccurrence"]["ci95"][0] <= 0,
-        "Everglades invasive trend rose, p below 0.05 and above the Bonferroni threshold":
-            ev_inv["tau"] > 0 and bonf < ev_inv["p_value"] < 0.05,
-        "Everglades native trend is not significant": ev_nat["p_value"] >= 0.05,
-        "Smokies invasive trend is not significant": sm_inv["p_value"] >= 0.05,
-        "Smokies native trend fell, p below 0.05 and above the Bonferroni threshold":
-            sm_nat["tau"] < 0 and bonf < sm_nat["p_value"] < 0.05,
-        "Mudumalai trends are not significant": mu_inv["p_value"] >= 0.05 and mu_nat["p_value"] >= 0.05,
-        "Exactly Mudumalai, Everglades and the Smokies meet the trend minimum and only the Everglades "
-        "and Smokies the correlation minimum":
-            {z for z, a in ad.items() if "invasive_per_observation" in a["trend"]}
-            == {"mudumalai", "everglades", "smokies"}
+        "Everglades invasive trend rose and is below the Bonferroni threshold":
+            ev_inv["tau"] > 0 and ev_inv["p_value"] < bonf,
+        "Everglades native trend fell and is below the Bonferroni threshold":
+            ev_nat["tau"] < 0 and ev_nat["p_value"] < bonf,
+        "Only the Everglades meets the trend minimum, and only the Everglades and the Smokies the "
+        "correlation minimum":
+            {z for z, a in ad.items() if "invasive_per_observation" in a["trend"]} == {"everglades"}
             and {z for z, a in ad.items() if "spearman_rho" in a["cooccurrence"]} == {"everglades", "smokies"},
+        "Every invasive species recorded has a paper": recorded <= kb_species,
+        "Serengeti has no invasive records": inv.get("serengeti", 0) == 0,
+        "No Indian park or the Smokies has the 30 invasive records the trend test needs":
+            all(inv.get(z, 0) < 30 for z in [*india, "smokies"]),
+        "The Everglades has the highest invasive share of all records":
+            all_share["everglades"] == max(all_share.values()),
+        "One species and one source supply most Everglades invasive records":
+            top["records"] > ever_total / 2 and usgs > ever_total / 2,
+        "USGS supplies a larger share of Everglades invasive records in each later period":
+            usgs_by_period == sorted(usgs_by_period),
+        "The Everglades holds no iNaturalist record dated 2020 or later": "iNaturalist" not in every["2020 on"],
+        "The invasive share of Everglades records is more than twice as high from 2020 on as before":
+            share["2020 on"] > 2 * max(share["to 2009"], share["2010 to 2019"]),
+        "iNaturalist reached its storage cap in the Everglades, the Smokies and Serengeti only":
+            set(capped_parks()) == {"everglades", "smokies", "serengeti"},
     }
     failed = [k for k, ok in claims.items() if not ok]
     if failed:
-        message = "paper template no longer matches the data; revise Sections 3.4 and 4:"
+        message = "paper template no longer matches the data; revise Sections 2, 3 and 4:"
         raise SystemExit(message + "\n  - " + ("\n  - ").join(failed))
 
 
 def values() -> dict[str, str]:
     snap = datetime.fromisoformat(S["computed_at"])
     ever = T.hotspots_of("everglades")
-    co = S["analysis_detail"]["smokies"]["cooccurrence"]
+    smk_hot = T.hotspots_of("smokies")
+    ad = S["analysis_detail"]
+    sm_co, ev_co = ad["smokies"]["cooccurrence"], ad["everglades"]["cooccurrence"]
+    ev_trend = ad["everglades"]["trend"]
+    ever_inv, ever_nat = T.trend_pair("everglades")
     fetched = S["records_fetched_by_source"]
     refused_n = sum(S["records_refused_by_reason"]["USGS NAS"].values())
     kb_rows = T.kb_rows()
@@ -91,93 +165,112 @@ def values() -> dict[str, str]:
     recorded = {x["species"] for rows in S["invasive_species_by_park"].values() for x in rows}
     years = [s["year"] for s in T.KB["sources"].values()]
     verified = datetime.fromisoformat(T.KB["verified_on"])
-    ever_inv, ever_obs = T.trend_pair("everglades")
-    mud_inv, mud_obs = T.trend_pair("mudumalai")
-    inv_total = sum(S["invasive_records_by_park"].values())
-    share = {z: S["invasive_records_by_park"].get(z, 0) / sum(
-        r["records"] for r in S["records_by_park_and_source"] if r["park"] == z) for z in T.ORDER}
+    inv = S["invasive_records_by_park"]
+    inv_total = sum(inv.values())
+    parks_records = {z: sum(r["records"] for r in S["records_by_park_and_source"] if r["park"] == z)
+                     for z in T.ORDER}
+    share = {z: inv.get(z, 0) / parks_records[z] for z in T.ORDER}
     others = {z: v for z, v in share.items() if z != "everglades"}
     lo, hi = min(others, key=others.get), max(others, key=others.get)
     india = [z for z in T.ORDER if T.COUNTRY[z] == "IN"]
+    in_species = [x for z in india for x in S["invasive_species_by_park"].get(z, [])]
 
     def sp_records(name: str) -> int:
-        return sum(x["records"] for z in india for x in S["invasive_species_by_park"].get(z, [])
-                   if x["species"] == name)
+        return sum(x["records"] for x in in_species if x["species"] == name)
 
-    ad = S["analysis_detail"]
-    ev_co = ad["everglades"]["cooccurrence"]
-    sm_inv, sm_nat = T.trend_pair("smokies")
-    mud_nat = trend("mudumalai", "native_per_observation")
     mix = S["invasive_records_by_period_and_source"]["everglades"]
-    pre = mix.get("to 2009", {})
-    late = mix.get("2020 on", {})
-    smk_hot = T.hotspots_of("smokies")
-    n_tests = N_TESTS
+    every = S["records_by_period_and_source"]["everglades"]
+    pre, late = mix.get("to 2009", {}), mix.get("2020 on", {})
+    inv_share = invasive_share_by_period()
+    top = S["invasive_species_by_park"]["everglades"][0]
+    usgs_inv = sum(v.get("USGS NAS", 0) for v in mix.values())
+
+    def pct_of_all(source: str, period: str) -> str:
+        return f"{100 * every[period].get(source, 0) / sum(every[period].values()):.0f}"
+
+    latest = {z: month(d) for z, d in capped_parks().items()}
     return {
-        "N_TESTS": str(n_tests),
-        "BONF": f"{0.05 / n_tests:.4f}",
-        "EVER_CELLS": T.n(ev_co["cells_usable"]),
-        "EVER_RHO": f"{ev_co['spearman_rho']:.2f}",
-        "EVER_RHO_LO": f"{ev_co['ci95'][0]:.2f}",
-        "EVER_RHO_HI": f"{ev_co['ci95'][1]:.2f}",
-        "EVER_NTAU": f"{ever_obs['tau']:.2f}",
-        "SMK_TAU": f"{sm_inv['tau']:.2f}",
-        "SMK_P": p_value(sm_inv["p_value"]),
-        "SMK_NTAU": f"{sm_nat['tau']:.2f}",
-        "SMK_NP": p_value(sm_nat["p_value"]),
-        "SMK_YEARS": str(sm_inv["n"]),
-        "SMK_Y0": str(ad["smokies"]["trend"]["years"][0]),
-        "SMK_Y1": str(ad["smokies"]["trend"]["years"][1]),
-        "MUD_NTAU": f"{mud_nat['tau']:.2f}",
-        "SMK_INV": T.n(smk_hot["records"]),
-        "SMK_CELLS_OCC": T.n(smk_hot["occupied_cells"]),
-        "SMK_ONE": T.n(smk_hot["cells_with_one_record"]),
-        "EVER_PRE_TOTAL": T.n(sum(pre.values())),
-        "EVER_PRE_USGS": T.n(pre.get("USGS NAS", 0)),
-        "EVER_LATE_TOTAL": T.n(sum(late.values())),
-        "EVER_LATE_GBIF": T.n(late.get("GBIF occurrences", 0)),
+        "SNAPSHOT": f"{snap.day} {snap:%B %Y}",
+        "TOTAL_RECORDS": T.n(S["total_records"]),
+        "ITOTAL": T.n(by_source("iNaturalist")),
+        "GTOTAL": T.n(by_source("GBIF specimens")),
+        "NTOTAL": T.n(by_source("USGS NAS")),
         "INV_TOTAL": T.n(inv_total),
+        "INV_SPECIES_TOTAL": str(len(recorded)),
+        "INAT_CAP": T.n(INAT_CAP),
+        "IN_INAT_LAST": month(min(r["latest"] for r in S["records_by_park_and_source"]
+                                  if r["source"] == "iNaturalist" and T.COUNTRY[r["park"]] == "IN")),
+        "EVER_INAT_LAST": latest["everglades"],
+        "SMK_INAT_LAST": latest["smokies"],
+        "SER_INAT_LAST": latest["serengeti"],
+        "FETCHED_I": T.n(fetched["iNaturalist"]),
+        "FETCHED_G": T.n(fetched["GBIF specimens"]),
+        "FETCHED_N": T.n(fetched["USGS NAS"]),
+        "REFUSED_N": T.n(refused_n),
+        "I_KEPT_PCT": f"{100 * by_source('iNaturalist') / fetched['iNaturalist']:.0f}",
+        "G_KEPT_PCT": f"{100 * by_source('GBIF specimens') / fetched['GBIF specimens']:.0f}",
+        "REASONS_I": reasons("iNaturalist"),
+        "REASONS_G": reasons("GBIF specimens"),
+        "REASONS_N": reasons("USGS NAS", 2),
+        "GBIF_HELD": T.n(CLEANUP["GBIF_HELD"]),
+        "GBIF_PRUNED": T.n(CLEANUP["GBIF_PRUNED"]),
+        "PRUNED_RECORDS": T.n(CLEANUP["PRUNED_RECORDS"]),
+        "PRUNED_SPECIES": T.n(CLEANUP["PRUNED_SPECIES"]),
+        "PRUNED_EVER": T.n(CLEANUP["PRUNED_EVER"]),
+        "PRUNED_SMOKIES": T.n(CLEANUP["PRUNED_SMOKIES"]),
         "EVER_SHARE": f"{100 * share['everglades']:.0f}",
         "SHARE_LOW": f"{100 * share[lo]:.1f}",
         "SHARE_LOW_PARK": T.NAMES[lo],
         "SHARE_HIGH": f"{100 * share[hi]:.1f}",
         "SHARE_HIGH_PARK": T.NAMES[hi],
-        "LANTANA_RECORDS": str(sp_records("Lantana camara")),
-        "SENNA_RECORDS": str(sp_records("Senna spectabilis")),
-        "INV_SPECIES_TOTAL": str(len(recorded)),
-        "EVER_Y0": str(S["analysis_detail"]["everglades"]["trend"]["years"][0]),
-        "EVER_Y1": str(S["analysis_detail"]["everglades"]["trend"]["years"][1]),
-        "MUD_Y0": str(S["analysis_detail"]["mudumalai"]["trend"]["years"][0]),
-        "MUD_Y1": str(S["analysis_detail"]["mudumalai"]["trend"]["years"][1]),
-        "SNAPSHOT": f"{snap.day} {snap:%B %Y}",
-        "TOTAL_RECORDS": T.n(S["total_records"]),
-        "ITOTAL": T.n(by_source("iNaturalist")),
-        "GTOTAL": T.n(by_source("GBIF occurrences")),
-        "NTOTAL": T.n(by_source("USGS NAS")),
-        "DBMB": f"{S['database_bytes'] / 1e6:.0f}",
-        "FETCHED_I": T.n(fetched["iNaturalist"]),
-        "FETCHED_G": T.n(fetched["GBIF occurrences"]),
-        "FETCHED_N": T.n(fetched["USGS NAS"]),
-        "REFUSED_N": T.n(refused_n),
-        "I_KEPT_PCT": f"{100 * by_source('iNaturalist') / fetched['iNaturalist']:.0f}",
-        "G_KEPT_PCT": f"{100 * by_source('GBIF occurrences') / fetched['GBIF occurrences']:.0f}",
+        "EVER_TOP_SPECIES": top["species"],
+        "EVER_TOP_COMMON": top["common_name"],
+        "EVER_TOP_PCT": f"{100 * top['records'] / inv['everglades']:.0f}",
+        "EVER_USGS_PCT": f"{100 * usgs_inv / inv['everglades']:.0f}",
+        "IN_REC_MIN": str(min(inv.get(z, 0) for z in india)),
+        "IN_REC_MAX": str(max(inv.get(z, 0) for z in india)),
+        "IN_SPECIES_MAX": str(max(x["records"] for x in in_species)),
+        "LANTANA_PHRASE": T.count_phrase(sp_records("Lantana camara")),
+        "SENNA_PHRASE": T.count_phrase(sp_records("Senna spectabilis")),
         "HOT_EVER_SHARE": f"{100 * ever['share_in_top_10_percent_of_cells']:.0f}",
         "HOT_EVER_MAX": T.n(ever["busiest_cell_records"]),
         "HOT_EVER_N": T.n(ever["records"]),
-        "HOT_EVER_CELLS": T.n(ever["occupied_cells"]),
-        "SMOKIES_CELLS": T.n(co["cells_usable"]),
-        "SMOKIES_RHO": f"{co['spearman_rho']:.2f}",
-        "SMOKIES_LO": f"{co['ci95'][0]:.2f}",
-        "SMOKIES_HI": f"{co['ci95'][1]:.2f}",
-        "EVER_YEARS": str(trend("everglades", "invasive_per_observation")["n"]),
+        "SMK_INV": T.n(smk_hot["records"]),
+        "SMK_CELLS_OCC": T.n(smk_hot["occupied_cells"]),
+        "SMK_ONE": T.n(smk_hot["cells_with_one_record"]),
+        "OTHER_INV_MAX": str(max(v for z, v in inv.items() if z != "everglades")),
+        "REQUIRED_INV": str(ev_trend["required_invasive_records"]),
+        "N_TESTS": str(N_TESTS),
+        "BONF": f"{0.05 / N_TESTS:.4f}",
+        "SMOKIES_CELLS": T.n(sm_co["cells_usable"]),
+        "SMK_CELLS_WITH": T.n(sm_co["cells_with_invasives"]),
+        "SMOKIES_RHO": f"{sm_co['spearman_rho']:.2f}",
+        "SMOKIES_LO": f"{sm_co['ci95'][0]:.2f}",
+        "SMOKIES_HI": f"{sm_co['ci95'][1]:.2f}",
+        "EVER_CELLS": T.n(ev_co["cells_usable"]),
+        "EVER_CELLS_WITH": T.n(ev_co["cells_with_invasives"]),
+        "EVER_RHO": f"{ev_co['spearman_rho']:.2f}",
+        "EVER_RHO_LO": f"{ev_co['ci95'][0]:.2f}",
+        "EVER_RHO_HI": f"{ev_co['ci95'][1]:.2f}",
+        "EVER_YEARS": str(ever_inv["n"]),
+        "EVER_Y0": str(ev_trend["years"][0]),
+        "EVER_Y1": str(ev_trend["years"][1]),
         "EVER_TAU": f"{ever_inv['tau']:.2f}",
         "EVER_P": p_value(ever_inv["p_value"]),
         "EVER_SLOPE": f"{ever_inv['slope']:.4f}",
-        "EVER_NP": p_value(ever_obs["p_value"]),
-        "MUD_YEARS": str(trend("mudumalai", "invasive_per_observation")["n"]),
-        "MUD_TAU": f"{mud_inv['tau']:.2f}",
-        "MUD_P": p_value(mud_inv["p_value"]),
-        "MUD_NP": p_value(mud_obs["p_value"]),
+        "EVER_NTAU": f"{ever_nat['tau']:.2f}",
+        "EVER_NP": p_value(ever_nat["p_value"]),
+        "EVER_PRE_USGS": T.of_phrase(pre.get("USGS NAS", 0), sum(pre.values())),
+        "EVER_LATE_USGS": T.of_phrase(late.get("USGS NAS", 0), sum(late.values())),
+        "EVER_SHARE_PRE": f"{100 * inv_share['to 2009']:.0f}",
+        "EVER_SHARE_MID": f"{100 * inv_share['2010 to 2019']:.0f}",
+        "EVER_SHARE_LATE": f"{100 * inv_share['2020 on']:.0f}",
+        "EVER_INAT_PRE": pct_of_all("iNaturalist", "to 2009"),
+        "EVER_INAT_MID": pct_of_all("iNaturalist", "2010 to 2019"),
+        "EVER_INAT_LATE": pct_of_all("iNaturalist", "2020 on"),
+        "EVER_USGS_ALL_PRE": pct_of_all("USGS NAS", "to 2009"),
+        "EVER_USGS_ALL_MID": pct_of_all("USGS NAS", "2010 to 2019"),
+        "EVER_USGS_ALL_LATE": pct_of_all("USGS NAS", "2020 on"),
         "KB_PAPERS": str(len(T.KB["sources"])),
         "KB_JOURNALS": str(len({s["journal"] for s in T.KB["sources"].values()})),
         "KB_Y0": str(min(years)),
@@ -186,7 +279,7 @@ def values() -> dict[str, str]:
         "KB_MANAGEMENT": str(len(T.KB["playbooks"])),
         "KB_QUOTES": str(sum(len(r["quotes"]) for r in kb_rows)),
         "KB_SPECIES": str(len(kb_species)),
-        "KB_RECORDED": str(len(kb_species & recorded)),
+        "KB_NOT_RECORDED": str(len(kb_species - recorded)),
         "KB_VERIFIED": f"{verified.day} {verified:%B %Y}",
         "KB_FINDING_DESIGNS": T.design_phrase(Counter(r["design"] for r in kb_rows if r["kind"] == "finding")),
         "KB_MANAGEMENT_DESIGNS": T.design_phrase(Counter(r["design"] for r in kb_rows if r["kind"] == "management")),

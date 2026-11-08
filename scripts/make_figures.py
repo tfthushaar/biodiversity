@@ -22,6 +22,7 @@ def main() -> int:
     p.add_argument("--base", default="http://localhost:4173")
     p.add_argument("--out", default="docs/figures")
     p.add_argument("--width", type=int, default=1500)
+    p.add_argument("--parks", nargs="+", default=PARKS, help="park slugs to draw (default: all)")
     args = p.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -30,12 +31,14 @@ def main() -> int:
         page = browser.new_context(
             viewport={"width": args.width, "height": 1000}, color_scheme="light"
         ).new_page()
-        for slug in PARKS:
+        for slug in args.parks:
             page.goto(f"{args.base}/#/hotspots/{slug}")
             page.wait_for_selector(".map", timeout=60000)
             try:
                 page.wait_for_selector("text=Busiest squares", timeout=30000)
             except Exception:
+                stale = out / f"hotspots-{slug}.png"
+                stale.unlink(missing_ok=True)  # an old figure would show records that are gone
                 print(f"{slug}: no hotspots to draw")
                 continue
             # The paper reports 2 km squares.

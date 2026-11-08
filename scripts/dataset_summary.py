@@ -51,9 +51,10 @@ def summarise(conn: psycopg.Connection) -> dict:
     ]
 
     out["records_by_park_and_source"] = [
-        {"park": z, "source": s, "records": n}
-        for z, s, n in rows(conn, """
-            select z.slug, s.name, count(*) from media_items m
+        {"park": z, "source": s, "records": n, "earliest": str(first), "latest": str(last)}
+        for z, s, n, first, last in rows(conn, """
+            select z.slug, s.name, count(*), min(m.captured_at)::date, max(m.captured_at)::date
+            from media_items m
             join zones z on z.id = m.zone_id join sources s on s.id = m.source_id
             group by 1, 2 order by 1, 2""")
     ]
@@ -148,6 +149,20 @@ def summarise(conn: psycopg.Connection) -> dict:
             join sources s on s.id = r.source_id group by 1, 2, 3"""):
         periods.setdefault(z, {}).setdefault(period, {})[source] = n
     out["invasive_records_by_period_and_source"] = periods
+
+    # The same split for every record, so the paper can say how the mix of sources changed over
+    # time beside the invasive records.
+    every: dict[str, dict[str, dict[str, int]]] = {}
+    for z, period, source, n in rows(conn, """
+            select z.slug,
+                   case when extract(year from m.captured_at) < 2010 then 'to 2009'
+                        when extract(year from m.captured_at) < 2020 then '2010 to 2019'
+                        else '2020 on' end,
+                   s.name, count(*)
+            from media_items m join zones z on z.id = m.zone_id
+            join sources s on s.id = m.source_id group by 1, 2, 3"""):
+        every.setdefault(z, {}).setdefault(period, {})[source] = n
+    out["records_by_period_and_source"] = every
 
     out["analysis_detail"] = {
         z: {

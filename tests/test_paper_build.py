@@ -65,3 +65,85 @@ def test_cited_works_in_the_text_are_in_the_reference_list(built):
     names = {a or b for a, b in cited}
     missing = sorted(n for n in names if n not in refs)
     assert not missing, f"cited without a reference entry: {missing}"
+
+
+# ------------------------------------------------------- the claim guard and its helpers
+
+
+@pytest.fixture
+def builder(monkeypatch):
+    monkeypatch.chdir(ROOT)
+    import build_paper
+
+    return build_paper
+
+
+def test_the_headline_numbers_are_the_snapshots(built, builder):
+    S = builder.S
+    assert f"{S['total_records']:,} records" in built
+    assert f"{sum(S['invasive_records_by_park'].values()):,} are records" in built
+
+
+def test_the_guard_passes_on_the_stored_snapshot(builder):
+    builder.check_claims()  # raises SystemExit when the data no longer supports a sentence
+
+
+@pytest.mark.parametrize(("path", "value", "claim"), [
+    # The Everglades trend stops being significant, so "survives a correction" is no longer true.
+    (("analysis_detail", "everglades", "trend", "invasive_per_observation", "p_value"), 0.2,
+     "Everglades invasive trend rose"),
+    # An iNaturalist record from 2020 appears, so "the park holds none after 2019" is false.
+    (("records_by_period_and_source", "everglades", "2020 on", "iNaturalist"), 40,
+     "no iNaturalist record dated 2020 or later"),
+    # A species without a paper is recorded.
+    (("invasive_species_by_park", "serengeti"), [{"species": "Unstudied weed", "records": 3,
+                                                  "common_name": None, "first_year": 2020,
+                                                  "last_year": 2020}],
+     "Every invasive species recorded has a paper"),
+])
+def test_the_guard_stops_the_build_when_the_data_no_longer_supports_a_sentence(
+        builder, monkeypatch, path, value, claim):
+    node = builder.S
+    for key in path[:-1]:
+        node = node[key]
+    monkeypatch.setitem(node, path[-1], value)
+    with pytest.raises(SystemExit) as stopped:
+        builder.check_claims()
+    assert claim in str(stopped.value)
+
+
+def test_p_values_carry_their_own_operator(builder):
+    assert builder.p_value(1e-13) == "p < 0.001"
+    assert builder.p_value(0.009) == "p = 0.009"
+    assert builder.p_value(0.2) == "p = 0.20"
+
+
+def test_the_gbif_source_reads_the_same_under_its_former_name(monkeypatch):
+    monkeypatch.chdir(ROOT)
+    import paper_tables as T
+
+    old = {"records_by_park_and_source": [{"park": "x", "source": "GBIF occurrences"}],
+           "records_refused_by_reason": {"GBIF occurrences": {"no_date": 1}}}
+    new = T.renamed(old)
+    assert new["records_by_park_and_source"][0]["source"] == "GBIF specimens"
+    assert list(new["records_refused_by_reason"]) == ["GBIF specimens"]
+
+
+def test_phrases_read_naturally_for_none_one_and_many(monkeypatch):
+    monkeypatch.chdir(ROOT)
+    import paper_tables as T
+
+    assert [T.count_phrase(k) for k in (0, 1, 6)] == ["no records", "1 record", "6 records"]
+    assert T.of_phrase(835, 835) == "all 835" and T.of_phrase(471, 650) == "471 of the 650"
+    assert T.listing(["a"]) == "a" and T.listing(["a", "b", "c"]) == "a, b and c"
+
+
+def test_the_paper_leaves_out_what_the_rules_removed(built):
+    for stale in ("IUCN", "eBird", "0.02 degrees", "nearly half", "does not survive a correction"):
+        assert stale not in built, f"out-of-date wording in the paper: {stale!r}"
+
+
+def test_the_paper_states_the_limit_on_recent_inaturalist_records(built, builder):
+    assert "Three parks lack recent iNaturalist records." in built
+    for park, latest in builder.capped_parks().items():
+        assert builder.month(latest) in built, park

@@ -16,7 +16,20 @@ from pathlib import Path
 
 from biodiv.knowledge.verify import citation_text
 
-S = json.loads(Path("docs/metrics/dataset_summary.json").read_text(encoding="utf-8"))
+# The GBIF source was called "GBIF occurrences" until the query was limited to preserved specimens.
+# A snapshot taken under either name reads the same here.
+FORMER_NAMES = {"GBIF occurrences": "GBIF specimens"}
+
+
+def renamed(x):
+    if isinstance(x, dict):
+        return {renamed(k): renamed(v) for k, v in x.items()}
+    if isinstance(x, list):
+        return [renamed(v) for v in x]
+    return FORMER_NAMES.get(x, x) if isinstance(x, str) else x
+
+
+S = renamed(json.loads(Path("docs/metrics/dataset_summary.json").read_text(encoding="utf-8")))
 # The evidence base is read from the verified knowledge file, so the paper states what the platform
 # enforces: peer-reviewed papers only, each claim quoted from the paper's abstract.
 KB = json.loads(Path("db/seeds/knowledge.json").read_text(encoding="utf-8"))
@@ -28,6 +41,21 @@ ORDER = [p["slug"] for p in S["parks"]]
 
 def n(x: int | float) -> str:
     return f"{x:,.0f}"
+
+
+def count_phrase(k: int, noun: str = "record") -> str:
+    """"no records", "1 record", "6 records"."""
+    return f"no {noun}s" if k == 0 else f"{k} {noun}" + ("" if k == 1 else "s")
+
+
+def of_phrase(k: int, total: int) -> str:
+    """"all 835" when every one, otherwise "471 of the 650"."""
+    return f"all {n(total)}" if k == total else f"{n(k)} of the {n(total)}"
+
+
+def listing(items: list[str]) -> str:
+    """"a", "a and b", "a, b and c"."""
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
 
 
 def table(head: list[str], rows: list[list[str]], align: str | None = None) -> str:
@@ -42,7 +70,7 @@ def records_table() -> str:
     by: dict[str, dict[str, int]] = {}
     for r in S["records_by_park_and_source"]:
         by.setdefault(r["park"], {})[r["source"]] = r["records"]
-    sources = ["iNaturalist", "GBIF occurrences", "USGS NAS"]
+    sources = ["iNaturalist", "GBIF specimens", "USGS NAS"]
     rows = []
     for slug in ORDER:
         v = by.get(slug, {})
