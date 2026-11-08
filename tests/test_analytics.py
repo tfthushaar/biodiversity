@@ -19,7 +19,7 @@ from biodiv.analytics.impact import (
     zone_report,
 )
 from biodiv.knowledge.loader import load_knowledge
-from helpers import World, day
+from helpers import World, day, finding_row, knowledge_file
 
 
 @pytest.fixture
@@ -163,16 +163,12 @@ def test_a_year_with_too_little_effort_does_not_count(world):
 
 
 def finding(species, zone, summary):
-    return {"species": species, "zone": zone, "finding_type": "concern", "affected": "forest",
-            "summary": summary, "certainty": "unverified_concern", "region_note": "here",
-            "source": "s", "quotes": ["a quote long enough to count as evidence here"]}
+    return finding_row(species, zone, finding_type="concern", affected="forest", summary=summary,
+                       region_note="here")
 
 
-def load(world, findings):
-    load_knowledge(world.conn, {
-        "verified_on": "2026-10-07",
-        "sources": {"s": {"citation": "C", "url": "https://x.org/s", "kind": "page"}},
-        "playbooks": [], "impact_findings": findings})
+def load(world, findings, **kw):
+    load_knowledge(world.conn, knowledge_file(findings=findings, **kw))
 
 
 def test_zone_specific_findings_show_even_when_the_species_is_not_recorded(world):

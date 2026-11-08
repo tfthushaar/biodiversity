@@ -1,713 +1,808 @@
 {
-  "_about": "Curated, cited knowledge about the invasive species recorded in the parks. Rule: no verbatim quote, no row. scripts/verify_citations.py checks every quote against its live source. The descriptions restate the sources for readers and the quotes are the evidence. The rows summarise what published sources report, with their caveats.",
-  "verified_on": "2026-10-08",
+  "_about": "Peer-reviewed research on the invasive species recorded in the parks. Every source is a journal article with a DOI, published in or after the policy year. Every row carries verbatim quotes from the paper's abstract. Rule: no paper, no row. scripts/verify_citations.py checks each paper against Crossref and OpenAlex and each quote against the abstract. The summaries restate what the papers report, with the setting of each study.",
+  "_policy": {
+    "min_year": 2016,
+    "blocked_venues": [
+      "EDIS"
+    ]
+  },
+  "verified_on": null,
   "sources": {
-    "gisd_lantana": {
-      "citation": "Global Invasive Species Database (2026) Species profile: Lantana camara. IUCN SSC Invasive Species Specialist Group.",
-      "url": "https://www.iucngisd.org/gisd/species.php?sc=56",
-      "kind": "page"
+    "willson2017": {
+      "doi": "10.1111/1365-2664.12844",
+      "title": "Indirect effects of invasive Burmese pythons on ecosystems in southern Florida",
+      "authors": "Willson, J.D.",
+      "year": 2017,
+      "journal": "Journal of Applied Ecology",
+      "volume": "54",
+      "pages": "1251-1258"
     },
-    "gisd_chromolaena": {
-      "citation": "Global Invasive Species Database (2026) Species profile: Chromolaena odorata. IUCN SSC Invasive Species Specialist Group.",
-      "url": "https://www.iucngisd.org/gisd/species.php?sc=47",
-      "kind": "page"
+    "hoyer2017": {
+      "doi": "10.1098/rsbl.2017.0353",
+      "title": "Mammal decline, linked to invasive Burmese python, shifts host use of vector mosquito towards reservoir hosts of a zoonotic disease",
+      "authors": "Hoyer, I.J., Blosser, E.M., Acevedo, C. et al.",
+      "year": 2017,
+      "journal": "Biology Letters",
+      "volume": "13",
+      "pages": "20170353"
     },
-    "gisd_parthenium": {
-      "citation": "Global Invasive Species Database (2026) Species profile: Parthenium hysterophorus. IUCN SSC Invasive Species Specialist Group.",
-      "url": "https://www.iucngisd.org/gisd/species.php?sc=153",
-      "kind": "page"
+    "orzechowski2019": {
+      "doi": "10.1371/journal.pone.0213943",
+      "title": "Environmental DNA sampling reveals high occupancy rates of invasive Burmese pythons at wading bird breeding aggregations in the central Everglades",
+      "authors": "Orzechowski, S.C.M., Frederick, P.C., Dorazio, R.M. et al.",
+      "year": 2019,
+      "journal": "PLOS ONE",
+      "volume": "14",
+      "pages": "e0213943"
     },
-    "gisd_prosopis": {
-      "citation": "Global Invasive Species Database (2026) Species profile: Prosopis juliflora. IUCN SSC Invasive Species Specialist Group.",
-      "url": "https://www.iucngisd.org/gisd/species.php?sc=917",
-      "kind": "page"
+    "guzy2023": {
+      "doi": "10.3897/neobiota.80.90439",
+      "title": "Burmese pythons in Florida: A synthesis of biology, impacts, and management tools",
+      "authors": "Guzy, J.C., Falk, B.G., Smith, B.J. et al.",
+      "year": 2023,
+      "journal": "NeoBiota",
+      "volume": "80",
+      "pages": "1-119"
     },
-    "roundglass_senna": {
-      "citation": "Vinayan, P.A. (2021) Gone Rogue: The Golden Shower Turns Invasive in the Western Ghats. Round Glass Sustain, updated 3 November 2021.",
-      "url": "https://roundglasssustain.com/conservation/golden-shower-invasive",
-      "fetch_url": "http://web.archive.org/web/20260416080321/https://roundglasssustain.com/conservation/golden-shower-invasive",
-      "kind": "page",
-      "note": "The site answers 404 to requests from GitHub's servers, so quotes are verified against an Internet Archive copy of the same article."
+    "miller2025": {
+      "doi": "10.3391/mbi.2025.16.4.14",
+      "title": "Mammalian scent lures fail to increase detections of invasive Burmese pythons (Python bivittatus)",
+      "authors": "Miller, S., Kirkland, M., Hart, K. et al.",
+      "year": 2025,
+      "journal": "Management of Biological Invasions",
+      "volume": "16",
+      "pages": "1147-1159"
     },
-    "mongabay_senna": {
-      "citation": "Menon, A. (2023) Wayanad's soured relationship with Senna. Mongabay-India, 13 November 2023.",
-      "url": "https://india.mongabay.com/2023/11/wayanads-soured-relationship-with-senna/",
-      "fetch_url": "http://web.archive.org/web/20260418194833/https://india.mongabay.com/2023/11/wayanads-soured-relationship-with-senna/",
-      "kind": "page",
-      "note": "Mongabay refuses automated requests, so quotes are verified against an Internet Archive copy of the same article."
+    "negi2019": {
+      "doi": "10.1007/s12229-019-09209-8",
+      "title": "Ecology and Use of Lantana camara in India",
+      "authors": "Negi, G.C.S., Sharma, S., Vishvakarma, S.C. et al.",
+      "year": 2019,
+      "journal": "The Botanical Review",
+      "volume": "85",
+      "pages": "109-130"
     },
-    "rufford_bandipur": {
-      "citation": "Prasad, A. (2007) Impact of Lantana camara, a Major Invasive Plant, on Wildlife Habitat in Bandipur Tiger Reserve, Southern India. The Rufford Foundation project page.",
-      "url": "https://www.rufford.org/projects/ayesha-prasad/impact-of-lantana-camara-a-major-invasive-plant-on-wildlife-habitat-in-bandipur-tiger-reserve-southern-india/",
-      "kind": "page"
+    "lone2025": {
+      "doi": "10.3389/ffgc.2025.1412130",
+      "title": "Invasive shrub (Lantana camara L.) alters the tree diversity and ecosystem-level carbon pools in tropical forests of Central India",
+      "authors": "Lone, P.A., Kothandaraman, S., Dar, J.A. et al.",
+      "year": 2025,
+      "journal": "Frontiers in Forests and Global Change",
+      "volume": "8",
+      "pages": "1412130"
+    },
+    "barahukwa2023": {
+      "doi": "10.1111/aje.13133",
+      "title": "The effects of the invasive species, Lantana camara, on regeneration of an African rainforest",
+      "authors": "Barahukwa, A., Chapman, C.A., Namaganda, M. et al.",
+      "year": 2023,
+      "journal": "African Journal of Ecology",
+      "volume": "61",
+      "pages": "451-460"
+    },
+    "muraleekrishnan2024": {
+      "doi": "10.11609/jott.8534.16.5.25198-25208",
+      "title": "Reproductive biology of Senna spectabilis (DC.) H.S.Irwin & Barneby (Fabaceae) - an invasive tree species in the tropical forests of the Western Ghats, India",
+      "authors": "Muraleekrishnan, K., Viswanath, S. and Hrideek, T.K.",
+      "year": 2024,
+      "journal": "Journal of Threatened Taxa",
+      "volume": "16",
+      "pages": "25198-25208"
+    },
+    "bargavi2025": {
+      "doi": "10.14719/pst.7138",
+      "title": "Senna spectabilis (DC.) H. S. Irwin & Barneby invasion in India: Impacts, challenges and management - A review",
+      "authors": "Bargavi, S., Baranidharan, K., Tilak, M. et al.",
+      "year": 2025,
+      "journal": "Plant Science Today"
+    },
+    "wei2017": {
+      "doi": "10.1002/ecs2.1831",
+      "title": "Invasion effects of Chromolaena odorata on soil carbon and nitrogen fractions in a tropical savanna",
+      "authors": "Wei, H., Xu, J., Quan, G. et al.",
+      "year": 2017,
+      "journal": "Ecosphere",
+      "volume": "8",
+      "pages": "e01831"
+    },
+    "suthari2016": {
+      "doi": "10.11609/jott.2134.8.2.8538-8540",
+      "title": "Intrusion of devil weed Chromolaena odorata, an exotic invasive, into Kinnerasani and Eturnagaram wildlife sanctuaries, Telangana, India",
+      "authors": "Suthari, S., Kandagatla, R., Geetha, S. et al.",
+      "year": 2016,
+      "journal": "Journal of Threatened Taxa",
+      "volume": "8",
+      "pages": "8538"
+    },
+    "moyer2018": {
+      "doi": "10.3375/043.038.0204",
+      "title": "Competitive Responses and Effects of the Invasive Grass Microstegium vimineum during Oak Woodland Restoration",
+      "authors": "Moyer, S.A. and Brewer, J.S.",
+      "year": 2018,
+      "journal": "Natural Areas Journal",
+      "volume": "38",
+      "pages": "139-147"
+    },
+    "williams2024": {
+      "doi": "10.1002/ajb2.16362",
+      "title": "Naturally diverse plant communities do not resist invasion by the strong competitor, Microstegium vimineum",
+      "authors": "Williams, G.L. and Brewer, J.S.",
+      "year": 2024,
+      "journal": "American Journal of Botany",
+      "volume": "111",
+      "pages": "e16362"
+    },
+    "brewer2026": {
+      "doi": "10.1111/rec.70322",
+      "title": "Restoration of an oak woodland invaded by Microstegium vimineum with and without herbicide control of the invader",
+      "authors": "Brewer, J.S.",
+      "year": 2026,
+      "journal": "Restoration Ecology",
+      "volume": "34",
+      "pages": "e70322"
+    },
+    "mcavoy2017": {
+      "doi": "10.3390/f8120497",
+      "title": "Mortality and Recovery of Hemlock Woolly Adelgid (Adelges tsugae) in Response to Winter Temperatures and Predictions for the Future",
+      "authors": "McAvoy, T., Régnière, J., St-Amant, R. et al.",
+      "year": 2017,
+      "journal": "Forests",
+      "volume": "8",
+      "pages": "497"
+    },
+    "quinterno2023": {
+      "doi": "10.3390/f14112229",
+      "title": "Basal Bark Treatment of Imidacloprid for Hemlock Woolly Adelgids (Adelges tsugae)",
+      "authors": "Quinterno, M., Dahle, G., Gazal, K. et al.",
+      "year": 2023,
+      "journal": "Forests",
+      "volume": "14",
+      "pages": "2229"
+    },
+    "fox2026": {
+      "doi": "10.1139/cjfr-2025-0281",
+      "title": "Impact of imidacloprid-based chemical control for hemlock woolly adelgid (Adelges tsugae) on the eastern red-backed salamander (Plethodon cinereus)",
+      "authors": "Fox, D.J., Forbes, G. and Edge, C.B.",
+      "year": 2026,
+      "journal": "Canadian Journal of Forest Research",
+      "volume": "56",
+      "pages": "1-11"
+    },
+    "wijerathna2026": {
+      "doi": "10.1007/s10530-026-03940-1",
+      "title": "Evaluating the benefits and risks of biological control agents for managing hemlock woolly adelgid in North America",
+      "authors": "Wijerathna, A. and MacQuarrie, C.J.K.",
+      "year": 2026,
+      "journal": "Biological Invasions",
+      "volume": "28",
+      "pages": "235"
+    },
+    "abdulahi2017": {
+      "doi": "10.56369/tsaes.2260",
+      "title": "Prosopis juliflora L: distribution, impacts and available control methods in Ethiopia",
+      "authors": "Abdulahi, M.M., Abdulkerim Ute, J. and Regasa, T.",
+      "year": 2017,
+      "journal": "Tropical and Subtropical Agroecosystems",
+      "volume": "20"
+    },
+    "bibi2023": {
+      "doi": "10.3390/agronomy13020590",
+      "title": "Allelopathic Effects of the Invasive Prosopis juliflora (Sw.) DC. on Native Plants: Perspectives toward Agrosystems",
+      "authors": "Bibi, S., Bibi, A., Al-Ghouti, M.A. et al.",
+      "year": 2023,
+      "journal": "Agronomy",
+      "volume": "13",
+      "pages": "590"
     },
     "nerlekar2021": {
-      "citation": "Nerlekar, A.N., Mehta, P., Pokar, J., Bhagwat, S. et al. (2021) Removal or utilization? Testing alternative approaches to the management of an invasive woody legume in an arid Indian grassland. Restoration Ecology.",
-      "url": "https://doi.org/10.1111/rec.13477",
-      "kind": "crossref",
-      "doi": "10.1111/rec.13477"
+      "doi": "10.1111/rec.13477",
+      "title": "Removal or utilization? Testing alternative approaches to the management of an invasive woody legume in an arid Indian grassland",
+      "authors": "Nerlekar, A.N., Mehta, N., Pokar, R. et al.",
+      "year": 2021,
+      "journal": "Restoration Ecology",
+      "volume": "30",
+      "pages": "e13477"
     },
-    "dorcas2012": {
-      "citation": "Dorcas, M.E., Willson, J.D., Reed, R.N., Snow, R.W. et al. (2012) Severe mammal declines coincide with proliferation of invasive Burmese pythons in Everglades National Park. Proceedings of the National Academy of Sciences.",
-      "url": "https://doi.org/10.1073/pnas.1115226109",
-      "kind": "crossref",
-      "doi": "10.1073/pnas.1115226109"
+    "oduor2021": {
+      "doi": "10.1111/nph.17574",
+      "title": "Native plant species show evolutionary responses to invasion by Parthenium hysterophorus in an African savanna",
+      "authors": "Oduor, A.M.O.",
+      "year": 2021,
+      "journal": "New Phytologist",
+      "volume": "233",
+      "pages": "983-994"
     },
-    "nas_python": {
-      "citation": "U.S. Geological Survey (2026) Python bivittatus (Burmese Python): Nonindigenous Aquatic Species fact sheet. Gainesville, Florida.",
-      "url": "https://nas.er.usgs.gov/queries/FactSheet.aspx?speciesID=2552",
-      "kind": "page"
+    "belgeri2020": {
+      "doi": "10.3390/plants9111587",
+      "title": "Managing an Invasive Weed Species, Parthenium hysterophorus, with Suppressive Plant Species in Australian Grasslands",
+      "authors": "Belgeri, A., Bajwa, A.A., Shabbir, A. et al.",
+      "year": 2020,
+      "journal": "Plants",
+      "volume": "9",
+      "pages": "1587"
     },
-    "nas_brown_trout": {
-      "citation": "U.S. Geological Survey (2026) Salmo trutta (Brown Trout): Nonindigenous Aquatic Species fact sheet. Gainesville, Florida.",
-      "url": "https://nas.er.usgs.gov/queries/FactSheet.aspx?speciesID=931",
-      "kind": "page"
+    "profetto2021": {
+      "doi": "10.3159/torrey-d-21-00019.1",
+      "title": "Plant community responses to kudzu (Pueraria montana) invasion in a southern upland forest",
+      "authors": "Profetto, G. and Howard, J.J.",
+      "year": 2021,
+      "journal": "The Journal of the Torrey Botanical Society",
+      "volume": "149",
+      "pages": "30-39"
     },
-    "gisd_melaleuca": {
-      "citation": "Global Invasive Species Database (2026) Species profile: Melaleuca quinquenervia. IUCN SSC Invasive Species Specialist Group.",
-      "url": "https://www.iucngisd.org/gisd/speciesname/Melaleuca+quinquenervia",
-      "kind": "page"
+    "hitt2017": {
+      "doi": "10.1139/cjfas-2016-0255",
+      "title": "Brook trout use of thermal refugia and foraging habitat influenced by brown trout",
+      "authors": "Hitt, N.P., Snook, E.L. and Massie, D.L.",
+      "year": 2017,
+      "journal": "Canadian Journal of Fisheries and Aquatic Sciences",
+      "volume": "74",
+      "pages": "406-418"
     },
-    "gisd_schinus": {
-      "citation": "Global Invasive Species Database (2026) Species profile: Schinus terebinthifolius. IUCN SSC Invasive Species Specialist Group.",
-      "url": "https://www.iucngisd.org/gisd/speciesname/Schinus+terebinthifolius",
-      "kind": "page"
+    "hoffmann2018": {
+      "doi": "10.3390/d10030078",
+      "title": "Lack of Behavioral and Chemical Interference Competition for Refuges among Native Treefrogs and Invasive Cuban Treefrogs (Osteopilus septentrionalis)",
+      "authors": "Hoffmann, K.E., McGarrity, M.E. and Johnson, S.A.",
+      "year": 2018,
+      "journal": "Diversity",
+      "volume": "10",
+      "pages": "78"
     },
-    "gisd_lygodium": {
-      "citation": "Global Invasive Species Database (2026) Species profile: Lygodium microphyllum. IUCN SSC Invasive Species Specialist Group.",
-      "url": "https://www.iucngisd.org/gisd/speciesname/Lygodium+microphyllum",
-      "kind": "page"
+    "tipping2021": {
+      "doi": "10.1017/inp.2021.4",
+      "title": "The influence of two wildfires and biological control agents on the population dynamics of Melaleuca quinquenervia in a seasonally inundated wetland",
+      "authors": "Tipping, P.W., Martin, M.R., Foley, J.R. et al.",
+      "year": 2021,
+      "journal": "Invasive Plant Science and Management",
+      "volume": "14",
+      "pages": "3-8"
     },
-    "gisd_pueraria": {
-      "citation": "Global Invasive Species Database (2026) Species profile: Pueraria montana var. lobata. IUCN SSC Invasive Species Specialist Group.",
-      "url": "https://www.iucngisd.org/gisd/speciesname/Pueraria+montana+var.+lobata",
-      "kind": "page"
+    "wheeler2024": {
+      "doi": "10.1016/j.biocontrol.2023.105410",
+      "title": "Host range, biology, and climate suitability of Callopistria exotica, a potential biological control agent of Old World climbing fern (Lygodium microphyllum) in the USA",
+      "authors": "Wheeler, G., Lake, E., Mattison, E. et al.",
+      "year": 2024,
+      "journal": "Biological Control",
+      "volume": "188",
+      "pages": "105410"
     },
-    "gisd_microstegium": {
-      "citation": "Global Invasive Species Database (2026) Species profile: Microstegium vimineum. IUCN SSC Invasive Species Specialist Group.",
-      "url": "https://www.iucngisd.org/gisd/speciesname/Microstegium+vimineum",
-      "kind": "page"
+    "aquino2025": {
+      "doi": "10.3390/insects16020135",
+      "title": "Improving Mass-Rearing Techniques for Releases of Floracarus perrepae, a Biological Control Agent for Old World Climbing Fern (Lygodium microphyllum)",
+      "authors": "Aquino-Thomas, J., Crees, L., Miles, M. et al.",
+      "year": 2025,
+      "journal": "Insects",
+      "volume": "16",
+      "pages": "135"
     },
-    "gisd_solanum": {
-      "citation": "Global Invasive Species Database (2026) Species profile: Solanum mauritianum. IUCN SSC Invasive Species Specialist Group.",
-      "url": "https://www.iucngisd.org/gisd/speciesname/Solanum+mauritianum",
-      "kind": "page"
+    "wheeler2016": {
+      "doi": "10.1656/058.015.sp802",
+      "title": "Biological Control of the Invasive WeedSchinus terebinthifolia(Brazilian Peppertree): A Review of the Project with an Update on the Proposed Agents",
+      "authors": "Wheeler, G.S., Kay, F.M., Vitorino, M.D. et al.",
+      "year": 2016,
+      "journal": "Southeastern Naturalist",
+      "volume": "15",
+      "pages": "15-34"
     }
   },
   "playbooks": [
     {
-      "species": "Lantana camara",
-      "method": "mechanical",
-      "summary": "Hand-pulling and mechanical clearing suit small infestations; fire is mentioned for large areas. The profile attaches no reference to this statement and stresses that regrowth must be controlled again and again.",
-      "effectiveness": "variable",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "Clearing without follow-up gives no lasting result: the same profile says repeated control of regrowth is critical.",
-      "failure_cases": null,
-      "region_note": "General global guidance; not specific to India or to forest reserves.",
-      "source": "gisd_lantana",
+      "species": "Python bivittatus",
+      "method": "detection",
+      "summary": "Field trials with rabbit-derived scent lures (feces, urine and hair) found no difference in python detections between lure plots (4) and soil controls (7). The authors conclude that mammalian scent lures alone are insufficient to attract pythons.",
+      "study_design": "experimental",
+      "region_note": "21 paired plots at three study sites in the Greater Everglades, June to September 2022.",
+      "source": "miller2025",
       "quotes": [
-        "Mechanical clearing and hand pulling are suitable for small areas and fire can be used over large areas.",
-        "Repeated control of regrowth is critical to success."
-      ]
-    },
-    {
-      "species": "Lantana camara",
-      "method": "biological",
-      "summary": "Biological control agents have reduced the bulk of individual plants, which makes other methods easier, but none of the more than 40 agents trialled has achieved total control.",
-      "effectiveness": "low",
-      "evidence_strength": "moderate",
-      "cost_tier": null,
-      "risks": "Partial success only; agents need to be combined with other control.",
-      "failure_cases": "None of the over 40 agents trialled gave total control.",
-      "region_note": "Trials reported worldwide in a review (Day et al. 2003, cited by GISD). Outcomes in Indian forests are not documented in this source.",
-      "source": "gisd_lantana",
-      "quotes": [
-        "Biocontrol agents have decreased the volume of individual plants making other control methods considerably easier.",
-        "None of the over 40 agents trialled have resulted in total control but some have been partially successful"
-      ]
-    },
-    {
-      "species": "Lantana camara",
-      "method": "cultural",
-      "summary": "A Rufford-funded project explored turning Lantana into fuel briquettes for indigenous communities as part of forest restoration. The page names the project but reports no outcomes.",
-      "effectiveness": "variable",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "No outcomes are reported, so effectiveness is unknown.",
-      "failure_cases": null,
-      "region_note": "Project page for work in India; outcomes not reported on the page.",
-      "source": "rufford_bandipur",
-      "quotes": [
-        "Forest Restoration meets Community Development - Converting Lantana camara into Fuel Briquettes for Indigenous Communities"
-      ]
-    },
-    {
-      "species": "Senna spectabilis",
-      "method": "mechanical",
-      "summary": "In 2013 the Kerala Forest Department girdled and applied kerosene to the debarked area of 19,500 trees in Wayanad. Months later only a very small share had died completely, and the report called the continued programme counterproductive.",
-      "effectiveness": "low",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "Girdled trees resprouted, and seeds already in the soil germinated.",
-      "failure_cases": "Debarked trees produced many coppice shoots, and the opened canopy let stored seed germinate, so the effort raised density.",
-      "region_note": "Wayanad Wildlife Sanctuary, Kerala. Reported by a journalist from a Kerala Forest Department / Ferns Nature Conservation Society report, not from a controlled study.",
-      "source": "mongabay_senna",
-      "quotes": [
-        "In 2013, the department tried to control its spread by girdling (cutting through the bark all the way around a tree or branch) and applying kerosene in the debarked area of 19,500 trees.",
-        "only a very small percentage of trees had died completely after eight months of the management measure",
-        "Though the girdling method continued in the following years, it was counterproductive as huge amounts of seeds in the soil started regenerating and multiple coppice shoots also started growing from each tree, the report says."
-      ]
-    },
-    {
-      "species": "Senna spectabilis",
-      "method": "mechanical",
-      "summary": "A conservation group in Wayanad reports fully uprooting Senna from 0.6 square km of a 1.3 square km restoration area, with native grass and shrubs returning within about four months. A researcher who mapped the spread disagrees, warning that uprooting large trees en masse on hilly, high-rainfall ground could cause erosion. The experts quoted do not agree on which method is better.",
-      "effectiveness": "moderate",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "Possible soil disturbance and erosion on slopes, raised by one researcher; contested by the practitioner.",
-      "failure_cases": null,
-      "region_note": "Tholpetty range, Wayanad Wildlife Sanctuary. A practitioner's account without measurements.",
-      "source": "mongabay_senna",
-      "quotes": [
-        "Senna trees have been removed completely from 0.6 km² using the uprooting method where the entire tree is manually and mechanically uprooted.",
-        "Once the uprooting is done, in four months or so, grass and other native shrubs will regenerate in the areas where Senna has been uprooted.",
-        "Vinayan said that uprooting large Senna trees en masse could disturb the soil and could lead to erosion since Wayanad is a hilly area with high rainfall."
-      ]
-    },
-    {
-      "species": "Senna spectabilis",
-      "method": "integrated",
-      "summary": "An earlier account of the Kerala Forest Department's attempts (uprooting, girdling, cutting, chopping branches and chemicals) reports that none stopped or even limited the spread, and that cutting raised density.",
-      "effectiveness": "low",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "Cut stumps resprout, and opening the overstorey triggers germination of stored seed.",
-      "failure_cases": "Management efforts increased density and spread.",
-      "region_note": "Wayanad Wildlife Sanctuary, Kerala. A conservation article by a researcher who has mapped the spread since 2012, with no controlled comparison. It groups uprooting with the other methods, while the 2023 article reports local success for uprooting, so the two accounts differ.",
-      "source": "roundglass_senna",
-      "quotes": [
-        "However, none of the management efforts succeeded in stopping or even limiting the spread of the golden shower tree.",
-        "Instead, multiple coppice shoots started growing from each cut tree stump.",
-        "Thus, the management efforts only resulted in increasing its density and spread."
-      ]
-    },
-    {
-      "species": "Senna spectabilis",
-      "method": "cultural",
-      "summary": "Senna is described as excellent lightweight timber, and a researcher argues that policy changes allowing removal and sale outside the forest would motivate local communities to clear it. This is a proposal that has not been evaluated.",
-      "effectiveness": "variable",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "Depends on policy change that, per the article, has not yet happened; the article reports no results.",
-      "failure_cases": null,
-      "region_note": "Karnataka (MM Hills) and Kerala, as discussed in the article.",
-      "source": "mongabay_senna",
-      "quotes": [
-        "Ravikanth said he is looking forward to policy changes that would legitimise the removal of Senna from the forest area and marketing it outside, so the local community could be enthused to clear the forest of the invasive.",
-        "Senna is excellent timber to make lightweight furniture and other wooden products."
-      ]
-    },
-    {
-      "species": "Chromolaena odorata",
-      "method": "mechanical",
-      "summary": "Slashing with bush-cutters or tractor-drawn implements is common, but slashing alone causes regeneration, so it must be followed by other control.",
-      "effectiveness": "low",
-      "evidence_strength": "moderate",
-      "cost_tier": null,
-      "risks": "Manual weeding is labour intensive; slashing without follow-up regrows.",
-      "failure_cases": "Slashing causes regeneration unless followed by other control methods.",
-      "region_note": "General global guidance from GISD; not specific to India.",
-      "source": "gisd_chromolaena",
-      "quotes": [
-        "Manual slashing and use of bush-cutter or tractor-drawn implements are commonly used methods",
-        "Slashing causes regeneration unless followed by other control methods"
-      ]
-    },
-    {
-      "species": "Chromolaena odorata",
-      "method": "chemical",
-      "summary": "Herbicide applied at the seedling stage or on regrowth has given encouraging results, and triclopyr is reported as the most effective. GISD lists high cost and ecological concerns as problems.",
-      "effectiveness": "moderate",
-      "evidence_strength": "moderate",
-      "cost_tier": "high",
-      "risks": "High cost of chemicals and application, ecological concerns, and non-compatibility with many cropping systems. Herbicide use in a protected reserve needs the park authority's own regulatory approval.",
-      "failure_cases": null,
-      "region_note": "General global guidance from GISD; not specific to India or to protected areas.",
-      "source": "gisd_chromolaena",
-      "quotes": [
-        "Chemical control using herbicides applied at the seedling stage or on regrowth has given encouraging results.",
-        "problems in herbicide use include the high cost of the chemicals and their application, ecological concerns"
-      ]
-    },
-    {
-      "species": "Chromolaena odorata",
-      "method": "biological",
-      "summary": "A defoliating moth, Pareuchaetes pseudoinsulata, effectively defoliated pure stands in Guam but was less successful on scattered plants and patches.",
-      "effectiveness": "variable",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "Release of a biocontrol agent is a regulated decision; results from island sites may not carry over to Indian forests.",
-      "failure_cases": "Less successful on scattered plants and patches.",
-      "region_note": "Reported from Guam and other Pacific islands. This source does not report results in India.",
-      "source": "gisd_chromolaena",
-      "quotes": [
-        "the biological control agent Pareuchaetes pseudoinsulata has been introduced into Guam, where it effectively defoliates pure stands. It is less successful in scattered plants and patches."
-      ]
-    },
-    {
-      "species": "Parthenium hysterophorus",
-      "method": "integrated",
-      "summary": "Control depends on the site and can combine biological control, pasture management, cultivation and chemicals. The profile also stresses detection and monitoring to stop spread by vehicles and as a contaminant.",
-      "effectiveness": "variable",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "The profile gives no outcomes or specifics for any single method.",
-      "failure_cases": null,
-      "region_note": "General guidance from GISD, written largely from the Australian experience.",
-      "source": "gisd_parthenium",
-      "quotes": [
-        "Control of parthenium weed can be managed using a combination of methods depending on the site, including biological control agents, pasture management, cultivation and chemicals.",
-        "Emphasis must be laid on establishing detection/monitoring procedures and stopping the spread of parthenium weed via vehicles and as a contaminant."
-      ]
-    },
-    {
-      "species": "Parthenium hysterophorus",
-      "method": "biological",
-      "summary": "GISD notes that biological control using insects and fungi is being pursued in Australia and in India. It reports activity, not results.",
-      "effectiveness": "variable",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "No outcomes reported in this source.",
-      "failure_cases": null,
-      "region_note": "Australia and India.",
-      "source": "gisd_parthenium",
-      "quotes": [
-        "Biological control using insects and fungi is being pursued in Australia and in India."
-      ]
-    },
-    {
-      "species": "Prosopis juliflora",
-      "method": "mechanical",
-      "summary": "In a four-year randomised field experiment at eight sites in India's Banni grassland, mechanically removing Prosopis tripled native herb richness and multiplied cover sixfold compared with leaving it alone. It was costly, and perennial grasses did not return.",
-      "effectiveness": "moderate",
-      "evidence_strength": "high",
-      "cost_tier": "high",
-      "risks": "Costly, especially at larger scales; the restored plots were still missing the perennial grasses of the reference grasslands.",
-      "failure_cases": null,
-      "region_note": "Banni grassland, Gujarat: an arid grassland. Not tested in forest reserves such as Bandipur or Nagarahole.",
-      "source": "nerlekar2021",
-      "quotes": [
-        "We found native herbaceous plant richness and cover to be threefold (mean = 6 species) and sixfold (mean = 18% cover) higher, respectively, in the mechanical-removal treatment compared to the control (mean richness = 2 species, cover = 3%)",
-        "However, mechanically removing Prosopis is costly, especially at larger scales.",
-        "both of these treatments were still missing perennial grasses that dominate the reference grasslands."
-      ]
-    },
-    {
-      "species": "Prosopis juliflora",
-      "method": "mechanical",
-      "summary": "In the same experiment, lopping (a cheaper approach) produced no significant improvement over doing nothing.",
-      "effectiveness": "low",
-      "evidence_strength": "high",
-      "cost_tier": "medium",
-      "risks": "Gives little benefit for native plant recovery.",
-      "failure_cases": "No significant difference between lopping and the untreated control.",
-      "region_note": "Banni grassland, Gujarat; an arid grassland.",
-      "source": "nerlekar2021",
-      "quotes": [
-        "found no significant differences between the lopping treatment (mean richness = 5 species, cover = 11%) and the control"
-      ]
-    },
-    {
-      "species": "Prosopis juliflora",
-      "method": "integrated",
-      "summary": "Because Prosopis also benefits some local people and full removal is costly, the authors suggest managing the landscape as a mosaic of restored grassland and invaded patches until the trade-offs are better understood.",
-      "effectiveness": "variable",
-      "evidence_strength": "moderate",
-      "cost_tier": null,
-      "risks": "A recommendation by the study's authors with no tested outcome.",
-      "failure_cases": null,
-      "region_note": "Banni grassland, Gujarat; socio-ecological context of pastoral communities.",
-      "source": "nerlekar2021",
-      "quotes": [
-        "Until we fully understand the trade-offs involved, it may therefore be better to manage this social-ecological landscape as a mosaic of restored grassland and Prosopis- invaded patches."
+        "We detected 11 pythons during our study, but there was no difference between controls with soil (n = 7) and treatments (n = 4).",
+        "Our experiment indicates that mammalian scent lures alone are insufficient to attract pythons."
       ]
     },
     {
       "species": "Python bivittatus",
-      "method": "mechanical",
-      "summary": "Removal depends on finding the snakes. Trained scent dogs help locate them in the park, and the first state-sanctioned hunting season captured 37 pythons.",
-      "effectiveness": "low",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "High mercury levels in Everglades pythons rule out eating them as a way to drive removal.",
-      "failure_cases": null,
-      "region_note": "Everglades National Park, Florida. USGS fact sheet summarising published and agency reports.",
-      "source": "nas_python",
+      "method": "detection",
+      "summary": "Environmental DNA analysis of water samples detects shed DNA and gives high detection probabilities for a snake that is extremely cryptic. The authors used it to estimate python occupancy at wading bird colonies.",
+      "study_design": "observational",
+      "region_note": "Tree islands in the central Everglades.",
+      "source": "orzechowski2019",
       "quotes": [
-        "The first ever state sanctioned hunting season for pythons captured 37 specimens, ranging in size from hatchlings to ten feet in length",
-        "Everglades National Park Service technicians have trained a beagle, Python Pete, to track the scent of the Burmese python in the Park to aid in removal efforts",
-        "Extremely high levels of mercury found in pythons coming out of the Everglades make them unsafe to eat"
+        "we utilized environmental DNA (eDNA) analysis-a genetic tool which detects shed DNA in water samples and provides high detection probabilities",
+        "Burmese pythons (hereafter \"pythons\") are extremely cryptic and there has been no efficient way to detect them"
+      ]
+    },
+    {
+      "species": "Python bivittatus",
+      "method": "integrated",
+      "summary": "A review of the science on managing Burmese pythons describes the existing control tools, reviews the challenges to research and identifies key knowledge gaps. It describes pythons as extremely challenging to detect because of inaccessible habitat and their cryptic nature.",
+      "study_design": "review",
+      "region_note": "Greater Everglades Ecosystem, southern Florida. A review and synthesis.",
+      "source": "guzy2023",
+      "quotes": [
+        "We describe existing control tools and review challenges to productive research, identifying key knowledge gaps that would improve future research and decision making for python control.",
+        "rendering them extremely challenging to detect"
+      ]
+    },
+    {
+      "species": "Lantana camara",
+      "method": "mechanical",
+      "summary": "In Kibale National Park, short-term management of Lantana by cutting and uprooting did not promote tree establishment, and the tree community in cleared areas was not converging on uninvaded forest. The authors conclude that sustained follow-up clearing of dense shrubs, herbs and resprouted Lantana is key to long-term recovery.",
+      "study_design": "observational",
+      "region_note": "Kibale National Park, Uganda; cleared, invaded and uninvaded plots compared.",
+      "source": "barahukwa2023",
+      "quotes": [
+        "The short-term management of Lantana did not promote tree establishment.",
+        "Sustained follow-up clearing of dense secondary shrubs and herbs and resprouted L. camara in cleared areas is key to ensuring long-term recovery of the forest tree community."
+      ]
+    },
+    {
+      "species": "Lantana camara",
+      "method": "integrated",
+      "summary": "A review of the literature from India describes Lantana as tenacious in its resistance to cutting and burning and puts the cost of control at US$70 per hectare. It concludes that economic uses outweigh the negative impacts and that cost-benefit studies are needed before eradication.",
+      "study_design": "review",
+      "region_note": "India. A review of studies reported from India.",
+      "source": "negi2019",
+      "quotes": [
+        "tenacious resistance to cutting and burning",
+        "the cost of its control is estimated at US$ 70 per ha"
+      ]
+    },
+    {
+      "species": "Senna spectabilis",
+      "method": "integrated",
+      "summary": "A review reports that mechanical, chemical, biological and cultural controls are used against Senna spectabilis with varying degrees of success, and that eradication efforts include complete uprooting, girdling and debarking, followed by native vegetation reinstatement and soil restoration.",
+      "study_design": "review",
+      "region_note": "India. A literature review.",
+      "source": "bargavi2025",
+      "quotes": [
+        "Various methods, including mechanical, chemical, biological, and cultural controls, are utilized to combat Senna spectabilis infestations, albeit with varying degrees of success.",
+        "Eradication endeavors encompass techniques like complete uprooting, girdling, and debarking"
+      ]
+    },
+    {
+      "species": "Chromolaena odorata",
+      "method": "mechanical",
+      "summary": "In two wildlife sanctuaries in Telangana the authors report that manual removal of the weed before flowering is the effective means to limit its spread, in comparison with the biological and chemical methods attempted.",
+      "study_design": "observational",
+      "region_note": "Kinnerasani and Eturnagaram wildlife sanctuaries, Telangana, India. A field report without a controlled comparison.",
+      "source": "suthari2016",
+      "quotes": [
+        "The manual removal of this weed (mechanical method) before flowering is the effective means to mitigate the spread of the species in comparison to the biological",
+        "and chemical (Glyphosate, Triclopyrester) methods attempted"
+      ]
+    },
+    {
+      "species": "Microstegium vimineum",
+      "method": "chemical",
+      "summary": "In a two-year field experiment, a pre-emergent herbicide dramatically reduced Microstegium vimineum in the second year but not most resident plants, which were perennials and indirectly benefited at a more productive site.",
+      "study_design": "experimental",
+      "region_note": "A two-year field experiment in natural plant communities; the abstract does not name the site.",
+      "source": "williams2024",
+      "quotes": [
+        "The pre-emergent herbicide dramatically reduced M. vimineum in year 2 of the study, but not most resident plants"
+      ]
+    },
+    {
+      "species": "Microstegium vimineum",
+      "method": "chemical",
+      "summary": "In oak woodlands in the eastern United States, a single application of a pre-emergent herbicide significantly reduced Microstegium vimineum density, and the invader had not fully recovered at either site by 2025. The herbicide had immediate but short-lived negative effects on some native species recruiting from seed at the less productive site.",
+      "study_design": "experimental",
+      "region_note": "Oak woodlands in the eastern United States; two sites, measured in 2019, 2024 and 2025.",
+      "source": "brewer2026",
+      "quotes": [
+        "The herbicide significantly reduced M. vimineum density in 2019.",
+        "The herbicide had immediate but short-lived negative effects on some native species recruiting from seed at the less productive site."
+      ]
+    },
+    {
+      "species": "Adelges tsugae",
+      "method": "biological",
+      "summary": "A benefit-risk analysis reports that releases of lady beetles and derodontid beetles have provided limited control of the hemlock woolly adelgid. It finds that biological control agents have not yet produced a net ecological benefit at current suppression levels, though stacking several agents could.",
+      "study_design": "review",
+      "region_note": "Eastern North America. An analysis of introduced biological control agents.",
+      "source": "wijerathna2026",
+      "quotes": [
+        "have provided limited control of HWA",
+        "BCAs have not as yet resulted in a net ecological benefit under current suppression levels, but stacking multiple BCAs could lead to a positive BRI under estimated suppression levels"
+      ]
+    },
+    {
+      "species": "Adelges tsugae",
+      "method": "chemical",
+      "summary": "A study of imidacloprid applied to the bark and to the soil, at high and low rates, found basal bark treatments as effective as soil treatments and concluded that bark treatment can be an effective method for controlling the hemlock woolly adelgid.",
+      "study_design": "experimental",
+      "region_note": "Eastern hemlock trees; the abstract does not name the site.",
+      "source": "quinterno2023",
+      "quotes": [
+        "The results showed that basal bark treatments were as effective as soil treatments.",
+        "Hence, basal bark treatments of imidacloprid can be an effective method for control of HWAs in eastern hemlock trees."
+      ]
+    },
+    {
+      "species": "Adelges tsugae",
+      "method": "chemical",
+      "summary": "In Nova Scotia hemlock stands, imidacloprid treatment increased eastern red-backed salamander abundance compared with untreated infested stands. The authors read this as support for integrating chemical control with long-term monitoring while biological control develops.",
+      "study_design": "observational",
+      "region_note": "Hemlock stands in southwestern Nova Scotia, Canada; treated, untreated and uninfested stands compared.",
+      "source": "fox2026",
+      "quotes": [
+        "Treatment and infestation were the only predictors of abundance: treatment increased abundance, whereas infestation reduced it.",
+        "These results reinforce the value of integrating chemical control with long-term monitoring while biological control strategies develop."
+      ]
+    },
+    {
+      "species": "Prosopis juliflora",
+      "method": "mechanical",
+      "summary": "In the Banni grasslands, mechanical removal of Prosopis juliflora gave threefold higher native herb richness and sixfold higher cover than the control over four years, while lopping did not differ significantly from the control. Neither treatment restored the perennial grasses of the reference grasslands, removal is costly at larger scales, and the authors describe its removal as involving complex trade-offs.",
+      "study_design": "experimental",
+      "region_note": "Banni grasslands, India; eight sites, randomised block design, four years.",
+      "source": "nerlekar2021",
+      "quotes": [
+        "We found native herbaceous plant richness and cover to be threefold (mean = 6 species) and sixfold (mean = 18% cover) higher, respectively, in the mechanical-removal treatment compared to the control",
+        "mechanically removing Prosopis is costly, especially at larger scales",
+        "its removal involves complex trade-offs"
+      ]
+    },
+    {
+      "species": "Parthenium hysterophorus",
+      "method": "cultural",
+      "summary": "In Australian grasslands, a mixture of mostly native pasture species suppressed parthenium weed re-establishment by 78% compared with the control, and a mixture of mostly introduced species could not suppress it.",
+      "study_design": "experimental",
+      "region_note": "Australian grasslands; planted mixtures compared with a control.",
+      "source": "belgeri2020",
+      "quotes": [
+        "This mixture suppressed parthenium weed re-establishment by 78% compared to the control treatment.",
+        "However, the mixture was unable to suppress the growth of parthenium weed."
+      ]
+    },
+    {
+      "species": "Salmo trutta",
+      "method": "mechanical",
+      "summary": "Experimental stream results suggest that removing introduced brown trout may help native brook trout expand and persist in downstream reaches, depending in part on where groundwater upwelling zones lie.",
+      "study_design": "experimental",
+      "region_note": "Experimental streams; brook trout are native to eastern North America.",
+      "source": "hitt2017",
+      "quotes": [
+        "Our results indicate that removal of introduced brown trout may facilitate native brook trout expansion and population viability in downstream reaches depending in part on the spatial configuration of groundwater upwelling zones."
       ]
     },
     {
       "species": "Melaleuca quinquenervia",
-      "method": "integrated",
-      "summary": "Managers combine herbicides, manual removal, prescribed fire and biological control. Heavy machinery suits few natural areas, and prescribed fire has drawbacks including mass seed release.",
-      "effectiveness": "variable",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "Machinery disturbs soils and non-target native vegetation. Fire can trigger mass seed release by the trees.",
-      "failure_cases": null,
-      "region_note": "Southern Florida. A species profile summarising published studies.",
-      "source": "gisd_melaleuca",
+      "method": "biological",
+      "summary": "Over 13 years that included two wildfires, recruitment of Melaleuca after the second fire was 96.5% smaller than after the first, and biological control agents slowed seedling growth. The authors advise managers to prioritise removing large reproductive trees over treating recently recruited populations.",
+      "study_design": "experimental",
+      "region_note": "A seasonally inundated wetland; the abstract does not name the site.",
+      "source": "tipping2021",
       "quotes": [
-        "Current management methods for melaleuca include herbicides, manual removal of plants, prescribed fires and bio-control.",
-        "Mechanical removal using heavy equipment is not appropriate in most natural areas because of disturbances to soils and non-target native vegetation",
-        "constraints to this method include impacts on non-target species, the triggering of mass seed release by trees and liability concerns"
+        "there was a downward trend in their overall invasiveness at this site, with progressively smaller recruitment cohorts due to biological control agents",
+        "Land managers should prioritize removing large reproductive trees over treating recently recruited populations"
       ]
     },
     {
       "species": "Lygodium microphyllum",
-      "method": "chemical",
-      "summary": "Herbicide can kill the fern back, and the profile describes a Florida trial where it browned nearly all of it. Control stays temporary and harms non-target plants, so treated areas need continual monitoring and spot treatment.",
-      "effectiveness": "variable",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "Herbicidal and mechanical controls damage non-target plants.",
-      "failure_cases": "A trial that killed back the fern was followed by thousands of new plants germinating from a massive spore release.",
-      "region_note": "Florida. A species profile quoting weed-council and research reports.",
-      "source": "gisd_lygodium",
+      "method": "biological",
+      "summary": "No-choice tests on 68 plant species found the moth Callopistria exotica highly specific to Old World climbing fern and one other exotic invasive fern, and climate modelling found very high suitability in south Florida. The authors expect its release to assist management of the fern.",
+      "study_design": "experimental",
+      "region_note": "Quarantine tests of a moth collected in Hong Kong, with climate modelling for Florida.",
+      "source": "wheeler2024",
       "quotes": [
-        "Herbicidal and mechanical controls are expensive, temporary solutions, and are damaging to non-target plants.",
-        "There had been an apparent massive spore release and germination.",
-        "Continual monitoring of the treated areas will be required to identify regrowth of L. microphyllum and to apply spot treatments to keep the fern from re-establishing."
+        "The results indicated that C. exotica is highly specific to the target weed, L. microphyllum and a congener that is also an exotic invasive, L. japonicum.",
+        "The release of C. exotica is expected to assist in the effort to manage the invasive weed Old World climbing fern."
       ]
     },
     {
-      "species": "Solanum mauritianum",
-      "method": "chemical",
-      "summary": "Herbicides kill the plant easily, and manual control by ring-barking trees or pulling seedlings is also used. A biological control insect released in South Africa has proved ineffective.",
-      "effectiveness": "moderate",
-      "evidence_strength": "low",
-      "cost_tier": null,
-      "risks": "Leaf hairs irritate during removal, and all parts of the plant are poisonous to people.",
-      "failure_cases": null,
-      "region_note": "South Africa and other regions; a species profile. Not tested in India.",
-      "source": "gisd_solanum",
+      "species": "Lygodium microphyllum",
+      "method": "biological",
+      "summary": "Revised rearing protocols for the biological control mite Floracarus perrepae raised gall abundance by 165.3% and mites per plant by 453.2%. The authors report that the larger releases improved establishment, abundance and impact of the agent across the invaded range in Florida.",
+      "study_design": "observational",
+      "region_note": "Mass rearing and releases as part of the Comprehensive Everglades Restoration Plan, Florida.",
+      "source": "aquino2025",
       "quotes": [
-        "Easily killed with herbicides.",
-        "Manual control involves ring-barking trees or removing seedlings by hand",
-        "However, this insect has proved ineffective to date."
+        "These changes have resulted in substantial improvements in gall abundance (165.3%), F. perrepae density per gall (86.0%), and estimated F. perrepae per plant (453.2%).",
+        "low establishment rates observed from 2008 to 2010"
+      ]
+    },
+    {
+      "species": "Schinus terebinthifolia",
+      "method": "biological",
+      "summary": "A review reports that the biological control agents released in Hawaii have had minimal impact and that the weed continues to be a difficult problem. Tests of two newer agents, a thrips and a foliage-gall former, indicate that they will safely contribute to control.",
+      "study_design": "review",
+      "region_note": "Southeastern United States and Hawaii. A review of the biological control project.",
+      "source": "wheeler2016",
+      "quotes": [
+        "However, the control agents have had minimal impact, and the weed continues to be a difficult problem.",
+        "Results of no-choice and choice trials conducted overseas and in quarantine indicate that both species will safely contribute to the control of this invasive weed."
       ]
     }
   ],
   "impact_findings": [
     {
-      "species": "Lantana camara",
+      "species": "Python bivittatus",
       "zone": null,
       "finding_type": "impact",
-      "affected": "forest plant species richness and regeneration",
-      "summary": "Reported to reduce plant species richness as its density rises and, at some sites, to stall rainforest regeneration for decades.",
-      "certainty": "review",
-      "region_note": "Cited by GISD from other studies (Fensham et al. 1994; Lamb 1991, in Day et al. 2003); not measured in the pilot reserves.",
-      "source": "gisd_lantana",
-      "quotes": [
-        "As the density of lantana in forest increases species richness decreases",
-        "At some sites, infestations have been so persistent that they have completely stalled the regeneration of rainforest for three decades."
-      ]
-    },
-    {
-      "species": "Lantana camara",
-      "zone": "bandipur",
-      "finding_type": "impact",
-      "affected": "dominant large mammal species",
-      "summary": "Preliminary survey work in Bandipur found an inverse pattern between the distribution of invasive plants (Lantana, Eupatorium/Chromolaena and Parthenium are named together) and that of dominant large mammals. This is a correlation from preliminary work, and the same page says the infestation's extent and effects were still unquantified.",
-      "certainty": "preliminary",
-      "region_note": "Bandipur National Park. A 2007 project description.",
-      "source": "rufford_bandipur",
-      "quotes": [
-        "Preliminary work by our team in Bandipur has shown a striking inverse pattern in the distribution of the above invasive plants and the overall distribution of dominant large mammal species.",
-        "the extent of infestation is yet to be quantified and its effects on vegetation communities and consequently wildlife communities remain largely unknown"
-      ]
-    },
-    {
-      "species": "Chromolaena odorata",
-      "zone": "bandipur",
-      "finding_type": "impact",
-      "affected": "dominant large mammal species",
-      "summary": "Named (as Eupatorium odoratum) in the same preliminary Bandipur observation of an inverse pattern with dominant large mammals. Correlational and preliminary.",
-      "certainty": "preliminary",
-      "region_note": "Bandipur National Park. The page lists Lantana, Eupatorium odoratum and Parthenium together and does not separate their effects.",
-      "source": "rufford_bandipur",
-      "quotes": [
-        "exotic plants such as Lantana camara, Eupatorium odoratum, and Parthenium hysterophorus have invaded the deciduous habitats in this landscape, altering native vegetation community dynamics and wildlife",
-        "Preliminary work by our team in Bandipur has shown a striking inverse pattern in the distribution of the above invasive plants and the overall distribution of dominant large mammal species."
-      ]
-    },
-    {
-      "species": "Parthenium hysterophorus",
-      "zone": "bandipur",
-      "finding_type": "impact",
-      "affected": "dominant large mammal species",
-      "summary": "Named in the same preliminary Bandipur observation of an inverse pattern with dominant large mammals. Correlational and preliminary.",
-      "certainty": "preliminary",
-      "region_note": "Bandipur National Park. The page lists Lantana, Eupatorium odoratum and Parthenium together and does not separate their effects.",
-      "source": "rufford_bandipur",
-      "quotes": [
-        "exotic plants such as Lantana camara, Eupatorium odoratum, and Parthenium hysterophorus have invaded the deciduous habitats in this landscape, altering native vegetation community dynamics and wildlife",
-        "Preliminary work by our team in Bandipur has shown a striking inverse pattern in the distribution of the above invasive plants and the overall distribution of dominant large mammal species."
-      ]
-    },
-    {
-      "species": "Chromolaena odorata",
-      "zone": null,
-      "finding_type": "impact",
-      "affected": "other plant species",
-      "summary": "Forms dense stands that prevent the establishment of other plant species.",
-      "certainty": "review",
-      "region_note": "General account from GISD; not specific to the pilot reserves.",
-      "source": "gisd_chromolaena",
-      "quotes": [
-        "it forms dense stands that prevent the establishment of other plant species."
-      ]
-    },
-    {
-      "species": "Parthenium hysterophorus",
-      "zone": null,
-      "finding_type": "impact",
-      "affected": "native plant species and natural ecosystems",
-      "summary": "Outcompetes native species, in part through allelopathy, and can degrade natural ecosystems.",
-      "certainty": "review",
-      "region_note": "General account from GISD; not specific to the pilot reserves.",
-      "source": "gisd_parthenium",
-      "quotes": [
-        "Outcompetes native species, in part due to allelopathy.",
-        "Infestations of parthenium weed can degrade natural ecosystems."
-      ]
-    },
-    {
-      "species": "Prosopis juliflora",
-      "zone": null,
-      "finding_type": "impact",
-      "affected": "native grassland plants",
-      "summary": "Documented to suppress native grassland vegetation, though it also provides benefits to some local people, which complicates removal.",
-      "certainty": "experimental",
-      "region_note": "Banni grassland, Gujarat. A controlled experiment in an arid grassland, whose conditions differ from forest.",
-      "source": "nerlekar2021",
-      "quotes": [
-        "Apart from its detrimental impact on grasslands, Prosopis also has benefits varying with stakeholder groups, and its removal involves complex trade-offs."
-      ]
-    },
-    {
-      "species": "Senna spectabilis",
-      "zone": null,
-      "finding_type": "impact",
-      "affected": "native tree regeneration and biodiversity",
-      "summary": "Reported to have spread across protected areas in the Western and Eastern Ghats of three states and to suppress regeneration of native trees.",
+      "affected": "nest predation on turtle nests, and the mammals that prey on the nests",
+      "summary": "Artificial turtle nests were rarely preyed on in the southern Everglades, where pythons have been established longest and few mammals were found, and very often preyed on at sites with few or no pythons. The author reports the first documentation of potential indirect effects of pythons on non-prey species and suggests that the loss of mammals is producing trophic cascades.",
       "certainty": "observational",
-      "region_note": "Southern India (Kerala, Tamil Nadu, Karnataka). Reported by journalists and researchers across several articles, with no controlled study.",
-      "source": "mongabay_senna",
+      "region_note": "Artificial turtle nests (N = 183) at 13 sites across the expanding range of the python population in southern Florida.",
+      "source": "willson2017",
       "quotes": [
-        "Senna has spread across various protected areas in the Western and Eastern Ghats in three south Indian states, leading to a decline in native biodiversity."
+        "I documented few mammals and low rates of nest predation (average score = 1.5 on a 1–5 scale) in the southern Everglades where pythons have been established the longest",
+        "and very high (average score = 4.6) rates of nest predation at sites with few or no pythons",
+        "suggest that loss or decline of mammals is resulting in trophic cascades that threaten the Everglades ecosystem"
+      ]
+    },
+    {
+      "species": "Python bivittatus",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "large mammals, and the mosquito hosts that depend on them",
+      "summary": "Mosquito blood meals taken from the hispid cotton rat, the main reservoir host of Everglades virus, rose from 14.7% in 1979 to 76.8% in 2016, while blood meals from deer, raccoons and opossums fell by 98.2%. The authors attribute the decline of these larger mammals to python predation and predict a higher risk of exposure to the virus, which they did not test.",
+      "certainty": "observational",
+      "region_note": "Florida Everglades; mosquito blood meals compared between 1979 and 2016.",
+      "source": "hoyer2017",
+      "quotes": [
+        "while blood meals from deer, raccoons and opossums decreased by 98.2%, reflecting precipitous declines in relative abundance of these larger mammals, attributed to python predation",
+        "although this was not tested in the current study"
+      ]
+    },
+    {
+      "species": "Python bivittatus",
+      "zone": null,
+      "finding_type": "concern",
+      "affected": "wading bird breeding colonies",
+      "summary": "Environmental DNA sampling found python DNA on tree islands holding wading bird colonies at a higher rate (occupancy 0.88) than on control islands with no breeding birds (0.42) between April and June. The authors suggest pythons are attracted to colonies and say monitoring is needed to determine the effect on bird populations.",
+      "certainty": "observational",
+      "region_note": "Tree islands in the central Everglades, April to June; 15 colony and control pairs.",
+      "source": "orzechowski2019",
+      "quotes": [
+        "site-level python eDNA occupancy rates were higher at wading bird colonies",
+        "Continued monitoring of wading bird colonies is warranted to determine the effect pythons are having on populations"
+      ]
+    },
+    {
+      "species": "Python bivittatus",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "native species and ecosystems",
+      "summary": "A review of the science on managing Burmese pythons reports that pythons have severely impacted native species and ecosystems in Florida and calls them one of the most intractable invasive-species management issues in the world.",
+      "certainty": "review",
+      "region_note": "Greater Everglades Ecosystem, southern Florida. A review and synthesis.",
+      "source": "guzy2023",
+      "quotes": [
+        "Pythons have severely impacted native species and ecosystems in Florida and represent one of the most intractable invasive-species management issues across the globe."
+      ]
+    },
+    {
+      "species": "Lantana camara",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "forests, pasture land, biodiversity and ecosystem services in India",
+      "summary": "A review of the literature from India reports that Lantana has invaded vast tracts of dry and moist forest and other wasteland, has invaded most Indian pasture land (13.2 million ha) and has potentially altered biodiversity, landscape ecology and ecosystem services. The review also concludes that its positive impacts and economic uses outweigh its negative impacts and asks for cost-benefit studies before eradication decisions.",
+      "certainty": "review",
+      "region_note": "India. A review of studies reported from India.",
+      "source": "negi2019",
+      "quotes": [
+        "Lantana has invaded vast tracts of dry-moist forests and other culturable wastelands, and has potentially altered biodiversity, landscape ecology and ecosystem services",
+        "the positive impacts and economic uses of Lantana outweigh its negative impacts and require further studies on cost-benefit considerations for decision making for its eradication and management"
+      ]
+    },
+    {
+      "species": "Lantana camara",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "tree species richness and ecosystem carbon",
+      "summary": "In tropical dry deciduous forest in Madhya Pradesh, invaded sites had significantly lower tree species richness, juvenile tree carbon, total tree carbon and total biomass carbon than uninvaded sites, and richness fell as Lantana density rose. Shrub, litter and soil organic carbon were higher in invaded sites.",
+      "certainty": "observational",
+      "region_note": "Tropical dry deciduous forests of Madhya Pradesh, India; invaded and uninvaded sites compared.",
+      "source": "lone2025",
+      "quotes": [
+        "Significantly lower species richness (SR), C storage of juveniles, total trees, and total biomass C were observed in LI sites than in UI sites.",
+        "A significant negative relationship was observed between L. camara density and SR"
+      ]
+    },
+    {
+      "species": "Lantana camara",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "forest regeneration, and tree, shrub and herb cover",
+      "summary": "In Kibale National Park, plots invaded by Lantana had lower tree, shrub and herb cover and diversity, and tree regeneration was suppressed.",
+      "certainty": "observational",
+      "region_note": "Kibale National Park, Uganda (an African rainforest); invaded, cleared and uninvaded plots compared.",
+      "source": "barahukwa2023",
+      "quotes": [
+        "Lantana reduced tree, shrub, and herb cover and diversity, and suppressed tree regeneration."
       ]
     },
     {
       "species": "Senna spectabilis",
       "zone": null,
       "finding_type": "spread",
-      "affected": "Wayanad Wildlife Sanctuary area invaded",
-      "summary": "In Wayanad Wildlife Sanctuary the mapped invaded area grew from under 16 square km in 2013-14 to 89 in 2019 and 123.86 in 2023, about 35% of the sanctuary. An earlier article by the same researcher gives somewhat different figures (under 15 square km in 2012 to 78 in 2020).",
+      "affected": "open and degraded forest land",
+      "summary": "Senna spectabilis is commonly found in Wayanad Wildlife Sanctuary. The study reports that it grows aggressively and can quickly cover open and degraded land, and that its reproductive strategy helps it colonise degraded areas and invade forest.",
       "certainty": "observational",
-      "region_note": "Wayanad Wildlife Sanctuary, which borders the Nilgiri landscape but is not one of this project's monitored zones.",
-      "source": "mongabay_senna",
+      "region_note": "Wayanad Wildlife Sanctuary, Kerala, India. Not one of the monitored parks.",
+      "source": "muraleekrishnan2024",
       "quotes": [
-        "while the spread of Senna was less than 16 km² in 2013-2014 and 89 km² in 2019, it now stands at 123.86 km²."
+        "Its aggressive growth rate and ability to quickly cover up open and degraded lands in forest ecosystems make it challenging to control its spread.",
+        "This reproductive strategy helps the taxon to colonise degraded areas and invade the forest ecosystem."
       ]
     },
     {
       "species": "Senna spectabilis",
       "zone": null,
       "finding_type": "impact",
-      "affected": "native mammals as seed dispersers",
-      "summary": "Native mammals, including elephants, chital and porcupine, were found to disperse Senna seeds, with thousands of seeds counted in one elephant dung pile. Native fauna are therefore helping the invader spread.",
+      "affected": "native plants and animals",
+      "summary": "A review of Senna spectabilis in India reports that its invasion results in habitat alteration, displacement of local flora and fauna and changes in trophic interactions, and that rapid growth, abundant seed production and allelopathic characteristics let it outcompete indigenous species.",
+      "certainty": "review",
+      "region_note": "India. A literature review.",
+      "source": "bargavi2025",
+      "quotes": [
+        "Senna spectabilis invasion results in habitat alteration, displacement of local flora and fauna, and changes in trophic interactions, impacting ecosystem stability.",
+        "Rapid growth, abundant seed production, and allelopathic characteristics enhance its invasiveness, allowing it to outcompete indigenous species and modify ecosystem dynamics."
+      ]
+    },
+    {
+      "species": "Chromolaena odorata",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "soil carbon and nitrogen",
+      "summary": "In a tropical savanna, slight invasion (30% cover) did not change or lowered soil carbon and nitrogen fractions, and severe invasion (100% cover) significantly increased most of them. The authors conclude that the effect on soil carbon and nitrogen varies with invasion severity.",
       "certainty": "observational",
-      "region_note": "Wayanad Wildlife Sanctuary; a scat study reported in the journal Biotropica.",
-      "source": "roundglass_senna",
+      "region_note": "Plots with no, slight or severe invasion in a tropical savanna; the abstract does not name the site.",
+      "source": "wei2017",
       "quotes": [
-        "A recent study published in the journal Biotropica has reported that native mammals disperse the seeds of the golden shower tree in the Wayanad Wildlife Sanctuary."
+        "slight invasion did not alter or decreased the total and labile soil C and N fractions, and severe invasion significantly increased most of the total and labile soil C and N fractions",
+        "the impacts of invasion on soil C and N fractions could vary depending on invasion severity"
       ]
     },
     {
-      "species": "Senna spectabilis",
-      "zone": "bandipur",
-      "finding_type": "concern",
-      "affected": "native vegetation of the reserve",
-      "summary": "Karnataka's forest department planted Senna in Bandipur and Nagarahole in the early 2000s as a replacement for Lantana, a decision now regarded as a mistake. Management attempts are said to be underway there. Spread within these reserves is reported but has not been measured in this project.",
-      "certainty": "unverified_concern",
-      "region_note": "Bandipur Tiger Reserve. A cautionary example of a control measure that created a bigger problem.",
-      "source": "mongabay_senna",
-      "quotes": [
-        "even planting the saplings in Bandipur and Nagarahole Tiger Reserves as a replacement for Lantana camara",
-        "Management attempts are underway in Bandipur and Nagarahole Tiger Reserves, too by the Karnataka Forest Department."
-      ]
-    },
-    {
-      "species": "Senna spectabilis",
-      "zone": "nagarahole",
-      "finding_type": "concern",
-      "affected": "native vegetation of the reserve",
-      "summary": "Planted in Nagarahole in the early 2000s as a replacement for Lantana. A researcher notes that in Nagarahole certain grass has been growing beneath Senna, which differs from the suppression seen elsewhere. Spread within the reserve is reported but not measured in this project.",
-      "certainty": "unverified_concern",
-      "region_note": "Nagarahole Tiger Reserve.",
-      "source": "mongabay_senna",
-      "quotes": [
-        "even planting the saplings in Bandipur and Nagarahole Tiger Reserves as a replacement for Lantana camara",
-        "Ravikanth, however, said that in Nagarahole, certain grass has been growing beneath Senna."
-      ]
-    },
-    {
-      "species": "Senna spectabilis",
-      "zone": "mudumalai",
-      "finding_type": "concern",
-      "affected": "native vegetation of the reserve",
-      "summary": "A senior elephant researcher pointed to Senna thickets outside his research centre near Mudumalai and called its invasion an emerging problem in Tamil Nadu's protected areas. This is an anecdotal observation.",
-      "certainty": "unverified_concern",
-      "region_note": "Near Mudumalai National Park. The article itself calls the evidence for spread in several reserves anecdotal.",
-      "source": "mongabay_senna",
-      "quotes": [
-        "pointed to a thicket of canopy Senna trees bearing bright yellow flowers outside his research centre near Mudumalai National Park and said that its bioinvasion is an emerging problem in Tamil Nadu’s protected areas.",
-        "Anecdotal evidence points to its spread in other protected areas of southern India too"
-      ]
-    },
-    {
-      "species": "Python bivittatus",
-      "zone": "everglades",
-      "finding_type": "impact",
-      "affected": "raccoons, opossums, bobcats and rabbits",
-      "summary": "Road surveys in Everglades National Park recorded raccoon sightings falling by 99.3%, opossum and bobcat sightings by 98.9% and 87.5%, and no rabbits, as Burmese pythons spread. The authors attribute the declines to predation by pythons.",
+      "species": "Chromolaena odorata",
+      "zone": null,
+      "finding_type": "spread",
+      "affected": "riparian vegetation, forest gaps and protected areas",
+      "summary": "The authors describe the spread of Chromolaena odorata as alarming in two wildlife sanctuaries in Telangana, where it invades roadsides, forest gaps, protected areas and plantations, and where it is steadily destroying riparian vegetation along river banks.",
       "certainty": "observational",
-      "region_note": "Everglades National Park, Florida. Nocturnal road surveys from 2003 to 2011. The study shows that the declines coincide with the pythons in time and place and infers predation from that.",
-      "source": "dorcas2012",
+      "region_note": "Kinnerasani and Eturnagaram wildlife sanctuaries, Telangana, India.",
+      "source": "suthari2016",
       "quotes": [
-        "a 99.3% decrease in the frequency of raccoon observations, decreases of 98.9% and 87.5% for opossum and bobcat observations, respectively, and failed to detect rabbits",
-        "These findings suggest that predation by pythons has resulted in dramatic declines in mammals within ENP"
-      ]
-    },
-    {
-      "species": "Python bivittatus",
-      "zone": "everglades",
-      "finding_type": "impact",
-      "affected": "wildlife in the park, including endangered species, and turtle and crocodile nests",
-      "summary": "A federal literature summary reports that Burmese pythons have contributed directly to wildlife declines in the park, and that the loss of mammalian predators correlates with less predation on turtle nests.",
-      "certainty": "review",
-      "region_note": "Everglades National Park, Florida. USGS fact sheet summarising published studies.",
-      "source": "nas_python",
-      "quotes": [
-        "Burmese pythons have directly contributed to wildlife populations decreasing within Everglades National Park (ENP), including endangered species",
-        "The decline of mammalian predators is correlated with decreased predation on turtle"
-      ]
-    },
-    {
-      "species": "Melaleuca quinquenervia",
-      "zone": "everglades",
-      "finding_type": "impact",
-      "affected": "native wetland wildlife, plant diversity and sawgrass communities",
-      "summary": "Reported to threaten wildlife habitat in the Everglades, to cut indices of native species in Florida wetlands by as much as 80%, and to convert fire-maintained sawgrass into melaleuca forest.",
-      "certainty": "review",
-      "region_note": "Southern Florida including Everglades National Park. A species profile summarising published studies.",
-      "source": "gisd_melaleuca",
-      "quotes": [
-        "Melaleuca threatens the preservation of critical wildlife habitat in southern Florida including in the Florida Everglades National Park.",
-        "Melaleuca forests provide limited food and habitat value for native wildlife and can reduce indices of native species in Florida wetlands by as much as 80%",
-        "Melaleuca is contributing to significant habitat loss in the Everglades National Park by converting fire-maintained sawgrass communities into Melaleuca forest"
-      ]
-    },
-    {
-      "species": "Schinus terebinthifolia",
-      "zone": "everglades",
-      "finding_type": "impact",
-      "affected": "native vegetation, mangrove swamps and listed plants",
-      "summary": "Reported to shade out and displace native vegetation, forming dense stands that reduce plant and animal diversity, and to threaten mangrove swamp communities in the Everglades.",
-      "certainty": "review",
-      "region_note": "Florida and other regions; a species profile summarising published studies.",
-      "source": "gisd_schinus",
-      "quotes": [
-        "shades out and displaces native vegetation, often forming dense monocultures that reduce the biological diversity of plants and animals in the invaded areas",
-        "Vast monospecific stands of it pose a significant threat to the mangrove swamp communities of the Florida Everglades"
-      ]
-    },
-    {
-      "species": "Lygodium microphyllum",
-      "zone": "everglades",
-      "finding_type": "impact",
-      "affected": "native canopy trees, understory plants and seedlings",
-      "summary": "Reported to colonise without disturbance, dominate native vegetation, and climb over and kill canopy trees.",
-      "certainty": "review",
-      "region_note": "Florida. A species profile quoting extension and weed-council reports.",
-      "source": "gisd_lygodium",
-      "quotes": [
-        "This rapidly spreading weed colonizes new areas without the need of habitat disturbance and frequently completely dominates native vegetation.",
-        "It climbs and blankets other vegetation, ultimately causing mortality to mature canopy and subcanopy trees"
-      ]
-    },
-    {
-      "species": "Pueraria montana",
-      "zone": "smokies",
-      "finding_type": "impact",
-      "affected": "native plants, seedlings and mature trees",
-      "summary": "Widely believed to reduce biodiversity by smothering other vegetation and forming monocultures, and able to kill seedlings and mature trees.",
-      "certainty": "review",
-      "region_note": "United States and elsewhere; a species profile summarising published studies, not measured in the Smokies.",
-      "source": "gisd_pueraria",
-      "quotes": [
-        "Kudzu is widely believed to drastically reduce biodiversity because of its ability to smother other vegetation and develop large-scale monocultures",
-        "It can climb overtop and subsequently kill new seedlings or mature trees",
-        "Few plants can survive once smothered by kudzu and small ecosystems can be radically altered."
+        "The spread of devil weed is alarming in areas of podu cultivation, on the bunds of agricultural lands, wastelands, along roadsides, tracks, forest gaps, protected areas and plantations in the two said wildlife sanctuaries.",
+        "It is found invading new territories easily along the river banks and steadily destroying the riparian elements."
       ]
     },
     {
       "species": "Microstegium vimineum",
-      "zone": "smokies",
+      "zone": null,
       "finding_type": "impact",
-      "affected": "native herbaceous plants and ground-nesting wildlife",
-      "summary": "Reported to crowd out native herbaceous vegetation in wetlands and forests within three to five years, and to take nesting habitat from quail and other wildlife.",
-      "certainty": "review",
-      "region_note": "Eastern United States; a species profile summarising published studies.",
-      "source": "gisd_microstegium",
+      "affected": "native groundcover plants",
+      "summary": "In field experiments during oak woodland restoration, removing Microstegium vimineum benefited the growth and flowering of six native groundcover species planted in its patches. Planting several native species together gave no competitive suppression of the invader.",
+      "certainty": "experimental",
+      "region_note": "Oak woodland restoration plots, 2015 to 2016; the abstract does not name the site.",
+      "source": "moyer2018",
       "quotes": [
-        "Once established, M. vimineum is able to crowd out native herbaceous vegetation in wetlands and forests within three to five years",
-        "Established populations of M. vimineum usurp quality nesting habitat from quail and other wildlife."
+        "removal of Microstegium benefited the growth (and flowering) of native transplants in 2016, and all native species were more or less equally affected",
+        "there was no evidence of competitive suppression of Microstegium"
+      ]
+    },
+    {
+      "species": "Microstegium vimineum",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "resident plant diversity",
+      "summary": "A two-year field experiment found that natural plant diversity did not resist invasion by Microstegium vimineum. The authors conclude that, at more productive sites, nearly complete removal of the invader is necessary to preserve plant species diversity.",
+      "certainty": "experimental",
+      "region_note": "A two-year field experiment in natural plant communities; the abstract does not name the site.",
+      "source": "williams2024",
+      "quotes": [
+        "Diversity-mediated resistance did not effectively deter invasion by a highly competitive invader.",
+        "it would appear that nearly complete removal of this invader is necessary to preserve plant species diversity"
+      ]
+    },
+    {
+      "species": "Adelges tsugae",
+      "zone": null,
+      "finding_type": "spread",
+      "affected": "eastern and Carolina hemlock",
+      "summary": "Winter mortality of the hemlock woolly adelgid was recorded at 100 sites from Maine to Georgia. Model projections under climate change showed increased winter survival and population growth over time, which the authors expect to raise its density across its current range, extend it northward and increase its impact on eastern hemlock.",
+      "certainty": "modelled",
+      "region_note": "Eastern North America; 100 sites from Maine to Georgia, 2014 to 2017, with model projections.",
+      "source": "mcavoy2017",
+      "quotes": [
+        "winter mortality of HWA was recorded at 100 sites from Maine to Georgia",
+        "Future projections under climate change showed increases in winter survival and population growth rates over time."
+      ]
+    },
+    {
+      "species": "Adelges tsugae",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "eastern red-backed salamander in hemlock stands",
+      "summary": "In southwestern Nova Scotia, infestation by the hemlock woolly adelgid reduced eastern red-backed salamander abundance, and imidacloprid treatment increased it.",
+      "certainty": "observational",
+      "region_note": "Hemlock stands in southwestern Nova Scotia, Canada.",
+      "source": "fox2026",
+      "quotes": [
+        "Treatment and infestation were the only predictors of abundance: treatment increased abundance, whereas infestation reduced it."
+      ]
+    },
+    {
+      "species": "Prosopis juliflora",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "plant diversity, crop yield, animals and people",
+      "summary": "A review reports that Prosopis has invaded parts of wildlife reserves and national parks, that it can decrease the composition and diversity of plant species, and that it has adverse effects on crop yield and on animal and human health.",
+      "certainty": "review",
+      "region_note": "Ethiopia and similar arid and semi-arid areas. A literature review.",
+      "source": "abdulahi2017",
+      "quotes": [
+        "Prosopis has invaded parts of wildlife reserves and National Parks threatening biodiversity.",
+        "Prosopis has the capacity to decrease the composition and diversity of plant species and it has adverse effects on crop yield, as well as animal and human health."
+      ]
+    },
+    {
+      "species": "Prosopis juliflora",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "germination and growth of native plants",
+      "summary": "A field survey found more new Prosopis recruits than recruits of native-associated plants, and aqueous leaf extract significantly reduced seed germination or seedling growth in the native Qatari plants tested.",
+      "certainty": "experimental",
+      "region_note": "A field site and laboratory extracts, Qatar.",
+      "source": "bibi2023",
+      "quotes": [
+        "Our field observations indicated a high prevalence of new recruitments of P. juliflora than other native-associated plants in the study site.",
+        "were significantly (p ≤ 0.05) reduced by the extracts at different concentration levels"
+      ]
+    },
+    {
+      "species": "Parthenium hysterophorus",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "native plant populations",
+      "summary": "In Nairobi National Park, native plants that had grown alongside the invader grew shorter than naive natives. The results suggest that Parthenium hysterophorus may have selected for shorter native genotypes that show plasticity in competitive ability under drought.",
+      "certainty": "experimental",
+      "region_note": "Nairobi National Park, Kenya; seven native species compared as invader-experienced and naive individuals.",
+      "source": "oduor2021",
+      "quotes": [
+        "Invader-experienced natives grew shorter than naive natives regardless of growth conditions.",
+        "The results suggest that P. hysterophorus may have selected for shorter native plant genotypes that also exhibit plasticity in competitive ability under drought conditions."
+      ]
+    },
+    {
+      "species": "Pueraria montana",
+      "zone": null,
+      "finding_type": "impact",
+      "affected": "forest plant community",
+      "summary": "In mixed pine-oak forest in Mississippi, sites invaded by kudzu had lower species richness, less understory cover and a lower density of woody species than uninvaded sites.",
+      "certainty": "observational",
+      "region_note": "Mixed pine-oak forest, Mississippi, USA; invaded and uninvaded sites compared.",
+      "source": "profetto2021",
+      "quotes": [
+        "Kudzu-invaded sites had lower species richness, less understory cover, and lower density of woody species than control sites."
       ]
     },
     {
       "species": "Salmo trutta",
-      "zone": "smokies",
+      "zone": null,
       "finding_type": "impact",
-      "affected": "native brook trout and other native fishes",
-      "summary": "Reported to reduce native fish populations through predation, displacement and competition, and to displace native brook trout from the best habitat.",
-      "certainty": "review",
-      "region_note": "United States generally. The fact sheet cites studies in Michigan, Pennsylvania and elsewhere; none is from the Smokies.",
-      "source": "nas_brown_trout",
+      "affected": "native brook trout",
+      "summary": "In experimental streams, brook trout living with brown trout moved less and were less evenly spread than brook trout living alone, which the authors read as interference competition by brown trout for access to foraging habitat outside thermal refuges.",
+      "certainty": "experimental",
+      "region_note": "Experimental streams; brook trout are native to eastern North America.",
+      "source": "hitt2017",
       "quotes": [
-        "Brown Trout have been implicated in reducing native fish populations (including other salmonids) through predation, displacement, and food competition",
-        "Fausch and White (1981) stated adult Brown Trout displaced adult native Brook Trout from the best habitats in a Michigan stream, and in the northeast in general.",
-        "found that predicted occurrence of Brook Trout was lower in the presence of Brown Trout across a wide range of landscape habitat characteristics."
+        "Allopatric brook trout showed greater movement rates and more even spatial distributions within streams than sympatric brook trout, suggesting interference competition by brown trout for access to forage habitats located outside thermal refugia."
       ]
     },
     {
-      "species": "Solanum mauritianum",
+      "species": "Osteopilus septentrionalis",
       "zone": null,
       "finding_type": "impact",
-      "affected": "native forest margins and other plant species",
-      "summary": "Reported to invade native forest margins and form dense stands that inhibit other species through overcrowding and shading.",
-      "certainty": "review",
-      "region_note": "A species profile summarising studies in South Africa, New Zealand and Australia. Not measured in India.",
-      "source": "gisd_solanum",
+      "affected": "native treefrogs",
+      "summary": "Laboratory trials found no evidence that Cuban treefrogs and native Florida treefrogs compete for refuges through behavioural or chemical cues. The native treefrogs could not avoid chemical cues from Cuban treefrogs even after living alongside them for 10 to 20 years, which the authors note matters for predation risk.",
+      "certainty": "experimental",
+      "region_note": "Laboratory trials with treefrogs native to Florida, USA.",
+      "source": "hoffmann2018",
       "quotes": [
-        "Can invade urban areas, native forest margins and pastoral land.",
-        "May form dense stands that inhibit the growth of other species through overcrowding and shading"
+        "We found no evidence of behavioral or chemical competition for refuges by Cuban treefrogs or native treefrogs.",
+        "The inability of native treefrogs to avoid chemical cues from Cuban treefrogs, despite living sympatrically with the invasive treefrogs for 10–20 years, has important implications for predation risk."
       ]
     }
   ]

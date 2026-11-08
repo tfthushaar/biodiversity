@@ -1,10 +1,14 @@
-"""Check every quote in db/seeds/knowledge.json against its live source.
+"""Check every source and every quote in db/seeds/knowledge.json against the published record.
 
     python scripts/verify_citations.py            # report only
     python scripts/verify_citations.py --write    # on success, stamp today's date into the file
 
-Pages can change or disappear, so this is worth re-running (the verify-citations workflow does it
-weekly). A failure means a quote is no longer on the page: re-read the source before touching it.
+For each cited paper this looks up its DOI in Crossref and OpenAlex and requires a published
+journal article (not a preprint, report or extension bulletin) that matches the title, journal,
+year and first author in the file, is recent enough for the policy, and is not retracted. It then
+requires each quote to appear in the paper's abstract. Records change, so the verify-citations
+workflow repeats this every week. A failure means a claim no longer stands on its source: read the
+paper again before touching the file.
 """
 
 from __future__ import annotations
@@ -15,32 +19,53 @@ import json
 import sys
 from datetime import date
 from pathlib import Path
+from urllib.parse import quote
 
 from biodiv.ingestion.http import PoliteClient
-from biodiv.knowledge.verify import find_problems, html_to_text, jats_to_text, validate_structure
+from biodiv.knowledge.verify import (
+    Problem,
+    abstracts_of,
+    check_paper,
+    find_problems,
+    validate_structure,
+)
 
 KNOWLEDGE = Path("db/seeds/knowledge.json")
-UA = "Mozilla/5.0 (compatible; biodiv-student-project/0.1; +https://github.com/tfthushaar/biodiversity)"
+UA = "biodiv-student-project/0.1 (+https://github.com/tfthushaar/biodiversity)"
+CROSSREF = "https://api.crossref.org/works/"
+OPENALEX = "https://api.openalex.org/works/doi:"
+STALE_AFTER_YEARS = 10
 
 
-async def fetch_all(sources: dict[str, dict]) -> tuple[dict[str, str], list[str]]:
-    texts: dict[str, str] = {}
-    errors: list[str] = []
-    async with PoliteClient(user_agent=UA, per_second=2.0, max_concurrency=4) as http:
+async def fetch_all(knowledge: dict) -> tuple[dict[str, list[str]], list[Problem]]:
+    texts: dict[str, list[str]] = {}
+    problems: list[Problem] = []
+    policy = knowledge.get("_policy", {})
+    async with PoliteClient(user_agent=UA, per_second=3.0, max_concurrency=4) as http:
 
-        async def one(key: str, s: dict) -> None:
+        async def lookup(url: str) -> dict | None:
             try:
-                if s["kind"] == "crossref":
-                    msg = (await http.get_json(f"https://api.crossref.org/works/{s['doi']}"))["message"]
-                    texts[key] = jats_to_text(msg.get("abstract", ""))
-                else:
-                    resp = await http.get(s.get("fetch_url") or s["url"])
-                    texts[key] = html_to_text(resp.text)
-            except Exception as exc:
-                errors.append(f"{key}: could not fetch ({type(exc).__name__}: {exc})")
+                return await http.get_json(url)
+            except Exception as exc:  # a 404 means the service does not know this DOI
+                if getattr(getattr(exc, "response", None), "status_code", None) == 404:
+                    return None
+                raise
 
-        await asyncio.gather(*(one(k, s) for k, s in sources.items()))
-    return texts, errors
+        async def one(key: str, source: dict) -> None:
+            doi = quote(source["doi"], safe="/")
+            try:
+                crossref, openalex = await asyncio.gather(
+                    lookup(CROSSREF + doi), lookup(OPENALEX + doi))
+            except Exception as exc:
+                problems.append(Problem(f"sources.{key}", f"could not look up the DOI "
+                                                          f"({type(exc).__name__}: {exc})"))
+                return
+            message = (crossref or {}).get("message")
+            problems.extend(check_paper(key, source, message, openalex, policy))
+            texts[key] = abstracts_of(message, openalex)
+
+        await asyncio.gather(*(one(k, s) for k, s in knowledge["sources"].items()))
+    return texts, problems
 
 
 def main() -> int:
@@ -49,9 +74,10 @@ def main() -> int:
     args = p.parse_args()
 
     knowledge = json.loads(KNOWLEDGE.read_text(encoding="utf-8"))
-    problems = [str(x) for x in validate_structure(knowledge)]
-    texts, errors = asyncio.run(fetch_all(knowledge["sources"]))
-    problems += errors + [str(x) for x in find_problems(knowledge, texts)]
+    problems = list(validate_structure(knowledge))
+    if not problems:
+        texts, found = asyncio.run(fetch_all(knowledge))
+        problems += found + find_problems(knowledge, texts)
 
     rows = len(knowledge["playbooks"]) + len(knowledge["impact_findings"])
     quotes = sum(len(r["quotes"]) for r in knowledge["playbooks"] + knowledge["impact_findings"])
@@ -60,7 +86,15 @@ def main() -> int:
         for line in problems:
             print("  -", line, file=sys.stderr)
         return 1
-    print(f"OK: {quotes} quotes in {rows} rows all found in {len(texts)} sources")
+
+    floor = knowledge["_policy"]["min_year"]
+    n = len(knowledge["sources"])
+    print(f"OK: {quotes} quotes in {rows} rows, all found in the abstracts of {n} peer-reviewed "
+          f"journal articles published {floor} or later")
+    if date.today().year - floor > STALE_AFTER_YEARS:
+        print(f"note: the policy accepts papers from {floor}, more than {STALE_AFTER_YEARS} years "
+              "ago; raise min_year in knowledge.json (and the check in migration 0020)",
+              file=sys.stderr)
     if args.write:
         knowledge["verified_on"] = date.today().isoformat()
         KNOWLEDGE.write_text(json.dumps(knowledge, indent=2, ensure_ascii=False) + "\n",

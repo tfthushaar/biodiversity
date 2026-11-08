@@ -42,9 +42,11 @@ def first_record_alerts(
                  where m.zone_id = s.zone_id and m.captured_at < s.first_record) as prior_effort,
                exists (select 1 from impact_findings f
                         where f.invasive_species_id = s.species_id
-                          and f.zone_id = s.zone_id) as documented_here,
+                          and f.zone_id = s.zone_id and f.verified_on is not null)
+                 as documented_here,
                exists (select 1 from impact_findings f
                         where f.invasive_species_id = s.species_id
+                          and f.verified_on is not null
                           and f.certainty in ('experimental', 'observational', 'review'))
                  as documented_harm
         from zone_invasive_summary s

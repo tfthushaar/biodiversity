@@ -78,21 +78,23 @@ def documented_findings(conn: psycopg.Connection, zone_slug: str) -> list[dict[s
         """
         select f.id, s.scientific_name, s.common_name, z.slug, f.finding_type, f.affected,
                f.summary, f.certainty, f.region_note, f.source_quotes, f.citation_text,
-               f.citation_url, f.verified_on::text,
+               f.citation_url, f.verified_on::text, f.citation_doi, f.citation_year,
+               f.citation_journal,
                coalesce(r.records, 0) as records_here
         from impact_findings f
         join species s on s.id = f.invasive_species_id
         left join zones z on z.id = f.zone_id
         left join (select species_id, records from zone_invasive_summary where zone_id = %s) r
                on r.species_id = f.invasive_species_id
-        where f.zone_id = %s or (f.zone_id is null and r.records is not null)
+        where f.verified_on is not null
+          and (f.zone_id = %s or (f.zone_id is null and r.records is not null))
         order by (f.zone_id is null), s.scientific_name, f.finding_type
         """,
         (zone_id, zone_id),
     ).fetchall()
     keys = ("id", "species", "common_name", "zone", "finding_type", "affected", "summary",
-            "certainty", "region_note", "quotes", "citation", "url", "verified_on",
-            "records_in_zone")
+            "certainty", "region_note", "quotes", "citation", "url", "verified_on", "doi",
+            "year", "journal", "records_in_zone")
     findings = [dict(zip(keys, r, strict=True)) for r in rows]
     for f in findings:
         # A zone-specific worry about a species we have no records of is still worth showing,

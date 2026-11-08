@@ -76,15 +76,15 @@ class Playbook:
     species: str
     method: str
     summary: str
-    effectiveness: str | None
-    evidence_strength: str | None
+    study_design: str
     region_note: str | None
     quotes: list[str]
     citation: str
-    url: str | None
+    url: str
+    doi: str
+    year: int
+    journal: str
     verified_on: date | None
-    risks: str | None
-    failure_cases: str | None
 
 
 T = TypeVar("T")
@@ -178,13 +178,14 @@ class Query:
     @strawberry.field
     def playbooks(self, info: Info, species: str | None = None) -> list[Playbook]:
         rows = _rows(info, """
-            select s.scientific_name, p.method, p.description, p.effectiveness,
-                   p.evidence_strength, p.region_note, p.source_quotes, p.citation_text,
-                   p.citation_url, p.verified_on, p.risks, p.failure_cases
+            select s.scientific_name, p.method, p.description, p.study_design, p.region_note,
+                   p.source_quotes, p.citation_text, p.citation_url, p.citation_doi,
+                   p.citation_year, p.citation_journal, p.verified_on
             from mitigation_playbooks p join species s on s.id = p.species_id
-            where %s::text is null or lower(s.scientific_name) = lower(%s)
+            where p.verified_on is not null
+              and (%s::text is null or lower(s.scientific_name) = lower(%s))
             order by s.scientific_name, p.method""", (species, species))
-        return _build(Playbook, [(*r[:6], list(r[6]), *r[7:]) for r in rows])
+        return _build(Playbook, [(*r[:5], list(r[5]), *r[6:]) for r in rows])
 
 
 schema = strawberry.Schema(query=Query)

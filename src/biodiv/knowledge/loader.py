@@ -1,4 +1,9 @@
-"""Load db/seeds/knowledge.json into the database. Idempotent."""
+"""Load db/seeds/knowledge.json into the database. Idempotent.
+
+The file holds peer-reviewed papers and the claims that rest on them. The loader refuses a file
+that breaks the rules in `verify.validate_structure`, and builds each reference from the paper's
+verified fields, so the text on the dashboard is the text that was checked.
+"""
 
 from __future__ import annotations
 
@@ -10,7 +15,7 @@ from typing import Any
 import psycopg
 from psycopg.types.json import Jsonb
 
-from biodiv.knowledge.verify import validate_structure
+from biodiv.knowledge.verify import citation_text, citation_url, validate_structure
 
 
 class KnowledgeError(RuntimeError):
@@ -65,22 +70,21 @@ def load_knowledge(
             keep_playbooks.append(conn.execute(
                 """
                 insert into mitigation_playbooks
-                  (species_id, method, description, effectiveness, evidence_strength, cost_tier,
-                   risks, failure_cases, citation_text, citation_url, source_quotes, region_note,
+                  (species_id, method, description, study_design, citation_text, citation_url,
+                   citation_doi, citation_year, citation_journal, source_quotes, region_note,
                    verified_on, origin)
-                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'knowledge.json')
+                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'knowledge.json')
                 on conflict (species_id, method, citation_url, description) do update set
-                  effectiveness = excluded.effectiveness,
-                  evidence_strength = excluded.evidence_strength,
-                  cost_tier = excluded.cost_tier, risks = excluded.risks,
-                  failure_cases = excluded.failure_cases, citation_text = excluded.citation_text,
+                  study_design = excluded.study_design, citation_text = excluded.citation_text,
+                  citation_doi = excluded.citation_doi, citation_year = excluded.citation_year,
+                  citation_journal = excluded.citation_journal,
                   source_quotes = excluded.source_quotes, region_note = excluded.region_note,
                   verified_on = excluded.verified_on
                 returning id
                 """,
-                (_species_id(conn, p["species"]), p["method"], p["summary"], p["effectiveness"],
-                 p["evidence_strength"], p["cost_tier"], p["risks"], p["failure_cases"],
-                 src["citation"], src["url"], Jsonb(p["quotes"]), p["region_note"], verified),
+                (_species_id(conn, p["species"]), p["method"], p["summary"], p["study_design"],
+                 citation_text(src), citation_url(src), src["doi"], src["year"], src["journal"],
+                 Jsonb(p["quotes"]), p["region_note"], verified),
             ).fetchone()[0])
             stats.playbooks += 1
 
@@ -90,18 +94,22 @@ def load_knowledge(
                 """
                 insert into impact_findings
                   (invasive_species_id, zone_id, finding_type, affected, summary, certainty,
-                   region_note, source_quotes, citation_text, citation_url, verified_on, origin)
-                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'knowledge.json')
+                   region_note, source_quotes, citation_text, citation_url, citation_doi,
+                   citation_year, citation_journal, verified_on, origin)
+                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'knowledge.json')
                 on conflict (invasive_species_id, coalesce(zone_id, 0), citation_url,
                              finding_type, affected) do update set
                   summary = excluded.summary, certainty = excluded.certainty,
                   region_note = excluded.region_note, source_quotes = excluded.source_quotes,
-                  citation_text = excluded.citation_text, verified_on = excluded.verified_on
+                  citation_text = excluded.citation_text, citation_doi = excluded.citation_doi,
+                  citation_year = excluded.citation_year,
+                  citation_journal = excluded.citation_journal, verified_on = excluded.verified_on
                 returning id
                 """,
                 (_species_id(conn, f["species"]), _zone_id(conn, f["zone"]), f["finding_type"],
                  f["affected"], f["summary"], f["certainty"], f["region_note"],
-                 Jsonb(f["quotes"]), src["citation"], src["url"], verified),
+                 Jsonb(f["quotes"]), citation_text(src), citation_url(src), src["doi"],
+                 src["year"], src["journal"], verified),
             ).fetchone()[0])
             stats.findings += 1
 

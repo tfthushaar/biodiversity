@@ -267,8 +267,10 @@ def seed_lantana(url):
         c.execute("insert into invasive_status (species_id, country, is_invasive, "
                   "establishment_means) values (%s, 'IN', true, 'Alien')", (sid,))
         c.execute("insert into mitigation_playbooks (species_id, method, description, "
-                  "citation_text, source_quotes) values (%s, 'mechanical', 'x', 'c', '[\"q\"]')",
-                  (sid,))
+                  "study_design, citation_text, citation_url, citation_doi, citation_year, "
+                  "citation_journal, source_quotes, verified_on) values (%s, 'mechanical', 'x', "
+                  "'review', 'c', 'https://doi.org/10.1234/x', '10.1234/x', 2021, 'J', '[\"q\"]', "
+                  "'2026-10-07')", (sid,))
         c.commit()
 
 

@@ -75,3 +75,42 @@ class World:
 
 def day(y, m=6, d=15):
     return datetime(y, m, d, tzinfo=UTC)
+
+
+def paper(**over):
+    """A cited paper as the knowledge file spells it: a journal article with a DOI."""
+    source = {
+        "doi": "10.1234/example.2021.001", "title": "Invasive plants in tropical forests",
+        "authors": "Author, A.B.", "year": 2021, "journal": "Journal of Examples",
+        "volume": "12", "pages": "1-10",
+    }
+    return {**source, **over}
+
+
+def knowledge_file(*, playbooks=(), findings=(), verified_on="2026-10-07", **sources):
+    """A small valid knowledge file. Rows cite the source named "s" unless they say otherwise."""
+    return {
+        "_policy": {"min_year": 2016, "blocked_venues": ["EDIS"]},
+        "verified_on": verified_on,
+        "sources": {"s": paper(), **sources},
+        "playbooks": list(playbooks),
+        "impact_findings": list(findings),
+    }
+
+
+def finding_row(species="Lantana camara", zone=None, **over):
+    return {
+        "species": species, "zone": zone, "finding_type": "impact", "affected": "forest plants",
+        "summary": "Fewer plant species where it grows.", "certainty": "observational",
+        "region_note": "A forest in southern India.", "source": "s",
+        "quotes": ["a quote long enough to count as evidence here"], **over,
+    }
+
+
+def playbook_row(species="Lantana camara", **over):
+    return {
+        "species": species, "method": "mechanical", "summary": "Pulling it up.",
+        "study_design": "experimental", "region_note": "A forest in southern India.",
+        "source": "s", "quotes": ["Hand pulling is suitable for small areas of infestation."],
+        **over,
+    }

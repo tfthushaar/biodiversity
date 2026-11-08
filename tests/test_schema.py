@@ -143,8 +143,10 @@ def test_confidence_must_be_a_probability(conn):
 def test_mitigation_playbook_requires_a_citation(conn):
     sp = _species(conn, "Lantana camara")
     insert = (
-        "insert into mitigation_playbooks (species_id, method, description, citation_text) "
-        "values (%s, 'mechanical', 'uproot', %s)"
+        "insert into mitigation_playbooks (species_id, method, description, study_design, "
+        "citation_text, citation_url, citation_doi, citation_year, citation_journal, "
+        "source_quotes) values (%s, 'mechanical', 'uproot', 'review', %s, "
+        "'https://doi.org/10.1234/x', '10.1234/x', 2021, 'J', '[\"q\"]')"
     )
     with pytest.raises(psycopg.errors.CheckViolation):
         conn.execute(insert, (sp, "   "))

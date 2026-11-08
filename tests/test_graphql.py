@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from biodiv.api.deps import get_conn
 from biodiv.api.main import app
 from biodiv.knowledge.loader import load_knowledge
-from helpers import World, day
+from helpers import World, day, knowledge_file, playbook_row
 
 
 @pytest.fixture
@@ -100,21 +100,21 @@ def test_zones_and_species_queries(gql):
 
 def test_playbooks_expose_their_evidence(gql, ingest_db_url):
     with psycopg.connect(ingest_db_url) as conn:
-        load_knowledge(conn, {
-            "verified_on": "2026-10-07",
-            "sources": {"s": {"citation": "A. Author (2020)", "url": "https://x.org/s",
-                              "kind": "page"}},
-            "playbooks": [{"species": "Lantana camara", "method": "mechanical",
-                           "summary": "Pull it up.", "effectiveness": "low",
-                           "evidence_strength": "low", "cost_tier": None, "risks": None,
-                           "failure_cases": None, "region_note": "Somewhere.", "source": "s",
-                           "quotes": ["Hand pulling is suitable for small infestations only."]}],
-            "impact_findings": []})
-    out = gql('{ playbooks(species: "Lantana camara") { method quotes citation regionNote '
-              'verifiedOn evidenceStrength } }')
+        load_knowledge(conn, knowledge_file(playbooks=[playbook_row(
+            quotes=["Hand pulling is suitable for small infestations only."])]))
+    out = gql('{ playbooks(species: "Lantana camara") { method quotes citation doi year journal '
+              'studyDesign verifiedOn } }')
     (row,) = out["data"]["playbooks"]
     assert row["quotes"] == ["Hand pulling is suitable for small infestations only."]
-    assert row["citation"] == "A. Author (2020)" and row["verifiedOn"] == "2026-10-07"
+    assert row["citation"].startswith("Author, A.B. (2021)") and row["verifiedOn"] == "2026-10-07"
+    assert (row["doi"], row["year"], row["journal"], row["studyDesign"]) == (
+        "10.1234/example.2021.001", 2021, "Journal of Examples", "experimental")
+
+
+def test_playbooks_whose_quotes_were_not_verified_are_not_served(gql, ingest_db_url):
+    with psycopg.connect(ingest_db_url) as conn:
+        load_knowledge(conn, knowledge_file(verified_on=None, playbooks=[playbook_row()]))
+    assert gql('{ playbooks(species: "Lantana camara") { method } }')["data"]["playbooks"] == []
 
 
 def test_alerts_query(gql, ingest_db_url):
