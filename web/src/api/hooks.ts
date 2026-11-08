@@ -4,13 +4,12 @@ import type {
   Alert,
   Finding,
   HotspotResult,
-  InvasiveSpecies,
   ModelVersion,
   Playbook,
-  RecordsGeoJSON,
   SourceHealth,
   SpeciesPhoto,
-  StorageStatus,
+  SpeciesProfile,
+  YearCount,
   ZoneReportRow,
   ZonesGeoJSON,
 } from "./types";
@@ -29,23 +28,44 @@ const q = <T>(key: unknown[], path: string) =>
 
 export const useZones = () => useQuery(q<ZonesGeoJSON>(["zones"], "/rpc/zones_geojson"));
 
-export const useRecords = (zone: string | null, enabled = true) =>
-  useQuery({
-    ...q<RecordsGeoJSON>(
-      ["records", zone],
-      `/rpc/records_geojson?p_kind=invasive&p_limit=5000${zone ? `&p_zone=${encodeURIComponent(zone)}` : ""}`,
-    ),
-    enabled: enabled && zone !== null,
-  });
+/** What narrows the squares on the map. Every field is optional. */
+export interface HotspotFilters {
+  /** Source names; none means every source. */
+  sources?: string[];
+  yearFrom?: number | null;
+  yearTo?: number | null;
+  kingdom?: string | null;
+  /** One species, by scientific name. The database counts it exactly. */
+  species?: string | null;
+}
 
-/** Invasive records grouped into square cells of `cell` degrees, with the species in each. */
-export const useHotspots = (zone: string | null, cell: number) =>
-  useQuery({
+/** Invasive records grouped into squares `km` kilometres across, with the species in each. */
+export const useHotspots = (zone: string | null, km: number, f: HotspotFilters = {}, enabled = true) => {
+  const params = new URLSearchParams({ p_zone: zone ?? "", p_km: String(km) });
+  if (f.sources?.length) params.set("p_sources", f.sources.join(","));
+  if (f.yearFrom != null) params.set("p_year_from", String(f.yearFrom));
+  if (f.yearTo != null) params.set("p_year_to", String(f.yearTo));
+  if (f.kingdom) params.set("p_kingdom", f.kingdom);
+  if (f.species) params.set("p_species", f.species);
+  return useQuery({
     ...q<HotspotResult>(
-      ["hotspots", zone, cell],
-      `/rpc/hotspot_cells?p_zone=${encodeURIComponent(zone ?? "")}&p_cell=${cell}`,
+      ["hotspots", zone, km, f.sources ?? [], f.yearFrom ?? null, f.yearTo ?? null, f.kingdom ?? null, f.species ?? null],
+      // %20 for a space, as every other request here writes it, in place of the form-style +.
+      `/rpc/hotspot_grid?${params.toString().replace(/\+/g, "%20")}`,
     ),
-    enabled: zone !== null,
+    enabled: zone !== null && enabled,
+  });
+};
+
+/** Invasive records per year, for one park or all of them. */
+export const useInvasiveByYear = (zone: string | null) =>
+  useQuery(q<YearCount[]>(["by-year", zone], `/rpc/invasive_by_year${zone ? `?p_zone=${encodeURIComponent(zone)}` : ""}`));
+
+/** One species' records by park, year and source. */
+export const useSpeciesProfile = (name: string | null) =>
+  useQuery({
+    ...q<SpeciesProfile>(["species-profile", name], `/rpc/species_profile?p_species=${encodeURIComponent(name ?? "")}`),
+    enabled: name !== null,
   });
 
 export const useSpeciesPhotos = () =>
@@ -76,7 +96,7 @@ export const useFindings = () =>
   useQuery(
     q<Finding[]>(
       ["findings"],
-      "/impact_findings?select=id,finding_type,affected,summary,certainty,region_note,source_quotes,citation_text,citation_url,verified_on,species:species!invasive_species_id(scientific_name,common_name),zones(slug,name)&order=id",
+      "/impact_findings?select=id,finding_type,affected,summary,certainty,region_note,source_quotes,citation_text,citation_url,citation_doi,citation_year,citation_journal,verified_on,species:species!invasive_species_id(scientific_name,common_name),zones(slug,name)&order=id",
     ),
   );
 
@@ -84,22 +104,13 @@ export const usePlaybooks = () =>
   useQuery(
     q<Playbook[]>(
       ["playbooks"],
-      "/mitigation_playbooks?select=id,method,description,effectiveness,evidence_strength,cost_tier,risks,failure_cases,region_note,source_quotes,citation_text,citation_url,verified_on,species(scientific_name,common_name)&order=id",
+      "/mitigation_playbooks?select=id,method,description,study_design,region_note,source_quotes,citation_text,citation_url,citation_doi,citation_year,citation_journal,verified_on,species(scientific_name,common_name)&order=id",
     ),
   );
 
 export const useModels = () =>
   useQuery(q<ModelVersion[]>(["models"], "/model_versions?select=id,name,task,weights_uri,metrics&order=id"));
 
-export const useStorage = () => useQuery(q<StorageStatus>(["storage"], "/rpc/storage_status"));
-
 export const useSources = () => useQuery(q<SourceHealth[]>(["sources"], "/source_health?order=id"));
 
 /** Species GRIIS lists as purely alien and invasive in India: the ones the dossier can be about. */
-export const useInvasiveSpecies = () =>
-  useQuery(
-    q<InvasiveSpecies[]>(
-      ["invasive-species"],
-      "/invasive_status?select=species_id,establishment_means,species(scientific_name,common_name,kingdom)&country=eq.IN&is_invasive=eq.true&origin_class=eq.alien&limit=1000",
-    ),
-  );

@@ -3,7 +3,9 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { ErrorState, Meter, QueryView, StatTile } from "./basics";
-import { BarList, LineChart, type LineSeries } from "./charts";
+import { BarList, ColumnChart, LineChart, ScatterPlot, type LineSeries } from "./charts";
+import { FindingCard, PlaybookCard } from "./cards";
+import { Citation } from "./evidence";
 import { safeUrl } from "./evidence";
 
 describe("StatTile", () => {
@@ -212,5 +214,139 @@ describe("safeUrl", () => {
       undefined,
     ];
     for (const b of bad) expect(safeUrl(b)).toBeUndefined();
+  });
+});
+
+describe("LineChart axis labels", () => {
+  it("labels about eight years along a century of data, not every year", () => {
+    const points = Array.from({ length: 100 }, (_, i) => ({ x: 1925 + i, y: i / 100 }));
+    const { container } = render(
+      <LineChart
+        series={[{ id: "a", label: "A", color: "var(--series-1)", points }]}
+        caption="A century"
+        xLabel="Year"
+        xFormat={(x) => String(x)}
+        yFormat={(y) => y.toFixed(2)}
+      />,
+    );
+    const labels = [...container.querySelectorAll("svg text")].map((t) => t.textContent ?? "").filter((t) => /^(19|20)\d\d$/.test(t));
+    expect(labels.length).toBeGreaterThanOrEqual(7);
+    expect(labels.length).toBeLessThanOrEqual(11);
+    expect(labels).toContain("2024"); // the last year is always labelled
+  });
+});
+
+describe("ColumnChart", () => {
+  const data = [
+    { year: 2018, records: 3 },
+    { year: 2020, records: 10 },
+    { year: 2021, records: 4 },
+  ];
+
+  it("draws one column for each year with records, and reads each year's value in the table view", () => {
+    const { container } = render(<ColumnChart data={data} caption="Records by year" />);
+    expect(screen.getByRole("img", { name: /Records by year/ })).toBeInTheDocument();
+    expect(container.querySelectorAll("path.col")).toHaveLength(3);
+    const table = within(screen.getByRole("table"));
+    expect(table.getByText("2020")).toBeInTheDocument();
+    expect(table.getByText("10")).toBeInTheDocument();
+  });
+
+  it("shows a year with no records as a gap, not a column", () => {
+    const { container } = render(<ColumnChart data={data} caption="Records by year" />);
+    // 2018 to 2021 is four years; 2019 has none.
+    expect(container.querySelectorAll("path.col")).toHaveLength(3);
+    const rows = within(screen.getByRole("table")).getAllByRole("row");
+    expect(rows).toHaveLength(5); // header and four years
+  });
+
+  it("groups a long record into bins so it never draws hairline columns", () => {
+    const long = Array.from({ length: 100 }, (_, i) => ({ year: 1926 + i, records: 1 }));
+    const { container } = render(<ColumnChart data={long} caption="A century" />);
+    expect(container.querySelectorAll("path.col").length).toBeLessThanOrEqual(24);
+    expect(within(screen.getByRole("table")).getAllByRole("row").length).toBeLessThanOrEqual(25);
+  });
+
+  it("reads out a column to the keyboard", async () => {
+    render(<ColumnChart data={data} caption="Records by year" />);
+    screen.getByRole("img", { name: /Records by year/ }).focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(await screen.findByText("2018", { selector: ".t-head" })).toBeInTheDocument();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(await screen.findByText("2019", { selector: ".t-head" })).toBeInTheDocument();
+  });
+
+  it("draws nothing for no data", () => {
+    const { container } = render(<ColumnChart data={[]} caption="Nothing" />);
+    expect(container.querySelector("svg")).toBeNull();
+  });
+});
+
+describe("ScatterPlot", () => {
+  it("draws one dot for each point, with a table of the same figures", () => {
+    const { container } = render(
+      <ScatterPlot
+        caption="Richness against share"
+        xLabel="Invasive share"
+        yLabel="Native species"
+        xFormat={(x) => `${Math.round(x * 100)}%`}
+        points={[{ x: 0.1, y: 8.2, note: "3 invasive records" }, { x: 0.5, y: 4 }]}
+      />,
+    );
+    expect(container.querySelectorAll("circle.dot-point")).toHaveLength(2);
+    const table = within(screen.getByRole("table"));
+    expect(table.getByText("10%")).toBeInTheDocument();
+    expect(table.getByText("8.2")).toBeInTheDocument();
+    expect(table.getByText("3 invasive records")).toBeInTheDocument();
+  });
+
+  it("draws nothing for no points", () => {
+    const { container } = render(<ScatterPlot caption="x" xLabel="a" yLabel="b" xFormat={String} points={[]} />);
+    expect(container.querySelector("svg")).toBeNull();
+  });
+});
+
+describe("evidence from a paper", () => {
+  const f = {
+    species: "Python bivittatus", commonName: "Burmese python", certainty: "experimental" as const, findingType: "impact",
+    summary: "Fewer raccoons where pythons are.", affected: "raccoons", regionNote: "Florida", quotes: ["a quote from the abstract"],
+    citation: "Willson, J.D. (2017) Indirect effects. Journal of Applied Ecology. doi:10.1/x", url: "https://doi.org/10.1/x",
+    verifiedOn: "2026-11-09",
+  };
+
+  it("names the study design in words a reader can follow", () => {
+    render(<FindingCard f={f} />);
+    expect(screen.getByText("Controlled experiment")).toHaveAttribute("title", expect.stringMatching(/changed one thing/));
+  });
+
+  it("links the paper by its DOI and says the quotes were checked against the abstract", () => {
+    render(<FindingCard f={f} />);
+    expect(screen.getByRole("link", { name: /Willson, J\.D\. \(2017\)/ })).toHaveAttribute("href", "https://doi.org/10.1/x");
+    expect(screen.getByText(/quotes checked against the abstract 9 Nov 2026/)).toBeInTheDocument();
+    expect(screen.getByText("Evidence (1 quote from the paper)")).toBeInTheDocument();
+  });
+
+  it("shows a management method with its study design and setting, and no rating of our own", () => {
+    render(
+      <PlaybookCard
+        p={{
+          id: 1, method: "chemical", description: "A herbicide cut the grass.", study_design: "experimental",
+          region_note: "Oak woodland", source_quotes: ["the herbicide significantly reduced density"],
+          citation_text: "Brewer (2026) Restoration. Restoration Ecology.", citation_url: "https://doi.org/10.1111/rec.70322",
+          citation_doi: "10.1111/rec.70322", citation_year: 2026, citation_journal: "Restoration Ecology", verified_on: "2026-11-09",
+          species: { scientific_name: "Microstegium vimineum", common_name: null },
+        }}
+      />,
+    );
+    expect(screen.getByText("Chemical control")).toBeInTheDocument();
+    expect(screen.getByText("Controlled experiment")).toBeInTheDocument();
+    expect(screen.getByText("Oak woodland")).toBeInTheDocument();
+    expect(screen.queryByText(/Worked|Evidence:|cost:|What went wrong|Risks/)).not.toBeInTheDocument();
+  });
+
+  it("renders a citation without a link when the address is unsafe", () => {
+    render(<Citation text="A paper" url="javascript:alert(1)" />);
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    expect(screen.getByText(/A paper/)).toBeInTheDocument();
   });
 });

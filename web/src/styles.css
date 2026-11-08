@@ -792,30 +792,6 @@ blockquote {
   border-top: 2px solid var(--ink);
 }
 
-/* ---------------------------------------------------------------------- start page */
-
-.start {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  margin: 0 0 8px;
-}
-.start .card span {
-  display: block;
-  margin-top: 6px;
-  color: var(--muted);
-  font-size: 14px;
-}
-.start .go {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 14px;
-  color: var(--ink);
-  font-size: 14px;
-  font-weight: 500;
-}
-
 /* ------------------------------------------------------------------ map & hotspots */
 
 .map {
@@ -869,13 +845,15 @@ blockquote {
 .split {
   display: grid;
   gap: 28px;
-  grid-template-columns: minmax(0, 2fr) minmax(340px, 1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   align-items: start;
 }
+.stage {
+  position: sticky;
+  top: 80px;
+}
 .panel {
-  max-height: var(--stage);
-  overflow-y: auto;
-  padding-right: 4px;
+  min-width: 0;
 }
 .scale {
   display: flex;
@@ -938,51 +916,113 @@ blockquote {
   font-size: 12px;
 }
 
-.species-card {
-  overflow: hidden;
-  padding: 0;
-  margin-bottom: 16px;
+/* ------------------------------------------------------------- species rows and cards */
+
+.species-list {
+  display: grid;
+  gap: 8px;
 }
-.species-card .photo {
-  position: relative;
-  aspect-ratio: 16 / 9;
+.species-row {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.species-row[open] {
+  border-color: var(--border-strong);
+}
+.species-row > summary {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 14px;
+  list-style: none;
+  cursor: pointer;
+}
+.species-row > summary::-webkit-details-marker {
+  display: none;
+}
+.species-row > summary:hover {
+  background: var(--hover);
+  border-radius: 12px;
+}
+.species-row .thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
   background: var(--hover);
   overflow: hidden;
 }
-.species-card .photo img {
+.species-row .thumb img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.species-card .photo .none {
+.species-row .names {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.species-row .names strong,
+.species-row .names em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.species-row .names .bar-track {
+  display: block;
+  height: 6px;
+  margin-top: 4px;
+  background: var(--track);
+  border-radius: 3px;
+}
+.species-row .names .bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  border-radius: 3px;
+}
+.species-row .count {
+  display: grid;
+  justify-items: end;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.species-body {
+  padding: 4px 18px 18px;
+}
+.species-body .photo {
+  aspect-ratio: 16 / 9;
+  max-height: 280px;
+  width: 100%;
+  background: var(--hover);
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+}
+.species-body .photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.species-body .photo .none {
   display: grid;
   place-items: center;
   height: 100%;
   color: var(--faint);
   font-size: 13px;
 }
-.species-card .credit {
-  padding: 6px 16px;
+.species-body .credit {
+  padding: 6px 12px;
   background: var(--wash);
-  border-bottom: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
   color: var(--muted);
   font-size: 11px;
 }
-.species-card .body {
-  padding: 16px 20px 20px;
-}
-.species-card h3 {
-  margin: 0;
-  font-size: 18px;
-}
-.species-card .facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 10px 0 14px;
-}
-.species-card h4 {
+.species-body h4 {
   margin: 16px 0 6px;
   font-size: 13px;
   font-weight: 500;
@@ -1061,5 +1101,261 @@ blockquote {
   }
   .tile .value {
     font-size: 30px;
+  }
+}
+
+/* ----------------------------------------------------------------- hotspot controls */
+
+.toolbar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px 16px;
+  align-items: end;
+  margin: 0 0 14px;
+}
+.toolbar label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+.toolbar select {
+  width: 100%;
+  min-width: 0;
+}
+.toolbar .check,
+.field .check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.scale .grow {
+  flex: 1;
+}
+.link-btn {
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.scope {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 0 0 8px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid var(--border);
+}
+.scope h2 {
+  margin: 0;
+  font-size: 24px;
+}
+.eyebrow {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.panel h3 {
+  margin: 22px 0 8px;
+}
+
+.chart .col {
+  fill: var(--series-1);
+}
+.chart .col.on {
+  fill: var(--ink-2);
+}
+.chart .dot-point {
+  fill: var(--series-1);
+  fill-opacity: 0.55;
+  stroke: var(--surface);
+  stroke-width: 1.5;
+}
+
+/* --------------------------------------------------------------- grids that fill the width */
+
+.grid.three {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.grid.charts {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  margin-top: 16px;
+}
+.grid.charts h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+.grid.stats {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-top: 16px;
+}
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr));
+  gap: 16px;
+}
+.evidence-grid .evidence {
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.evidence-grid .evidence:first-child,
+.evidence-grid .evidence:last-child {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.alert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+  gap: 16px;
+}
+.alert .head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  align-items: center;
+}
+
+/* ------------------------------------------------------------------- species page */
+
+.species-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.list-pane {
+  position: sticky;
+  top: 80px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 104px);
+  padding: 16px;
+}
+.list-tools {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+.field {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+.field input,
+.field select {
+  width: 100%;
+}
+.species-index {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0 4px 0 0;
+  overflow-y: auto;
+  list-style: none;
+}
+.species-index a {
+  display: grid;
+  gap: 1px;
+  padding: 8px 10px;
+  color: var(--ink);
+  border-radius: 8px;
+  text-decoration: none;
+}
+.species-index a:hover {
+  background: var(--hover);
+}
+.species-index a[aria-current="true"] {
+  background: var(--wash);
+  box-shadow: inset 3px 0 0 var(--ink);
+}
+.species-index .primary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dossier {
+  min-width: 0;
+}
+.dossier > h2:first-of-type {
+  margin-top: 32px;
+}
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+}
+.hero:not(:has(figure)) {
+  grid-template-columns: 1fr;
+}
+.hero figure {
+  margin: 0;
+}
+.hero img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+}
+.hero figcaption {
+  padding: 6px 10px;
+  background: var(--wash);
+  border: 1px solid var(--border);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.papers {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+@media (max-width: 1100px) {
+  .split,
+  .species-layout {
+    grid-template-columns: 1fr;
+  }
+  .stage,
+  .list-pane {
+    position: static;
+  }
+  .list-pane {
+    max-height: 420px;
+  }
+}
+@media (max-width: 640px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+  .species-row > summary {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+  .species-row .thumb {
+    width: 48px;
+    height: 48px;
   }
 }

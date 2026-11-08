@@ -21,14 +21,14 @@ export function Alerts() {
         <Empty>
           <div>
             <strong>No alerts.</strong> No invasive species has been recorded in any park for the first time in
-            the past year. This describes the records held here. The dominant invasive plants are rarely
-            photographed, so the absence of an alert is limited evidence (see Sources).
+            the past year. This describes the records held here, and says little about species that
+            observers rarely record (see Sources).
           </div>
         </Empty>
       ) : (
-        <div className="card">
+        <div className="alert-grid">
           {alerts.data.map((a) => (
-            <article className="evidence" key={a.id}>
+            <article className="card alert" key={a.id}>
               <div className="head">
                 <SeverityBadge severity={a.severity} />
                 <strong>

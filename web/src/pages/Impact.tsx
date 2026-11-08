@@ -2,12 +2,10 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useReports } from "../api/hooks";
 import type { LayerResult, ReportFinding, ZoneReport } from "../api/types";
 import { Empty, ErrorState, Loading, Meter } from "../components/basics";
+import { LineChart, ScatterPlot } from "../components/charts";
 import { FindingCard } from "../components/cards";
-import { fmtAgo, fmtInt } from "../lib/format";
+import { fmtAgo, fmtInt, pluralise } from "../lib/format";
 import { linear } from "../lib/scale";
-
-// Past this many, the rest of the species names sit behind a "Show" control.
-const TOP_SPECIES = 8;
 
 const num = (d: Record<string, unknown>, k: string): number => (typeof d[k] === "number" ? (d[k] as number) : 0);
 
@@ -31,7 +29,7 @@ export function Impact() {
     <>
       <h1>Impact on native ecosystems</h1>
       <p className="lede">
-        Three questions, from the most certain to the least. The first reports what cited sources say. The
+        Three questions, from the most certain to the least. The first reports what peer-reviewed papers say. The
         other two are statistics that give an answer only once there is enough data to support one.
       </p>
 
@@ -69,27 +67,17 @@ function ZoneLayers({ report, name }: { report: ZoneReport; name: string }) {
   const reported = documented.findings.filter((f) => !f.recorded_in_zone);
 
   const invasive = report.invasive_species.map((s) => s.species);
-  const shown = invasive.slice(0, TOP_SPECIES);
-  const rest = invasive.slice(TOP_SPECIES);
 
   return (
     <>
       <p>
-        <strong>{name}</strong>: {fmtInt(report.observations)} observations of {fmtInt(report.species)} species;{" "}
+        <strong>{name}</strong>:{" "}
         {invasive.length === 0
-          ? "no invasive species recorded."
-          : rest.length === 0
-            ? `${invasive.length} invasive species recorded: ${shown.join(", ")}.`
-            : `${invasive.length} invasive species recorded. The most recorded are ${shown.join(", ")}.`}
+          ? "no invasive species with a peer-reviewed paper recorded."
+          : `${pluralise(invasive.length, "invasive species", "invasive species")} recorded: ${invasive.join(", ")}.`}
       </p>
-      {rest.length > 0 && (
-        <details className="hint">
-          <summary>Show the other {rest.length}</summary>
-          <p>{rest.join(", ")}.</p>
-        </details>
-      )}
 
-      <Layer n={1} title="Documented findings" question="What do cited sources report about these species here?">
+      <Layer n={1} title="Documented findings" question="What do peer-reviewed papers report about these species here?">
         {documented.findings.length === 0 ? (
           <Empty>Nothing cited yet for the species recorded in this zone.</Empty>
         ) : (
@@ -137,6 +125,7 @@ function FindingGroup({ title, note, items }: { title: string; note?: string; it
     <div style={{ marginBottom: 8 }}>
       <h3>{title}</h3>
       {note && <p className="hint" style={{ marginTop: 0 }}>{note}</p>}
+      <div className="evidence-grid">
       {items.map((f, i) => (
         <FindingCard
           key={`${f.species}-${f.zone}-${f.affected}-${i}`}
@@ -156,6 +145,7 @@ function FindingGroup({ title, note, items }: { title: string; note?: string; it
           }}
         />
       ))}
+      </div>
     </div>
   );
 }
@@ -199,6 +189,7 @@ const capitalise = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 function CoResult({ detail }: { detail: Record<string, unknown> }) {
   const rho = num(detail, "spearman_rho");
   const ci = (detail.ci95 as [number, number] | null) ?? null;
+  const cells = (detail.points as [number, number, number][] | undefined) ?? [];
   const W = 520;
   const x = linear([-1, 1], [24, W - 24]);
   return (
@@ -222,11 +213,42 @@ function CoResult({ detail }: { detail: Record<string, unknown> }) {
         <text x={x(-1)} y={18} textAnchor="start">fewer native species where invaded</text>
         <text x={x(1)} y={18} textAnchor="end">more</text>
       </svg>
+      {cells.length > 0 && (
+        <>
+          <h3>The squares behind the number</h3>
+          <p className="hint" style={{ marginTop: 0 }}>
+            One dot for each map square of about 5 km. Native richness is the number of native species in a
+            sample of {fmtInt(num(detail, "richness_compared_at"))} native records.
+          </p>
+          <ScatterPlot
+            caption="Native species richness against the invasive share of records, one dot per square"
+            xLabel="Invasive share of records"
+            yLabel="Native species per sample"
+            xFormat={(v) => `${Math.round(v * 100)}%`}
+            points={cells.map(([share, richness, invasive]) => ({
+              x: share,
+              y: richness,
+              note: `${fmtInt(invasive)} invasive ${invasive === 1 ? "record" : "records"}`,
+            }))}
+          />
+        </>
+      )}
     </>
   );
 }
 
+interface YearRow {
+  year: number;
+  observations: number;
+  invasive: number;
+  native: number;
+  invasive_per_observation: number;
+  native_per_observation: number;
+}
+
 function TrendResult({ detail }: { detail: Record<string, unknown> }) {
+  const series = (detail.series as YearRow[] | undefined) ?? [];
+  const top = Math.max(0.05, ...series.flatMap((r) => [r.invasive_per_observation, r.native_per_observation]));
   const inv = detail.invasive_per_observation as { tau: number; p_value: number; slope: number } | null;
   const nat = detail.native_per_observation as { tau: number; p_value: number; slope: number } | null;
   const row = (label: string, r: typeof inv) =>
@@ -239,6 +261,33 @@ function TrendResult({ detail }: { detail: Record<string, unknown> }) {
       </tr>
     );
   return (
+    <>
+      {series.length > 0 && (
+        <LineChart
+          caption="Records per observation by year"
+          xLabel="Year"
+          xFormat={(x) => String(x)}
+          yFormat={(y) => y.toFixed(2)}
+          yDomain={[0, Math.ceil(top * 20) / 20]}
+          series={[
+            {
+              id: "inv",
+              label: "Invasive records per observation",
+              short: "Invasive",
+              color: "var(--series-1)",
+              points: series.map((r) => ({ x: r.year, y: r.invasive_per_observation })),
+            },
+            {
+              id: "nat",
+              label: "Native records per observation",
+              short: "Native",
+              color: "var(--series-2)",
+              dash: "6 4",
+              points: series.map((r) => ({ x: r.year, y: r.native_per_observation })),
+            },
+          ]}
+        />
+      )}
     <div className="table-wrap">
       <table>
         <caption>Mann-Kendall trend of records per observation, {(detail.years as number[] | undefined)?.join(" to ")}</caption>
@@ -248,5 +297,6 @@ function TrendResult({ detail }: { detail: Record<string, unknown> }) {
         <tbody>{row("Invasive records per observation", inv)}{row("Native records per observation", nat)}</tbody>
       </table>
     </div>
+    </>
   );
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fmtAgo, fmtCompact, fmtDate, fmtInt, fmtPct, fmtYear, humanise, pluralise } from "./format";
-import { clamp, linear, nearestIndex, niceTicks } from "./scale";
+import { binYears, clamp, linear, nearestIndex, niceTicks } from "./scale";
 
 describe("number formatting", () => {
   it("groups thousands and rounds", () => {
@@ -83,5 +83,30 @@ describe("scales", () => {
   it("clamps", () => {
     expect(clamp(5, 0, 3)).toBe(3);
     expect(clamp(-1, 0, 3)).toBe(0);
+  });
+});
+
+describe("binYears", () => {
+  it("keeps one bin for each year when the record is short, with empty years as zero", () => {
+    expect(binYears([{ year: 2018, records: 3 }, { year: 2021, records: 4 }])).toEqual([
+      { start: 2018, end: 2018, records: 3 },
+      { start: 2019, end: 2019, records: 0 },
+      { start: 2020, end: 2020, records: 0 },
+      { start: 2021, end: 2021, records: 4 },
+    ]);
+  });
+  it("groups a long record into 5-year bins, then 10-year bins, so columns stay readable", () => {
+    const years = (n: number) => Array.from({ length: n }, (_, i) => ({ year: 1990 + i, records: 1 }));
+    expect(binYears(years(60))[0]).toMatchObject({ start: 1990, end: 1994, records: 5 });
+    const bins = binYears(years(200));
+    expect(bins[0]).toMatchObject({ start: 1990, end: 1999, records: 10 });
+    expect(bins.length).toBeLessThanOrEqual(21);
+  });
+  it("never loses or invents a record", () => {
+    const data = [{ year: 1925, records: 2 }, { year: 1999, records: 7 }, { year: 2026, records: 11 }];
+    expect(binYears(data).reduce((a, b) => a + b.records, 0)).toBe(20);
+  });
+  it("has nothing to draw for no data", () => {
+    expect(binYears([])).toEqual([]);
   });
 });

@@ -32,3 +32,27 @@ export function nearestIndex(xs: number[], x: number): number {
 }
 
 export const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+
+/**
+ * Groups yearly counts into bins so a long record does not become a hundred hairline bars: one
+ * year per bin up to `maxBars` years, then 5 or 10 years per bin. Empty years inside the range
+ * count as zero, so gaps in the record show as gaps.
+ */
+export function binYears(
+  data: { year: number; records: number }[],
+  maxBars = 36,
+): { start: number; end: number; records: number }[] {
+  if (data.length === 0) return [];
+  const first = Math.min(...data.map((d) => d.year));
+  const last = Math.max(...data.map((d) => d.year));
+  const span = last - first + 1;
+  const width = span <= maxBars ? 1 : span <= maxBars * 5 ? 5 : 10;
+  const start = Math.floor(first / width) * width;
+  const out: { start: number; end: number; records: number }[] = [];
+  for (let b = start; b <= last; b += width) out.push({ start: b, end: b + width - 1, records: 0 });
+  for (const d of data) {
+    const bin = out[Math.floor((d.year - start) / width)];
+    if (bin) bin.records += d.records;
+  }
+  return out;
+}

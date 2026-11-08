@@ -1,7 +1,7 @@
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { errorMessage } from "../api/rest";
-import type { Certainty } from "../api/types";
+import type { StudyDesign } from "../api/types";
 import { humanise } from "../lib/format";
 import { Icon } from "./icons";
 
@@ -134,27 +134,25 @@ export function KindBadge({ kind }: { kind: "invasive" | "native" | "introduced"
   );
 }
 
-const CERTAINTY_COPY: Record<Certainty, string> = {
+const STUDY_COPY: Record<StudyDesign, string> = {
   experimental: "Controlled experiment",
-  observational: "Field observation",
-  review: "Reported in a review",
-  preliminary: "Preliminary",
-  unverified_concern: "Unverified concern",
+  observational: "Field study",
+  review: "Review of studies",
+  modelled: "Model projection",
 };
 
-export function CertaintyBadge({ certainty }: { certainty: Certainty }) {
-  return (
-    <span className="badge" title="How firmly the source supports this">
-      {CERTAINTY_COPY[certainty] ?? humanise(certainty)}
-    </span>
-  );
-}
+const STUDY_HELP: Record<StudyDesign, string> = {
+  experimental: "The authors changed one thing and measured the result",
+  observational: "The authors compared places or times without changing anything",
+  review: "The paper gathers and summarises other studies",
+  modelled: "The paper projects what a model predicts",
+};
 
-export function EvidenceBadge({ label, level }: { label: string; level: string | null }) {
-  if (!level) return null;
+/** What kind of study a claim comes from. Every claim shown rests on a peer-reviewed paper. */
+export function StudyBadge({ design }: { design: StudyDesign }) {
   return (
-    <span className="badge">
-      {label}: <strong>{level}</strong>
+    <span className="badge" title={STUDY_HELP[design]}>
+      {STUDY_COPY[design] ?? humanise(design)}
     </span>
   );
 }

@@ -1,6 +1,18 @@
 import { describe, expect, it } from "vitest";
 import type { HotspotCell } from "../api/types";
-import { cellKey, chooseCellSize, describeCell, filterCells, heatLevel, rankSpecies, yearSpan } from "./hotspots";
+import {
+  SIZES_KM,
+  cellKey,
+  cellsInView,
+  chooseSizeKm,
+  describeCell,
+  extentKm,
+  heatLevel,
+  rankSpecies,
+  sourceTotals,
+  yearSpan,
+  yearTotals,
+} from "./hotspots";
 
 const sp = (name: string, records: number, first = 2020, last = 2020) => ({
   name,
@@ -9,7 +21,12 @@ const sp = (name: string, records: number, first = 2020, last = 2020) => ({
   first_year: first,
   last_year: last,
 });
-const cell = (west: number, south: number, species: ReturnType<typeof sp>[]): HotspotCell => ({
+const cell = (
+  west: number,
+  south: number,
+  species: ReturnType<typeof sp>[],
+  extra: Partial<HotspotCell> = {},
+): HotspotCell => ({
   west,
   south,
   east: west + 0.02,
@@ -17,59 +34,50 @@ const cell = (west: number, south: number, species: ReturnType<typeof sp>[]): Ho
   records: species.reduce((a, s) => a + s.records, 0),
   species_count: species.length,
   species,
+  ...extra,
 });
 
 const CELLS = [
-  cell(76.5, 11.7, [sp("Lantana camara", 3, 2018, 2022), sp("Senna spectabilis", 1)]),
-  cell(76.6, 11.8, [sp("Lantana camara", 1, 2015, 2015)]),
-  cell(76.7, 11.9, [sp("Senna spectabilis", 2, 2021, 2023)]),
+  cell(76.5, 11.7, [sp("Lantana camara", 3, 2018, 2022), sp("Senna spectabilis", 1)], {
+    by_year: [[2018, 1], [2022, 3]],
+    by_source: { iNaturalist: 3, "GBIF specimens": 1 },
+  }),
+  cell(76.6, 11.8, [sp("Lantana camara", 1, 2015, 2015)], { by_year: [[2015, 1]], by_source: { iNaturalist: 1 } }),
+  cell(76.7, 11.9, [sp("Senna spectabilis", 2, 2021, 2023)], { by_year: [[2021, 1], [2023, 1]], by_source: { "USGS NAS": 2 } }),
 ];
 
-describe("chooseCellSize", () => {
+describe("chooseSizeKm", () => {
   it("gives a small park finer squares than a large one", () => {
-    expect(chooseCellSize(0.25)).toBeLessThan(chooseCellSize(1.2));
+    expect(chooseSizeKm(30)).toBeLessThan(chooseSizeKm(150));
   });
   it("lands on one of the offered sizes", () => {
-    for (const extent of [0.05, 0.3, 0.9, 3, 40]) {
-      expect([0.005, 0.01, 0.02, 0.05, 0.1]).toContain(chooseCellSize(extent));
-    }
+    for (const extent of [3, 30, 100, 330, 4000]) expect(SIZES_KM).toContain(chooseSizeKm(extent));
   });
   it("aims for a few dozen squares across when there is plenty of data", () => {
-    expect(chooseCellSize(0.56)).toBe(0.02);
-    expect(chooseCellSize(1.4)).toBe(0.05);
+    expect(chooseSizeKm(62)).toBe(2);
+    expect(chooseSizeKm(155)).toBe(5);
   });
   it("uses coarser squares where records are few", () => {
-    expect(chooseCellSize(0.5, 6)).toBeGreaterThan(chooseCellSize(0.5, 5000));
+    expect(chooseSizeKm(55, 6)).toBeGreaterThan(chooseSizeKm(55, 5000));
   });
   it("copes with no records at all", () => {
-    expect([0.005, 0.01, 0.02, 0.05, 0.1]).toContain(chooseCellSize(0.5, 0));
+    expect(SIZES_KM).toContain(chooseSizeKm(55, 0));
   });
 });
 
-describe("filterCells", () => {
-  it("returns everything when no species is chosen", () => {
-    expect(filterCells(CELLS, null)).toBe(CELLS);
-  });
-  it("keeps only the chosen species and recounts each cell", () => {
-    const got = filterCells(CELLS, "Senna spectabilis");
-    expect(got.map((c) => c.records)).toEqual([2, 1]); // busiest first
-    expect(got.every((c) => c.species.length === 1 && c.species_count === 1)).toBe(true);
-  });
-  it("drops cells where the species was never recorded", () => {
-    expect(filterCells(CELLS, "Lantana camara")).toHaveLength(2);
-    expect(filterCells(CELLS, "Nothing")).toEqual([]);
-  });
-  it("does not change the cells it was given", () => {
-    const before = JSON.stringify(CELLS);
-    filterCells(CELLS, "Lantana camara");
-    expect(JSON.stringify(CELLS)).toBe(before);
+describe("extentKm", () => {
+  it("measures the larger side of a box in kilometres, whatever the latitude", () => {
+    // One degree of latitude is about 110.6 km everywhere.
+    expect(extentKm([0, 0, 0.1, 1])).toBeCloseTo(110.574, 1);
+    // One degree of longitude is shorter in the north: 111.32 * cos(60 degrees) = 55.66 km.
+    expect(extentKm([10, 59.5, 11, 60.5])).toBeCloseTo(110.574, 1);
+    expect(extentKm([10, 59.9, 12, 60.1])).toBeCloseTo(2 * 111.32 * Math.cos((60 * Math.PI) / 180), 0);
   });
 });
 
 describe("rankSpecies", () => {
   it("adds up each species across cells and orders by records", () => {
-    const got = rankSpecies(CELLS);
-    expect(got.map((s) => [s.name, s.records])).toEqual([
+    expect(rankSpecies(CELLS).map((s) => [s.name, s.records])).toEqual([
       ["Lantana camara", 4],
       ["Senna spectabilis", 3],
     ]);
@@ -84,6 +92,39 @@ describe("rankSpecies", () => {
   });
 });
 
+describe("totals for the charts", () => {
+  it("adds yearly counts across cells, oldest first", () => {
+    expect(yearTotals(CELLS)).toEqual([
+      { year: 2015, records: 1 },
+      { year: 2018, records: 1 },
+      { year: 2021, records: 1 },
+      { year: 2022, records: 3 },
+      { year: 2023, records: 1 },
+    ]);
+  });
+  it("adds source counts across cells, most first", () => {
+    expect(sourceTotals(CELLS)).toEqual([
+      { source: "iNaturalist", records: 4 },
+      { source: "USGS NAS", records: 2 },
+      { source: "GBIF specimens", records: 1 },
+    ]);
+  });
+  it("copes with cells that carry no breakdown", () => {
+    expect(yearTotals([cell(0, 0, [sp("A", 1)])])).toEqual([]);
+    expect(sourceTotals([cell(0, 0, [sp("A", 1)])])).toEqual([]);
+  });
+});
+
+describe("cellsInView", () => {
+  it("keeps the cells whose middle is inside the view", () => {
+    const got = cellsInView(CELLS, [76.45, 11.65, 76.65, 11.85]);
+    expect(got.map(cellKey)).toEqual(["76.5000,11.7000", "76.6000,11.8000"]);
+  });
+  it("returns nothing for a view with no cells in it", () => {
+    expect(cellsInView(CELLS, [0, 0, 1, 1])).toEqual([]);
+  });
+});
+
 describe("heatLevel", () => {
   it("is lightest for nothing and darkest for the busiest cell", () => {
     expect(heatLevel(0, 100)).toBe(0);
@@ -94,7 +135,6 @@ describe("heatLevel", () => {
     expect(heatLevel(1, 0)).toBe(0);
   });
   it("lifts quiet cells above the lightest shade when one cell dominates", () => {
-    expect(heatLevel(10, 1000)).toBeGreaterThanOrEqual(0);
     expect(heatLevel(250, 1000)).toBeGreaterThan(heatLevel(10, 1000));
   });
 });

@@ -1,4 +1,4 @@
-import type { Feature, FeatureCollection, Geometry, Point } from "geojson";
+import type { FeatureCollection, Geometry } from "geojson";
 
 export interface ZoneProps {
   slug: string;
@@ -16,12 +16,13 @@ export type ZonesGeoJSON = FeatureCollection<Geometry, ZoneProps>;
 export interface HotspotSpecies {
   name: string;
   common_name: string | null;
+  kingdom?: string | null;
   records: number;
   first_year: number;
   last_year: number;
 }
 
-/** A square of the map, in degrees, and the invasive records inside it. */
+/** A square of the map and the invasive records inside it, with their years and sources. */
 export interface HotspotCell {
   west: number;
   south: number;
@@ -30,11 +31,30 @@ export interface HotspotCell {
   records: number;
   species_count: number;
   species: HotspotSpecies[];
+  /** [year, records] pairs, oldest first. */
+  by_year?: [number, number][];
+  by_source?: Record<string, number>;
 }
 
+/** Squares are `km` kilometres on a side, wherever the park lies. */
 export interface HotspotResult {
-  cell: number;
+  km: number | null;
   cells: HotspotCell[];
+}
+
+export interface YearCount {
+  year: number;
+  records: number;
+}
+
+/** Everything the species page charts for one species. */
+export interface SpeciesProfile {
+  records: number;
+  first_year: number | null;
+  last_year: number | null;
+  by_park: { slug: string; park: string; records: number }[];
+  by_year: YearCount[];
+  by_source: { source: string; records: number }[];
 }
 
 /** A species' representative photo, with the credit and licence its owner chose. */
@@ -47,26 +67,9 @@ export interface SpeciesPhoto {
   photo_source_url: string | null;
 }
 
-/** What kind of record a point is. */
-export type RecordClass = "invasive" | "introduced" | "native";
-export interface RecordProps {
-  species: string;
-  common_name: string | null;
-  zone: string;
-  captured_at: string;
-  origin: "observer" | "model";
-  class: RecordClass;
-  url: string | null;
-}
-export type RecordsGeoJSON = FeatureCollection<Point, RecordProps>;
-export type RecordFeature = Feature<Point, RecordProps>;
-
-export type Certainty =
-  | "experimental"
-  | "observational"
-  | "review"
-  | "preliminary"
-  | "unverified_concern";
+/** What kind of study a claim comes from. Every claim rests on a peer-reviewed paper. */
+export type StudyDesign = "experimental" | "observational" | "review" | "modelled";
+export type Certainty = StudyDesign;
 
 export interface SpeciesRef {
   scientific_name: string;
@@ -83,6 +86,9 @@ export interface Finding {
   source_quotes: string[];
   citation_text: string;
   citation_url: string;
+  citation_doi: string;
+  citation_year: number;
+  citation_journal: string;
   verified_on: string | null;
   species: SpeciesRef;
   zones: { slug: string; name: string } | null;
@@ -92,15 +98,14 @@ export interface Playbook {
   id: number;
   method: string;
   description: string;
-  effectiveness: "low" | "moderate" | "high" | "variable" | null;
-  evidence_strength: "low" | "moderate" | "high" | null;
-  cost_tier: string | null;
-  risks: string | null;
-  failure_cases: string | null;
+  study_design: StudyDesign;
   region_note: string | null;
   source_quotes: string[];
   citation_text: string;
-  citation_url: string | null;
+  citation_url: string;
+  citation_doi: string;
+  citation_year: number;
+  citation_journal: string;
   verified_on: string | null;
   species: SpeciesRef;
 }
@@ -140,6 +145,9 @@ export interface ReportFinding {
   quotes: string[];
   citation: string;
   url: string;
+  doi?: string;
+  year?: number;
+  journal?: string;
   verified_on: string | null;
   records_in_zone: number;
   recorded_in_zone: boolean;
@@ -236,16 +244,4 @@ export interface SourceHealth {
   failed: number | null;
   rejected: Record<string, number> | null;
   items: number;
-}
-
-/** How full the free-tier database is. */
-export interface StorageStatus {
-  db_bytes: number;
-  budget_bytes: number;
-}
-
-export interface InvasiveSpecies {
-  species_id: number;
-  establishment_means: string | null;
-  species: SpeciesRef & { kingdom: string | null };
 }

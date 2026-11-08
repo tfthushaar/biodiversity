@@ -1,37 +1,29 @@
 import type { Geometry } from "geojson";
-import type { HotspotCell, HotspotSpecies } from "../api/types";
+import type { HotspotCell, HotspotSpecies, YearCount } from "../api/types";
 
-/** Square sizes on offer, in degrees, with their width in kilometres. */
-export const SIZES = [
-  { deg: 0.005, km: 0.5 },
-  { deg: 0.01, km: 1 },
-  { deg: 0.02, km: 2 },
-  { deg: 0.05, km: 5 },
-  { deg: 0.1, km: 10 },
-];
-const STEPS = SIZES.map((s) => s.deg);
+/** Square sizes on offer, in kilometres. The server builds the grid in kilometres, so a square
+ *  is square wherever the park lies and its width is the width this list states. */
+export const SIZES_KM = [0.5, 1, 2, 5, 10, 20];
+
+/** Kilometres in one degree of latitude, and in one degree of longitude at the equator. */
+const KM_PER_DEG_LAT = 110.574;
+const KM_PER_DEG_LON_EQ = 111.32;
 
 /**
  * A square size that suits the park and its data: up to about 28 squares across for a park with
  * thousands of records, and coarser squares where records are few, so a handful of records does
- * not become a scatter of tiny marks. `extentDeg` is the larger side of the park's bounding box.
+ * not become a scatter of tiny marks. `extentKm` is the larger side of the park's bounding box.
  */
-export function chooseCellSize(extentDeg: number, records = Number.POSITIVE_INFINITY): number {
+export function chooseSizeKm(extentKm: number, records = Number.POSITIVE_INFINITY): number {
   const across = Math.min(28, Math.max(6, Math.round(Math.sqrt(Math.max(records, 0)) * 2.5)));
-  const target = extentDeg / across;
-  return STEPS.reduce((best, s) => (Math.abs(s - target) < Math.abs(best - target) ? s : best), STEPS[0]!);
+  const target = extentKm / across;
+  return SIZES_KM.reduce((best, s) => (Math.abs(s - target) < Math.abs(best - target) ? s : best), SIZES_KM[0]!);
 }
 
-/** Cells with only the chosen species counted; cells it is absent from disappear. */
-export function filterCells(cells: HotspotCell[], species: string | null): HotspotCell[] {
-  if (!species) return cells;
-  return cells
-    .map((c) => {
-      const only = c.species.filter((s) => s.name === species);
-      return { ...c, species: only, species_count: only.length, records: only.reduce((a, s) => a + s.records, 0) };
-    })
-    .filter((c) => c.records > 0)
-    .sort((a, b) => b.records - a.records);
+/** Width and height of a bounding box in kilometres: [west, south, east, north] in degrees. */
+export function extentKm([w, s, e, n]: [number, number, number, number]): number {
+  const mid = (((s + n) / 2) * Math.PI) / 180;
+  return Math.max((e - w) * KM_PER_DEG_LON_EQ * Math.cos(mid), (n - s) * KM_PER_DEG_LAT);
 }
 
 /** Species across all cells, most recorded first. */
@@ -56,6 +48,33 @@ export function rankSpecies(cells: HotspotCell[]): HotspotSpecies[] {
   return [...by.values()].sort((a, b) => b.records - a.records || a.name.localeCompare(b.name));
 }
 
+/** Records per year across cells, oldest first. */
+export function yearTotals(cells: HotspotCell[]): YearCount[] {
+  const by = new Map<number, number>();
+  for (const c of cells) for (const [y, n] of c.by_year ?? []) by.set(y, (by.get(y) ?? 0) + n);
+  return [...by.entries()].sort((a, b) => a[0] - b[0]).map(([year, records]) => ({ year, records }));
+}
+
+/** Records per source across cells, most first. */
+export function sourceTotals(cells: HotspotCell[]): { source: string; records: number }[] {
+  const by = new Map<string, number>();
+  for (const c of cells) for (const [k, n] of Object.entries(c.by_source ?? {})) by.set(k, (by.get(k) ?? 0) + n);
+  return [...by.entries()].sort((a, b) => b[1] - a[1]).map(([source, records]) => ({ source, records }));
+}
+
+/** [west, south, east, north] of a map view. */
+export type Bounds = [number, number, number, number];
+
+/** The cells whose middle lies inside a view. A cell on the edge belongs to the view it is mostly in. */
+export function cellsInView(cells: HotspotCell[], view: Bounds): HotspotCell[] {
+  const [w, s, e, n] = view;
+  return cells.filter((c) => {
+    const lon = (c.west + c.east) / 2;
+    const lat = (c.south + c.north) / 2;
+    return lon >= w && lon <= e && lat >= s && lat <= n;
+  });
+}
+
 /** Shading levels, 0 (lightest) to 4. Square-root scaling keeps one very busy cell from
  *  flattening every other cell into the lightest shade. */
 export function heatLevel(records: number, max: number): number {
@@ -78,6 +97,9 @@ export function describeCell(c: HotspotCell): string {
 export function yearSpan(first: number, last: number): string {
   return first === last ? String(first) : `${first} to ${last}`;
 }
+
+/** "0.5 km", "2 km". */
+export const fmtKm = (km: number) => `${km} km`;
 
 /** [west, south, east, north] of any polygon geometry. */
 export function bboxOf(geometry: Geometry): [number, number, number, number] {

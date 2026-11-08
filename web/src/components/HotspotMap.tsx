@@ -2,8 +2,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
 import type { Feature, Geometry } from "geojson";
-import type { HotspotCell, RecordsGeoJSON, ZoneProps } from "../api/types";
-import { HEAT_OPACITY, cellKey, heatLevel } from "../lib/hotspots";
+import type { HotspotCell, ZoneProps } from "../api/types";
+import { HEAT_OPACITY, cellKey, heatLevel, type Bounds } from "../lib/hotspots";
 import { token, useResolvedTheme } from "../lib/theme";
 
 const OSM = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -13,8 +13,10 @@ export interface HotspotMapProps {
   cells: HotspotCell[];
   selected: string | null;
   onSelect: (key: string | null) => void;
-  /** Individual invasive records, drawn as small dots under the squares. */
-  points: RecordsGeoJSON | null;
+  /** Called with [west, south, east, north] whenever the visible area changes. */
+  onView?: (view: Bounds) => void;
+  /** Changing this number fits the map to the park again. */
+  fitKey?: number;
   label: string;
 }
 
@@ -23,28 +25,45 @@ export interface HotspotMapProps {
  * the count; a ranked list beside the map offers every square to keyboard and screen-reader
  * users, since map shapes cannot take focus.
  */
-export function HotspotMap({ zone, cells, selected, onSelect, points, label }: HotspotMapProps) {
+export function HotspotMap({ zone, cells, selected, onSelect, onView, fitKey = 0, label }: HotspotMapProps) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const zoneLayer = useRef<L.GeoJSON | null>(null);
   const cellLayer = useRef<L.LayerGroup | null>(null);
-  const pointLayer = useRef<L.LayerGroup | null>(null);
   const selectedBounds = useRef<L.LatLngBounds | null>(null);
   const theme = useResolvedTheme();
+  // The latest callbacks, so the map's own event handlers never act on stale ones.
+  const viewCb = useRef(onView);
+  const selectCb = useRef(onSelect);
+  viewCb.current = onView;
+  selectCb.current = onSelect;
 
   useEffect(() => {
     if (!el.current || map.current) return;
-    const m = L.map(el.current, { preferCanvas: true }).setView([20, 0], 2);
+    const m = L.map(el.current).setView([20, 0], 2); // SVG: no deferred canvas redraw to outlive the map
+    m.on("moveend", () => {
+      if (map.current !== m) return; // the map was removed while this event was queued
+      const b = m.getBounds();
+      viewCb.current?.([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()]);
+    });
+    m.on("click", () => selectCb.current(null)); // a click on empty ground clears the selection
+    // The map sits in a layout that changes size (filters wrapping, the window resizing).
+    const watch = new ResizeObserver(() => m.invalidateSize());
+    watch.observe(el.current);
     L.tileLayer(OSM, {
       maxZoom: 18,
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(m);
-    pointLayer.current = L.layerGroup().addTo(m);
     cellLayer.current = L.layerGroup().addTo(m);
     map.current = m;
     return () => {
+      watch.disconnect();
+      m.off();
+      m.stop();
       m.remove();
       map.current = null;
+      zoneLayer.current = null;
+      cellLayer.current = null;
     };
   }, []);
 
@@ -61,7 +80,7 @@ export function HotspotMap({ zone, cells, selected, onSelect, points, label }: H
     zoneLayer.current = layer;
     const b = layer.getBounds();
     if (b.isValid()) m.fitBounds(b.pad(0.08), { animate: false });
-  }, [zone, theme]);
+  }, [zone, theme, fitKey]);
 
   // The squares.
   useEffect(() => {
@@ -83,12 +102,13 @@ export function HotspotMap({ zone, cells, selected, onSelect, points, label }: H
         opacity: isSelected ? 1 : 0.4,
         fillColor: `rgb(${hot})`,
         fillOpacity: HEAT_OPACITY[heatLevel(c.records, max)],
+        bubblingMouseEvents: false, // a click on a square is not a click on the empty map
       });
       rect.bindTooltip(`${c.records} ${c.records === 1 ? "record" : "records"}, ${c.species_count} species`);
-      rect.on("click", () => onSelect(isSelected ? null : key));
+      rect.on("click", () => selectCb.current(isSelected ? null : key));
       group.addLayer(rect);
     }
-  }, [cells, selected, onSelect, theme]);
+  }, [cells, selected, theme]);
 
   // Move to a square when it is chosen from the list or the map.
   useEffect(() => {
@@ -96,24 +116,6 @@ export function HotspotMap({ zone, cells, selected, onSelect, points, label }: H
     const b = selectedBounds.current;
     if (m && b && selected) m.fitBounds(b.pad(4), { maxZoom: 14, animate: false });
   }, [selected]);
-
-  // Individual records, quiet and small.
-  useEffect(() => {
-    const group = pointLayer.current;
-    if (!group) return;
-    group.clearLayers();
-    if (!points) return;
-    const ink = token("--ink");
-    for (const f of points.features) {
-      const [lon, lat] = f.geometry.coordinates;
-      if (lon == null || lat == null) continue;
-      group.addLayer(
-        L.circleMarker([lat, lon], { radius: 2.5, stroke: false, fillColor: ink, fillOpacity: 0.7 }).bindTooltip(
-          f.properties.species,
-        ),
-      );
-    }
-  }, [points, theme]);
 
   return <div ref={el} className="map" role="region" aria-label={label} />;
 }

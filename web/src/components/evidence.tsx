@@ -11,6 +11,7 @@ export function safeUrl(url: string | null | undefined): string | undefined {
   }
 }
 
+/** The paper a claim rests on: its reference, linked to the DOI, and when the quotes were checked. */
 export function Citation({
   text,
   url,
@@ -23,7 +24,7 @@ export function Citation({
   const href = safeUrl(url);
   return (
     <p className="where">
-      Source:{" "}
+      Paper:{" "}
       {href ? (
         <a href={href} target="_blank" rel="noopener noreferrer">
           {text}
@@ -31,7 +32,7 @@ export function Citation({
       ) : (
         text
       )}
-      {verifiedOn && <span className="hint"> · quotes checked against the source {fmtDate(verifiedOn)}</span>}
+      {verifiedOn && <span className="hint"> · quotes checked against the abstract {fmtDate(verifiedOn)}</span>}
     </p>
   );
 }
@@ -61,7 +62,7 @@ export function EvidenceDetails({
   return (
     <details>
       <summary>
-        Evidence ({quotes.length} verbatim {quotes.length === 1 ? "quote" : "quotes"})
+        Evidence ({quotes.length} {quotes.length === 1 ? "quote" : "quotes"} from the paper)
       </summary>
       <Quotes quotes={quotes} />
       <Citation text={citation} url={url} verifiedOn={verifiedOn} />

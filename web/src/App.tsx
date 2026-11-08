@@ -115,8 +115,8 @@ export default function App() {
         {route(path)}
       </main>
       <footer>
-        Open data from iNaturalist, GBIF, GRIIS and the U.S. Geological Survey, each under its own
-        licence (see Sources). Map data © OpenStreetMap contributors. Code and methods:{" "}
+        Data from iNaturalist, GBIF, GRIIS and the U.S. Geological Survey under their own licences. Findings
+        from peer-reviewed papers. Map data © OpenStreetMap contributors. Code and methods:{" "}
         <a href="https://github.com/tfthushaar/biodiversity" target="_blank" rel="noopener noreferrer">
           github.com/tfthushaar/biodiversity
         </a>
