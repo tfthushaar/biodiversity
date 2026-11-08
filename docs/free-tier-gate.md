@@ -15,8 +15,7 @@ Fill in the last two columns when you create each account.
 | Render (free web service) | Optional FastAPI service | Sources differ, so check at signup | | |
 | Kaggle | Free GPU for model training | Yes (phone verification) | | |
 | Hugging Face (Hub only) | Model weights. Docker and Gradio Spaces became paid in July 2026 and are not used | Yes | | |
-| IUCN Red List API | Threat links (code 8.1.2). The token is reviewed by a person, so apply early | Yes, free token | | |
-| iNaturalist, GBIF, GRIIS, USGS NAS | Occurrences and invasive status. Reads need no key | Yes | n/a | n/a |
+| iNaturalist, GBIF, GRIIS, USGS NAS, Crossref, OpenAlex | Occurrences, invasive status and paper checks. Reads need no key | Yes | n/a | n/a |
 
 ## Fallbacks
 
@@ -68,6 +67,22 @@ handled.
   `public` to the public roles. Migration 0016 removes write access everywhere and makes new
   objects private until a migration grants them. Without it, the migration bookkeeping table kept
   insert, update, delete and truncate for the public role.
+
+### Upgrading a project that is already running
+
+Apply the migrations in order. Three of them change what is stored:
+
+- **0020** removes the earlier findings and management rows, which cited pages and not papers, and
+  adds the columns a paper needs. Run `python scripts/verify_citations.py --write` and then
+  `python -m biodiv.workers.seed_knowledge --prune` straight after it.
+- **0024** makes the invasive-species views, and what the public role can read, depend on a paper.
+  Species without one disappear from the dashboard at once.
+- **0021** and **0023** drop the IUCN table and the old hotspot function. Apply them once the new
+  dashboard is deployed, because the old dashboard calls the function.
+
+Then remove the records stored before the rules with `python scripts/prune_unresearched.py` and
+`python scripts/prune_gbif_records.py`. Both report what they would remove, and delete only with
+`--delete`.
 
 If you applied migration 0013 or 0014 to a local database before this was handled, the runner
 reports that they changed. Rebuild the local database; it holds nothing that cannot be ingested

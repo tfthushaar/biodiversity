@@ -8,32 +8,41 @@ public REST API and draws the results, which lets it run on a free static host t
 
 | Page | What it answers | Source of its numbers |
 |---|---|---|
-| Overview | How many records, how many are invasive, any early-detection alerts, and what the data supports | `zones_geojson()`, `zone_reports`, `alerts` |
-| Hotspots | Where invasive records concentrate in a park, which species are there, and what research reports about their effect on the local environment | `hotspot_cells()`, `species` (photos), `impact_findings`, `mitigation_playbooks` |
-| Species | One invasive species: where it is recorded, what research reports, and what management has been tried | `zone_reports`, `impact_findings`, `mitigation_playbooks` |
-| Impact | What cited sources report, and whether the data supports a co-occurrence or trend statistic | `zone_reports`, computed by the analyse worker |
+| Overview | How many invasive records, how many invasive species, how many papers, and how records are spread over parks, years and species | `zones_geojson()`, `zone_reports`, `invasive_by_year()`, `impact_findings`, `mitigation_playbooks` |
+| Hotspots | Where invasive records concentrate in a park, which species are there, and what papers report about their effect on the local environment | `hotspot_grid()`, `invasive_by_year()`, `species` (photos), `impact_findings`, `mitigation_playbooks`, `source_health` |
+| Species | One invasive species: where and when it was recorded, what papers report, and what management has been tried | `species_profile()`, `zone_reports`, `impact_findings`, `mitigation_playbooks` |
+| Impact | What papers report, and whether the data supports a co-occurrence or trend statistic | `zone_reports`, computed by the analyse worker |
 | Alerts | An invasive species recorded in a park for the first time | `alerts` |
 | Models | Measured accuracy of each model, with its limits | `model_versions` |
-| Sources | Where the data came from, its licence, why records were refused, and how full the free database is | `source_health`, `storage_status()` |
+| Sources | Where the data came from, its licence, why records were refused, and the limits of the data | `source_health` |
+
+A species appears on any page only when a peer-reviewed paper backs it ([evidence.md](evidence.md)).
+Every finding and management method shows its paper, linked to the DOI, with the quotes it rests on.
 
 The Models page has a photo panel. It needs the optional analysis service (`VITE_API_URL`) and
 reports when that service is not connected.
 
 ### The Hotspots page
 
-1. Choose a park and, optionally, one species. Parks are grouped by country.
+1. Choose a park. Parks are grouped by country. The other filters narrow what the map and the list
+   count: one species, plants or animals, one source, and a range of years. "Reset filters"
+   clears them.
 2. The map shows square cells shaded from light to dark red by the number of invasive records in
    them. The scale under the map explains the shading, and each cell's tooltip gives its count.
-3. The square size defaults to a value that suits the park and its number of records. The
-   Square size menu offers 0.5, 1, 2, 5 and 10 km.
-4. Selecting a cell, on the map or in the ranked list beside it, opens a card for each species
-   there: a photo with its credit and a link to the photo page, the number of records and the years
-   they span, and up to two cited findings on the species' effect on the local environment. When no
-   cited research is on file, the card says so. A link leads to the full species page.
-5. "Show individual records" draws the park's 5,000 most recent invasive records as small dots.
+3. Squares are measured in kilometres and are square wherever the park lies. The Square size menu
+   offers 0.5, 1, 2, 5, 10 and 20 km, and "Automatic" picks a size that suits the park and its
+   number of records and says which. The database builds the grid at the park's own latitude, so a
+   square in the Great Smoky Mountains is as wide as it is tall.
+4. The panel beside the map describes a region, and its heading says which: **This square** when
+   one is selected, **In the map view** after zooming or moving the map, and **Whole park**
+   otherwise. It shows the records and species in that region, the busiest squares, a chart of
+   records by year, and the species ranked by records, most recorded first. The first species is open
+   and shows its photo with its credit, its record count and years, and up to two findings with their
+   papers. "Show the whole park" returns the map to the full park.
+5. Clicking empty ground clears the selected square.
 
-The ranked list and a table under the map list the same cells, so the page works with a keyboard
-and a screen reader. Map shapes cannot take focus.
+The ranked list of squares and a table under the map list the same cells, so the page works with a
+keyboard and a screen reader. Map shapes cannot take focus.
 
 ## Visual design
 
@@ -99,13 +108,24 @@ redeploy. Before relying on a deployment, run
 answer below a minimum amount of data ([impact.md](impact.md)). A meter shows how far each park
 is from each requirement, so an insufficient result tells the reader what would change it.
 
-**Counts reflect recording effort.** The Overview says so before it shows a number, because
-citizen-science photos under-record the plants that dominate these reserves.
+**Counts reflect recording effort.** The Overview says so before it shows a number. A species that
+observers rarely record can be common and still have few records.
 
-**Every claim carries its evidence.** Findings and management options show verbatim quotes from
-the cited source, the certainty of the evidence, and where it was gathered. `scripts/verify_citations.py`
-checks each quote against the live page. Links from the database render only when they are http(s),
-so a stored `javascript:` address appears as text.
+**Every claim carries its paper.** Findings and management options show the paper's reference,
+linked to its DOI, the design of the study, where it took place, and verbatim quotes from its abstract.
+`scripts/verify_citations.py` checks each paper and quote ([evidence.md](evidence.md)). Links from
+the database render only when they are http(s), so a stored `javascript:` address appears as text.
+
+**Nothing appears without a paper.** The Species page lists only species a paper backs. The charts,
+counts and map read from views that hold only those species, and the browser applies no second
+filter that could drift from the database.
+
+**Only what a visitor uses is on the page.** The Overview holds three numbers and three charts.
+Operator details such as how full the database is stay out of the interface, and a control appears
+only when it changes what the page shows.
+
+**Estimates are not drawn as data.** When one species is chosen, the database counts its records
+for each square and year exactly, and the browser never scales a total to stand in for them.
 
 **Photos carry their credit.** A species photo is stored only when its licence allows showing it
 with credit. The card shows the credit and links to the photo page, and says when no licensed photo
@@ -113,8 +133,10 @@ exists.
 
 ## Tests
 
-`npm test` runs the formatting, scale and grid helpers, the shared components (meter wording, zero
-bars, legends, keyboard tooltips, table twins, link safety), and the pages against a mocked REST
-API. The page tests cover insufficient-data states, empty and failed loads, the Hotspots page
-(default park, species filter, cards with and without a photo or research, unsafe image addresses)
-and the photo demo's disabled, rate-limited and asleep-service states. CI runs them on every push.
+`npm test` runs the formatting, scale, binning and grid helpers, the shared components (meter
+wording, zero bars, legends, axis labels, column and scatter charts, keyboard tooltips, table twins,
+link safety, paper citations), and the pages against a mocked REST API. The page tests cover
+insufficient-data states, empty and failed loads, the Hotspots page (default park, region-following
+panel, filters sent to the database, exact species counts, unsafe image addresses), the Species page
+(only species with a paper are listed), the Overview, the Sources page and the photo demo's
+disabled, rate-limited and asleep-service states. CI runs them on every push.

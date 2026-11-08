@@ -21,7 +21,7 @@ it.
 | Part | Where | Always on | When it runs |
 |---|---|---|---|
 | Ingest (`workers/ingest.py`) | GitHub Actions | no | every 6 hours, `ingest.yml` |
-| Detect (`workers/detect.py`) | GitHub Actions | no | every 6 hours, `infer.yml` |
+| Detect (`workers/detect.py`) | GitHub Actions | no | started by hand, `infer.yml`, when camera-trap images are added |
 | Analyse (`workers/analyse.py`) | GitHub Actions | no | four times a day, `analytics.yml` |
 | Species photos (`workers/enrich_species.py`) | GitHub Actions | no | after every ingest, for species without one |
 | Retention (`workers/retention.py`) | GitHub Actions | no | after every ingest |
@@ -49,9 +49,11 @@ Six national parks, with boundaries from OpenStreetMap (`scripts/build_zone_seed
 1. **Invasive status** comes from GRIIS country checklists (`import_griis`). A species counts as
    invasive in a country when GRIIS lists it as alien and invasive there. A species recorded as
    both native and alien (the chital in India) is left out of the invasive counts.
-2. **Sightings** come from three sources. iNaturalist research-grade observations and GBIF specimen
-   records are kept when they name a species, carry a full date and a position accurate to 2 km,
-   fall inside a park boundary, and are not captive or deliberately obscured. The USGS
+2. **Sightings** come from three sources. iNaturalist research-grade observations and GBIF preserved
+   specimens are kept when they name a species, carry a full date and a position accurate to 2 km,
+   fall inside a park boundary, and are not captive or deliberately obscured. GBIF supplies
+   preserved specimens only, because those trace to a museum or herbarium collection. A record of an
+   invasive species that no paper backs is refused. The USGS
    Nonindigenous Aquatic Species database adds curated records of non-native aquatic species in
    the two US parks, each with a source type and a coordinate accuracy class. Failed introductions,
    approximate and centroid positions, and records without a full date are set aside. Each refusal
@@ -62,17 +64,22 @@ Six national parks, with boundaries from OpenStreetMap (`scripts/build_zone_seed
 4. **Analysis** (`analyse`) writes precomputed reports for each park, so the dashboard reads
    results and computes no statistics in the browser.
 5. **Knowledge** (cited findings and management options) loads from `db/seeds/knowledge.json`.
-   Every claim carries verbatim quotes, and `scripts/verify_citations.py` re-checks each quote
-   against the live source.
+   Every claim comes from a peer-reviewed journal article and carries verbatim quotes from its
+   abstract. `scripts/verify_citations.py` re-checks each paper in Crossref and OpenAlex and each
+   quote against the abstract ([evidence.md](evidence.md)).
 6. **Photos** (`enrich_species`) attach one licensed photo to each recorded invasive species, with
    the owner's credit and a link back to the photo page.
 
 ## Hotspots
 
-`hotspot_cells` (migration 0018) groups a park's invasive records into square cells of a chosen
-size and returns one row per occupied cell with its species. The server does the grouping so the
-browser downloads a few hundred rows instead of thousands of records. The dashboard shades each
-cell by its count and opens a card for each species when a cell is selected.
+`hotspot_grid` (migration 0022) groups a park's invasive records into square cells of a chosen
+number of kilometres and returns one row per occupied cell with its species, its records by year and
+its records by source. The grid is built at the park's own latitude, so cells are square. The
+filters (one species, one source, a range of years, plants or animals) are applied in the database,
+so every count is exact. The server does the grouping so the browser downloads a few hundred rows
+instead of thousands of records. The dashboard shades each cell by its count, and its panel follows
+the chosen square or the part of the park in view. `invasive_by_year` and `species_profile` supply
+the charts on the Overview and Species pages.
 
 ## Running against a remote database
 
@@ -101,9 +108,8 @@ what the public can and cannot do.
 
 - The statistical impact layers report that more data is needed in most parks. [impact.md](impact.md)
   gives the thresholds.
-- IUCN Red List threat links are imported and stored, and the database hides those rows from the
-  public API, because IUCN's terms prohibit redistribution without written permission. See
-  [iucn.md](iucn.md).
+- Only 14 species have a peer-reviewed paper on file, and only those appear as invasive species.
+  A species GRIIS lists as invasive that no paper backs is not recorded or shown ([evidence.md](evidence.md)).
 - The animal classifier covers 13 North American species. It shows how a classifier transfers to
   unseen cameras and does not cover Indian or African fauna. See [models.md](models.md).
 - Detection runs on archived images. There is no live camera feed.

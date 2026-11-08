@@ -10,50 +10,39 @@ Run it with `python -m biodiv.workers.analyse` (all parks, or `--zone bandipur`)
 
 | Layer | Question | Needs | Status |
 |---|---|---|---|
-| 1. Documented findings | What do cited sources report about these species here? | Nothing beyond the sources | Available for the species with cited findings |
-| 2. Co-occurrence | Where invasives are denser, is native richness lower? | 20 or more grid cells with 10 or more native records each, and 5 or more of those also holding invasive records | Computed for the Everglades and Great Smoky Mountains. Insufficient in the other four parks |
-| 3. Trend | Is the invasive share rising while natives fall? | 6 or more years with 15 or more observations each, and 30 or more invasive records in the park | Computed for Mudumalai, the Everglades and Great Smoky Mountains. Insufficient in the other three parks |
+| 1. Documented findings | What do peer-reviewed papers report about these species here? | A paper for each species | Available for the 14 species that have one |
+| 2. Co-occurrence | Where invasives are denser, is native richness lower? | 20 or more grid cells with 10 or more native records each, and 5 or more of those also holding invasive records | Computed where the data reaches the minimum, and "insufficient" elsewhere |
+| 3. Trend | Is the invasive share rising while natives fall? | 6 or more years with 15 or more observations each, and 30 or more invasive records in the park | Computed where the data reaches the minimum, and "insufficient" elsewhere |
 
-Layers 2 and 3 are implemented, tested and gated by those minimums. Where they run, their results
-are shaped by recording effort and by the mix of sources, so they describe records and give limited
-information about effects of invaders. [paper.md](../paper.md) reports the results and these
-caveats. Below them, the result is
-"insufficient", with the reason and what would help, for example *"only 8 invasive records in the
-zone (need 30)"*. A statistic computed from a handful of records would suggest more certainty than
-the records support, so none is shown. The dashboard's Impact page shows each park's distance from
-each minimum as a meter.
+An invasive record is a record of a species that GRIIS lists as alien and invasive in the park's
+country **and** that a peer-reviewed paper backs ([evidence.md](evidence.md)). Layers 2 and 3 count
+only those records as invasive. Which parks reach the minimums changes as records accumulate, and
+the Impact page shows each park's status and its distance from each minimum.
+
+Layers 2 and 3 are implemented, tested and gated by those minimums. Where they run, recording effort
+and the mix of sources shape their results, so they describe records and give limited information
+about the effects of invaders. Below the minimums the result is "insufficient", with the reason and
+what would help, for example *"only 8 invasive records in the zone (need 30)"*. A statistic computed
+from a handful of records would suggest more certainty than the records support, so none is shown.
+The dashboard draws each statistic from the data behind it: a scatter plot of the map squares for
+the correlation, and a line chart of the yearly figures for the trend.
 
 ### Layer 1: documented findings
 
-`db/seeds/knowledge.json` is loaded into `impact_findings` and `mitigation_playbooks`. Every row
-carries verbatim quotes from a named source, a note on where the evidence was gathered, and a
-certainty label: `experimental`, `observational`, `review`, `preliminary` or `unverified_concern`.
+`db/seeds/knowledge.json` is loaded into `impact_findings` and `mitigation_playbooks`. [evidence.md](evidence.md)
+states the rules: only peer-reviewed journal articles from 2016 on, every claim with verbatim quotes
+from the paper's abstract, and a note on where the study took place. Each finding carries its study
+design (controlled experiment, field study, review of studies or model projection) and its paper's
+reference, linked to the DOI.
 
-- `scripts/verify_citations.py` downloads each source and checks that every quote appears on it.
-  It tolerates typography (curly quotes, dashes, case, spacing) and nothing else. The current
-  file has 41 rows backed by 83 quotes from 17 sources, and all of them verify.
-  A weekly workflow repeats the check to catch pages that change or disappear.
+- `scripts/verify_citations.py` looks up each paper in Crossref and OpenAlex and checks every quote
+  against the abstract. It tolerates typography (curly quotes, dashes, accents, case, spacing) and
+  nothing else. The current file has 40 rows backed by 75 quotes from 31 papers, and all of them
+  verify. A weekly workflow repeats the check.
 - A finding about a park is shown even when we hold no record of the species there, and the page
   marks it as reported and not recorded. A report of a species in the literature is not a sighting.
-- IUCN threat links are described in [iucn.md](iucn.md).
-
-Sources include a peer-reviewed field study (Dorcas et al. 2012, on mammal declines as Burmese
-pythons spread through Everglades National Park), USGS Nonindigenous Aquatic Species fact sheets,
-and Global Invasive Species Database profiles, which summarise published studies. Where a source
-reports work from another region, the row's region note says so. For example, the brown trout
-finding for the Great Smoky Mountains cites studies from Michigan and Pennsylvania.
-
-What the sources report about the Indian parks, none of it measured by this project:
-
-- **Bandipur.** A 2007 project page reports preliminary work finding "a striking inverse pattern"
-  between invasive plants (*Lantana*, *Eupatorium* and *Chromolaena*, *Parthenium*) and dominant large
-  mammals, and says the extent and effects of the infestation were still unquantified.
-- **Bandipur and Nagarahole.** The Karnataka forest department planted *Senna spectabilis* in the
-  early 2000s as a replacement for *Lantana*, a decision now regarded as a mistake. The same article
-  says management attempts are under way.
-- **Mudumalai.** An elephant researcher pointed to *Senna* thickets near the reserve and called
-  them an emerging problem in Tamil Nadu's reserves. The article sets this beside what it calls
-  "anecdotal evidence" of spread in other southern protected areas.
+- Where a paper reports work from another region, the row's region note says so. For example, the
+  *Lantana* finding from Kibale National Park concerns an African rainforest.
 
 ### Layer 2: co-occurrence
 
@@ -81,32 +70,28 @@ cause.
 ## Early-detection alerts
 
 An alert marks the first record of an invasive species in a park, in our sources, after enough
-observation that its earlier absence means something. It is raised only when the first record is
-less than a year old, the park had at least 50 observations before it, and no cited source already
-reports the species there. Each alert carries the caveat that a first record in our sources may
-predate the species' arrival in our data by an unknown time. Severity is high when the literature
-documents harm by the species anywhere, and medium otherwise. An alert is a prompt to look.
+observation that its earlier absence means something. It is raised only for a species a paper backs,
+only when the first record is less than a year old, the park had at least 50 observations before it,
+and no finding already reports the species in that park. Each alert carries the caveat that a first
+record in our sources may come long after the species arrived. Severity is high when a paper
+reports harm by the species anywhere, and medium otherwise. An alert is a prompt to look.
 
 ## Management knowledge
 
-`mitigation_playbooks` holds 19 management options for 9 species, each with its quotes,
-the region the evidence comes from, and an evidence-strength label.
+`mitigation_playbooks` holds 19 rows, each restating what one paper reports about a method, with
+the setting of the study and its design. No row rates a method: no paper states how well a method
+works in general, so the platform does not either.
 
-- One result is strong evidence: a four-year randomised field experiment on *Prosopis* in the Banni
-  grassland of Gujarat (Nerlekar et al. 2021). Mechanical removal tripled native herb richness and
-  multiplied cover sixfold, lopping had no effect, removal was costly, and the site is an arid
-  grassland and not a forest.
-- For *Senna spectabilis* no documented method works reliably, and experts disagree. The Kerala forest
-  department's girdling of 19,500 trees was reported as counterproductive. A practitioner reports that
-  uprooting worked on 0.6 sq km. The researcher who mapped the spread warns that uprooting at scale
-  could cause erosion on steep, high-rainfall ground. The dashboard shows all three accounts.
-- *Lantana* biocontrol: "none of the over 40 agents trialled have resulted in total control."
-- For melaleuca, climbing fern and Burmese pythons in the Everglades, the sources describe
-  combinations of herbicide, removal, fire and biological control with their limits. Herbicide
-  killed back climbing fern in a Florida trial, and thousands of new plants germinated afterwards
-  from a mass spore release.
-- Several species recorded in the parks have no cited management guidance yet. A row exists only
-  when a verbatim quote supports it.
+- Methods covered are biological control (5 rows), mechanical removal (4), chemical control (4),
+  combined methods (3), detection (2) and use and community-based management (1).
+- The rows include null and negative results. Rabbit scent lures did not raise Burmese python
+  detections in the Everglades, and short-term cutting and uprooting of *Lantana* in a Ugandan
+  rainforest did not promote tree establishment.
+- A four-year randomised field experiment in the Banni grassland of Gujarat (Nerlekar et al. 2021)
+  found that mechanical removal of *Prosopis juliflora* tripled native herb richness and raised
+  cover sixfold, that lopping did not differ from the control, and that removal is costly. The site
+  is an arid grassland.
+- A species with no management paper has no management row, and the Species page leaves the
+  section out.
 
-The rows summarise what published sources report, with their caveats. A method that worked in one
-habitat or country may not work in another.
+A method that worked in one habitat or country may not work in another.

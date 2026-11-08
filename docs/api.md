@@ -20,13 +20,14 @@ precomputed results such as `zone_reports` and does not ask a server to compute.
 | Read | Endpoint |
 |---|---|
 | Parks with headline counts, as GeoJSON for the map | `GET /rpc/zones_geojson` |
-| Invasive records grouped into map squares, with species per square (`p_zone`, `p_cell` in degrees from 0.005 to 0.5, optional `p_species`) | `GET /rpc/hotspot_cells?p_zone=everglades&p_cell=0.02` |
-| Individual sightings as GeoJSON points (`p_zone`, `p_kind` = `invasive` or `all`, `p_limit` up to 5000) | `GET /rpc/records_geojson?p_zone=bandipur` |
+| Invasive records grouped into square map cells, with species, years and sources per cell (`p_zone`, `p_km` from 0.5 to 50, optional `p_species`, `p_sources` as comma-separated source names, `p_year_from`, `p_year_to`, `p_kingdom`) | `GET /rpc/hotspot_grid?p_zone=everglades&p_km=2` |
+| Invasive records per year, for one park or all (`p_zone`, `p_species` optional) | `GET /rpc/invasive_by_year?p_zone=smokies` |
+| One species' records by park, year and source | `GET /rpc/species_profile?p_species=Python%20bivittatus` |
 | How full the free database is | `GET /rpc/storage_status` |
 | Per-park three-layer report | `GET /zone_reports?select=report,computed_at&zone_id=eq.1` |
 | Alerts with park and species | `GET /alerts?select=*,zones(slug),species(scientific_name)` |
-| Cited findings | `GET /impact_findings?select=*,species(scientific_name)` |
-| Management options and their quotes | `GET /mitigation_playbooks?select=*,species(scientific_name)` |
+| Findings, each with its paper (`citation_doi`, `citation_year`, `citation_journal`) | `GET /impact_findings?select=*,species(scientific_name)` |
+| Management rows, each with its study design and paper | `GET /mitigation_playbooks?select=*,species(scientific_name)` |
 | Species with their photo, credit and licence | `GET /species?select=scientific_name,photo_url,photo_credit,photo_license,photo_source_url` |
 | Data sources, licences and why records were refused | `GET /source_health` |
 | Model versions and measured accuracy | `GET /model_versions` |
@@ -41,7 +42,9 @@ in CI against a real PostgREST and can be pointed at the live project).
 The public role can:
 
 - read the tables and views the dashboard uses;
-- call `zones_geojson`, `records_geojson`, `hotspot_cells` and `storage_status`.
+- call `zones_geojson`, `hotspot_grid`, `invasive_by_year`, `species_profile` and `storage_status`;
+- read a species, or its invasive status, only when a verified paper backs it (`species`,
+  `invasive_status` and the `researched_species` view show nothing else).
 
 The public role cannot:
 
@@ -50,7 +53,9 @@ The public role cannot:
 - read partitions directly or the migration bookkeeping table;
 - call PostGIS functions or read PostGIS reference tables beyond the single WGS84 row that
   geometry serialisation needs;
-- read rows whose `evidence_source` is `iucn` in `threat_links` (see [iucn.md](iucn.md)).
+- read the rollup views `invasion_index_monthly` and `native_trend_monthly`, which counted
+  records of every species and which nothing on the dashboard reads;
+- read a finding or a management row whose quotes have not been verified against its paper.
 
 Three properties of hosted Postgres shaped these rules:
 
