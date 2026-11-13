@@ -9,7 +9,8 @@ they have been managed. It is built for researchers, conservation groups and par
 journal article published in 2016 or later, with verbatim quotes from its abstract, checked against
 Crossref and OpenAlex. A species appears only when such a paper backs it, and a species without one
 is neither recorded nor shown. [docs/evidence.md](docs/evidence.md) states the rules and where each is
-enforced.
+enforced. The paper holds itself to them: its references are verified articles, and its citations and
+numbers are checked before it is written.
 
 Project by K N Thushaar Rangan, Yashas S, Amogh P A and G Ritzia.
 
@@ -58,9 +59,12 @@ Sources of records and status:
 - **Impact.** Three questions in order of certainty: what papers report, whether native richness is
   lower where invaders are dense, and whether the invasive share is changing. The two statistical
   questions answer only when the data meets stated minimums, and the page shows how far each park
-  is from them. Where they answer, a scatter plot and a line chart show the data behind them.
+  is from them. Where they answer, charts show the data behind them: the squares grouped by invasive
+  share with their medians, and the invasive share by year beside the observations each year rests on.
 - **Alerts, Models, Sources.** First records of invasive species, measured accuracy of each model,
-  and where the data came from with its licence and why records were refused.
+  and where the data came from with its licence and why records were refused. The Models page shows
+  what happens to 100 test photos (named correctly, named wrongly, left as "unknown"), how far each
+  rate can be trusted, and accuracy against guessing.
 
 ## Hosting and cost
 

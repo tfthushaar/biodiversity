@@ -24,8 +24,15 @@ and the mix of sources shape their results, so they describe records and give li
 about the effects of invaders. Below the minimums the result is "insufficient", with the reason and
 what would help, for example *"only 8 invasive records in the zone (need 30)"*. A statistic computed
 from a handful of records would suggest more certainty than the records support, so none is shown.
-The dashboard draws each statistic from the data behind it: a scatter plot of the map squares for
-the correlation, and a line chart of the yearly figures for the trend.
+The dashboard draws each statistic from the data behind it. For the correlation it shows the
+estimate with its interval on a scale from -1 to +1, then every map square as a dot, grouped by the
+share of its records that are invasive (none, then up to three groups of similar size), with the
+middle of each group marked and each group's size stated. For the trend it shows the invasive share
+for each year as a dot whose area is the observations that year rests on, with the Theil-Sen line, and
+beneath it a column chart of the observations in each year. That second chart shows what the trend
+rests on: a sudden change in effort can produce a trend in the share. The native share is not drawn,
+because it moves against the invasive share (both are shares of the same records), and both tests
+are in the table.
 
 ### Layer 1: documented findings
 
@@ -37,8 +44,9 @@ reference, linked to the DOI.
 
 - `scripts/verify_citations.py` looks up each paper in Crossref and OpenAlex and checks every quote
   against the abstract. It tolerates typography (curly quotes, dashes, accents, case, spacing) and
-  nothing else. The current file has 40 rows backed by 75 quotes from 31 papers, and all of them
-  verify. A weekly workflow repeats the check.
+  nothing else. The current file has 40 rows backed by 84 quotes from 31 papers, and all of them
+  verify. Each number a summary states is also in a quote, and in the abstract. A weekly workflow
+  repeats the check, and covers the paper's own references too ([evidence.md](evidence.md)).
 - A finding about a park is shown even when we hold no record of the species there, and the page
   marks it as reported and not recorded. A report of a species in the literature is not a sighting.
 - Where a paper reports work from another region, the row's region note says so. For example, the

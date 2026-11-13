@@ -16,9 +16,9 @@ Park managers need to know where invasive species concentrate and what they do t
 
 Biological invasions are among the main pressures on biodiversity, and the number of alien species keeps rising with no sign of saturation (Seebens et al. 2017). In protected areas the practical questions are local. Managers want to know which invasive species are present, where they concentrate, what they do to the native species around them, and what has been tried against them elsewhere.
 
-Open data now answers part of each question. Community platforms such as iNaturalist and the Global Biodiversity Information Facility (GBIF) hold millions of georeferenced records. The Global Register of Introduced and Invasive Species (GRIIS) lists which species are alien and invasive in each country (Pagad et al. 2018). Curated databases such as the U.S. Geological Survey's Nonindigenous Aquatic Species (NAS) database record non-native species with their source, positional accuracy and establishment status. These sources are separate, they differ in quality, and community records favour accessible places and conspicuous species (Isaac et al. 2014). Evidence about effects sits in journals that a park manager is unlikely to search record by record.
+Open data now answers part of each question. Community platforms such as iNaturalist and the Global Biodiversity Information Facility (GBIF) hold millions of georeferenced records. The Global Register of Introduced and Invasive Species (GRIIS) lists which species are alien and invasive in each country (Pagad et al. 2018). Curated databases such as the U.S. Geological Survey's Nonindigenous Aquatic Species (NAS) database record non-native species with their source, positional accuracy and establishment status. These sources are separate, they differ in quality, and opportunistic records are relatively unstructured, with recorder activity that varies (Isaac et al. 2014). Evidence about effects sits in journals that a park manager is unlikely to search record by record.
 
-Deep learning has also changed how images are processed. Detectors such as MegaDetector separate animals, people and vehicles from empty camera-trap frames (Beery et al. 2019), classifiers identify species in the frames that remain (Norouzzadeh et al. 2018; Tabak et al. 2019), and self-supervised vision models make accurate small classifiers possible without a large training budget (Oquab et al. 2024).
+Deep learning has also changed how images are processed. Detectors such as MegaDetector have been tested at finding humans and animals in camera-trap images against manual classification (Fennell et al. 2022), deep learning is used to detect objects such as animals, humans and vehicles and to classify species (Vélez et al. 2022), and classifiers identify species in camera-trap images (Norouzzadeh et al. 2018; Tabak et al. 2019). We test whether a frozen self-supervised vision backbone, DINOv2, can serve as the base for small classifiers of invasive plants and camera-trap animals.
 
 We joined these ingredients for six national parks in India, Tanzania and the United States, and ask four questions of the data:
 
@@ -73,7 +73,7 @@ Findings on the effects of invasive species and on management options come from 
 
 The detector is the MIT-licensed variant of MegaDetector V6 (YOLOv9-c), run on an ordinary CPU. We checked our conversion of the model against the reference implementation on 60 photos and evaluated the detector on 1,000 Caltech Camera Traps photos (720 with animals, 30 with vehicles, 250 verified empty) against human-drawn boxes.
 
-The classifiers share one frozen DINOv2 ViT-S/14 backbone (Oquab et al. 2024). Each photo is embedded once, and a logistic-regression head is trained on the 768-number embedding. We chose the regularisation strength by validation log-loss and calibrated probabilities by temperature scaling (Guo et al. 2017). Below a threshold the classifier answers "unknown". Each threshold was fixed on validation data before the test set was scored: for the plant classifier, the lowest value at which each kind of non-target plant was called invasive no more than 5% of the time, and for the animal classifier the lowest value at which answers were at least 95% correct. The plant classifier has 15 classes: ten invasives, four native look-alikes drawn from iNaturalist's identification confusions and recorded as native to India, and a class of random other plants. It was trained on 1,407 and tested on 469 CC-licensed photos, with the split made by observer so that no photographer appears on both sides. The animal classifier has 13 North American classes cut from Caltech Camera Traps boxes (1,732 training and 565 test crops), split by camera location. We report 95% Wilson score intervals (Wilson 1927).
+The classifiers share one frozen DINOv2 ViT-S/14 backbone. Each photo is embedded once, and a logistic-regression head is trained on the 768-number embedding. We chose the regularisation strength by validation log-loss and calibrated probabilities by temperature scaling, which divides the scores by one number fitted on validation data. Below a threshold the classifier answers "unknown". Each threshold was fixed on validation data before the test set was scored: for the plant classifier, the lowest value at which each kind of non-target plant was called invasive no more than 5% of the time, and for the animal classifier the lowest value at which answers were at least 95% correct. The plant classifier has 15 classes: ten invasives, four native look-alikes drawn from iNaturalist's identification confusions and recorded as native to India, and a class of random other plants. It was trained on 1,407 and tested on 469 CC-licensed photos, with the split made by observer so that no photographer appears on both sides. The animal classifier has 13 North American classes cut from Caltech Camera Traps boxes (1,732 training and 565 test crops), split by camera location. We report 95% Wilson score intervals (Wilson 1927).
 
 ### 2.9 Data handling
 
@@ -108,7 +108,7 @@ Invasive records are a small share of all records in every park except the Everg
 <!-- table:invasive -->
 <!-- /table -->
 
-The most recorded invasive species differ sharply between parks (Table 4). In the Everglades, *{{EVER_TOP_SPECIES}}* ({{EVER_TOP_COMMON}}) makes up {{EVER_TOP_PCT}}% of the invasive records. In the three Indian parks no species has more than {{IN_SPECIES_MAX}} records. *Lantana camara* and *Senna spectabilis* are both described as invaders of Indian forests (Negi et al. 2019; Bargavi et al. 2025), and across the three parks the study holds {{LANTANA_PHRASE}} of the first and {{SENNA_PHRASE}} of the second.
+The most recorded invasive species differ sharply between parks (Table 4). In the Everglades, *{{EVER_TOP_SPECIES}}* ({{EVER_TOP_COMMON}}) makes up {{EVER_TOP_PCT}}% of the invasive records. In the three Indian parks no species has more than {{IN_SPECIES_MAX}} records. *Lantana camara* and *Senna spectabilis* are both described as invaders of Indian forests (Negi et al. 2019; Bargavi et al. 2025). Across the three parks the study holds {{LANTANA_PHRASE}} of the first and {{SENNA_PHRASE}} of the second.
 
 **Table 4.** The five most recorded invasive species in each park.
 
@@ -164,11 +164,11 @@ The papers describe a range of effects and of results. In the Everglades, mammal
 
 ## 4. Discussion
 
-**The source shapes the picture.** The Everglades share of invasive records is {{EVER_SHARE}}%, and USGS supplies {{EVER_USGS_PCT}}% of those records. The USGS database records non-native aquatic species and the reptiles and amphibians in its scope. Of the 8,294 Burmese python records it holds for the three Everglades counties (queried 8 October 2026), 7,531 are classed as derived from literature and 760 as museum specimens, so one report can contribute many records. A park's invasive share is therefore comparable with another park's only when both are drawn from the same kind of source. The share also counts only the {{INV_SPECIES_TOTAL}} species that the evidence base covers, so it is lower than the share of records of every species GRIIS lists as invasive. Among the other five parks the invasive share ranged from {{SHARE_LOW}}% in {{SHARE_LOW_PARK}} to {{SHARE_HIGH}}% in {{SHARE_HIGH_PARK}}.
+**The source shapes the picture.** The Everglades share of invasive records is {{EVER_SHARE}}%, and USGS supplies {{EVER_USGS_PCT}}% of those records. The USGS database records non-native aquatic species and the reptiles and amphibians in its scope. Of the {{PY_TOTAL}} Burmese python records it holds for the three Everglades counties (queried {{PY_DATE}}), {{PY_LITERATURE}} are classed as derived from literature and {{PY_SPECIMEN}} as specimens, so one report can contribute many records. A park's invasive share is therefore comparable with another park's only when both are drawn from the same kind of source. The share also counts only the {{INV_SPECIES_TOTAL}} species that the evidence base covers, so it is lower than the share of records of every species GRIIS lists as invasive. Among the other five parks the invasive share ranged from {{SHARE_LOW}}% in {{SHARE_LOW_PARK}} to {{SHARE_HIGH}}% in {{SHARE_HIGH_PARK}}.
 
 **Three parks lack recent iNaturalist records.** We read iNaturalist oldest first and stored at most {{INAT_CAP}} records per park. The Everglades, Great Smoky Mountains and Serengeti reached that limit, so their iNaturalist records end in {{EVER_INAT_LAST}}, {{SMK_INAT_LAST}} and {{SER_INAT_LAST}}. For these parks the maps and counts describe the earlier years better than the recent ones, and a recent record is measured against a smaller and different set of records than an earlier one. The three Indian parks are below the limit, and their iNaturalist records run to at least {{IN_INAT_LAST}}.
 
-**Conspicuous weeds are under-recorded.** *Lantana camara* is described as having invaded vast tracts of Indian forest and pasture (Negi et al. 2019), and *Senna spectabilis* as a widespread invader in India (Bargavi et al. 2025). The three Indian parks hold {{LANTANA_PHRASE}} of the first and {{SENNA_PHRASE}} of the second. People photograph flowers and animals more than common weeds, a known property of community data (Isaac et al. 2014). Counts from these sources describe where species were recorded, and they say little about how much ground a species covers. Any use of the hotspot maps for planning should take recording effort into account. In the Everglades, effort is itself uneven. At 2 km the shaded squares form lines across the park (Figure 1), which is consistent with recording that follows roads, trails and survey routes. We did not test this.
+**Conspicuous weeds are under-recorded.** *Lantana camara* is described as having invaded vast tracts of Indian forest and pasture (Negi et al. 2019), and *Senna spectabilis* as a widespread invader in India (Bargavi et al. 2025). The three Indian parks hold {{LANTANA_PHRASE}} of the first and {{SENNA_PHRASE}} of the second. Observers may photograph flowers and animals more often than common weeds, and community records vary with recorder activity (Isaac et al. 2014). We did not test whether this explains the few records of these weeds. Counts from these sources describe where species were recorded, and they say little about how much ground a species covers. Any use of the hotspot maps for planning should take recording effort into account. In the Everglades, effort is itself uneven. At 2 km the shaded squares form lines across the park (Figure 1), which is consistent with recording that follows roads, trails and survey routes. We did not test this.
 
 **The statistical results reflect where people go and which sources dominate.** The positive correlation in Great Smoky Mountains runs against what studies of invader effects would lead one to expect, for example lower richness in invaded forest (Lone et al. 2025). It rests on {{SMK_INV}} invasive records in {{SMK_CELLS_WITH}} squares. Native richness at a fixed sample size is highest in well-visited, varied squares, so both measures plausibly rise with access, disturbance and habitat variety. The correlation cannot separate those influences from an effect of invaders, and we did not test them. We read it as a warning that raw co-occurrence in community data can point either way, and as no evidence that invaders raise or lower native richness.
 
@@ -192,47 +192,7 @@ We thank the iNaturalist community, GBIF and its publishers, the GRIIS contribut
 
 ## References
 
-Beery, S., Morris, D. and Yang, S. (2019) Efficient pipeline for camera trap image review. arXiv:1907.06772.
-
-Beery, S., Van Horn, G. and Perona, P. (2018) Recognition in Terra Incognita. In: Proceedings of the European Conference on Computer Vision (ECCV). arXiv:1807.04975.
-
-Efron, B. (1979) Bootstrap methods: another look at the jackknife. The Annals of Statistics 7(1): 1-26. doi:10.1214/aos/1176344552
-
-GBIF.org (2026) GBIF Occurrence Data. https://www.gbif.org
-
-Guo, C., Pleiss, G., Sun, Y. and Weinberger, K.Q. (2017) On calibration of modern neural networks. In: Proceedings of the 34th International Conference on Machine Learning. arXiv:1706.04599.
-
-Hurlbert, S.H. (1971) The nonconcept of species diversity: a critique and alternative parameters. Ecology 52(4): 577-586. doi:10.2307/1934145
-
-iNaturalist contributors (2026) iNaturalist research-grade observations. https://www.inaturalist.org
-
-Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014) Statistics for citizen science: extracting signals of change from noisy ecological data. Methods in Ecology and Evolution 5(10): 1052-1060. doi:10.1111/2041-210X.12254
-
-LILA BC (2026) Labeled Information Library of Alexandria: Biology and Conservation. https://lila.science
-
-Mann, H.B. (1945) Nonparametric tests against trend. Econometrica 13(3): 245-259. doi:10.2307/1907187
-
-Miao, Z., Hernandez, A., Vargas, L.F., Chacon, I.D., Ruiz, D. et al. (2025) Pytorch-Wildlife model weights (MegaDetector V6). Zenodo. doi:10.5281/zenodo.15398270
-
-Norouzzadeh, M.S., Nguyen, A., Kosmala, M., Swanson, A., Palmer, M.S., Packer, C. et al. (2018) Automatically identifying, counting, and describing wild animals in camera-trap images with deep learning. Proceedings of the National Academy of Sciences 115(25): E5716-E5725. doi:10.1073/pnas.1719367115
-
-OpenStreetMap contributors (2026) OpenStreetMap, licensed under the Open Database Licence. https://www.openstreetmap.org
-
-Oquab, M., Darcet, T., Moutakanni, T., Vo, H., Szafraniec, M. et al. (2024) DINOv2: learning robust visual features without supervision. Transactions on Machine Learning Research. arXiv:2304.07193.
-
-Pagad, S., Genovesi, P., Carnevali, L., Schigel, D. and McGeoch, M.A. (2018) Introducing the Global Register of Introduced and Invasive Species. Scientific Data 5: 170202. doi:10.1038/sdata.2017.202
-
-Seebens, H., Blackburn, T.M., Dyer, E.E., Genovesi, P., Hulme, P.E., Jeschke, J.M. et al. (2017) No saturation in the accumulation of alien species worldwide. Nature Communications 8: 14435. doi:10.1038/ncomms14435
-
-Sen, P.K. (1968) Estimates of the regression coefficient based on Kendall's tau. Journal of the American Statistical Association 63(324): 1379-1389. doi:10.1080/01621459.1968.10480934
-
-Tabak, M.A., Norouzzadeh, M.S., Wolfson, D.W., Sweeney, S.J., Vercauteren, K.C., Snow, N.P. et al. (2019) Machine learning to classify animal species in camera trap images: applications in ecology. Methods in Ecology and Evolution 10(4): 585-590. doi:10.1111/2041-210X.13120
-
-U.S. Geological Survey (2026) Nonindigenous Aquatic Species Database. Gainesville, Florida. https://nas.er.usgs.gov
-
-Virtanen, P., Gommers, R., Oliphant, T.E., Haberland, M., Reddy, T., Cournapeau, D. et al. (2020) SciPy 1.0: fundamental algorithms for scientific computing in Python. Nature Methods 17(3): 261-272. doi:10.1038/s41592-019-0686-2
-
-Wilson, E.B. (1927) Probable inference, the law of succession, and statistical inference. Journal of the American Statistical Association 22(158): 209-212. doi:10.1080/01621459.1927.10502953
+{{REFERENCES}}
 
 ### Papers in the evidence base
 

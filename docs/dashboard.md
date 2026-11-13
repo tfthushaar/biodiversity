@@ -13,7 +13,7 @@ public REST API and draws the results, which lets it run on a free static host t
 | Species | One invasive species: where and when it was recorded, what papers report, and what management has been tried | `species_profile()`, `zone_reports`, `impact_findings`, `mitigation_playbooks` |
 | Impact | What papers report, and whether the data supports a co-occurrence or trend statistic | `zone_reports`, computed by the analyse worker |
 | Alerts | An invasive species recorded in a park for the first time | `alerts` |
-| Models | Measured accuracy of each model, with its limits | `model_versions` |
+| Models | What each model does with 100 photos, how far each measured rate can be trusted, accuracy against guessing, and the limits | `model_versions` |
 | Sources | Where the data came from, its licence, why records were refused, and the limits of the data | `source_health` |
 
 A species appears on any page only when a peer-reviewed paper backs it ([evidence.md](evidence.md)).
@@ -60,12 +60,28 @@ picks one. The map's base tiles are greyscale in both themes.
 
 Charts follow a few rules:
 
+- a chart is laid out at the width it is shown, so its text is 12 px at every screen size and the
+  labels along an axis are spaced by the room there is;
+- the axis always reaches the highest value, so no bar or dot sits above it;
 - one y-axis per chart;
 - a legend for two or more series, with direct labels added only when they fit without colliding;
 - a zero draws no bar;
 - every chart has a "View as table" twin with the same values, and tooltips repeat information
   that is also in the table;
 - keyboard users reach the same tooltips: Tab to a chart, then use the arrow keys, Home and End.
+
+The kinds of chart are chosen for what the data is:
+
+| Data | Chart |
+|---|---|
+| A count over years | Columns, with long records grouped into 5 or 10 years |
+| A magnitude by category | Horizontal bars |
+| A value over time where years rest on different amounts of data | Dots whose area is the data behind each year, with a trend line |
+| Many squares, some at the same value | Dots in columns by class, with each class's median and size |
+| One estimate with its range | A dot on a fixed scale with its interval, and what each end means |
+| What happens to a whole (photos named correctly, wrongly, left as "unknown") | A stacked bar. Each part differs by fill (solid, hatched, pale) and is also written out |
+| Several rates with their uncertainty | Each rate on a 0 to 100% scale with its interval, marked higher or lower is better |
+| The effect of a setting | Lines, with the setting in use marked |
 
 On a refetch the previous result stays on screen, slightly dimmed. A failed request says what
 failed and offers a retry.
@@ -120,7 +136,8 @@ the database render only when they are http(s), so a stored `javascript:` addres
 counts and map read from views that hold only those species, and the browser applies no second
 filter that could drift from the database.
 
-**Only what a visitor uses is on the page.** The Overview holds three numbers and three charts.
+**Only what a visitor uses is on the page.** The Overview holds three numbers and three charts, with
+the year chart across the full width.
 Operator details such as how full the database is stay out of the interface, and a control appears
 only when it changes what the page shows.
 
@@ -133,10 +150,12 @@ exists.
 
 ## Tests
 
-`npm test` runs the formatting, scale, binning and grid helpers, the shared components (meter
-wording, zero bars, legends, axis labels, column and scatter charts, keyboard tooltips, table twins,
-link safety, paper citations), and the pages against a mocked REST API. The page tests cover
+`npm test` runs the formatting, scale, binning, label-spacing, grouping and grid helpers, the shared
+components (meter wording, zero bars, legends, axis labels, column charts, yearly dots with a trend,
+grouped dots, interval plots, share bars, rate ranges, keyboard tooltips, table twins, link safety,
+paper citations), and the pages against a mocked REST API. The page tests cover
 insufficient-data states, empty and failed loads, the Hotspots page (default park, region-following
 panel, filters sent to the database, exact species counts, unsafe image addresses), the Species page
-(only species with a paper are listed), the Overview, the Sources page and the photo demo's
-disabled, rate-limited and asleep-service states. CI runs them on every push.
+(only species with a paper are listed), the Impact page's charts, the Models page (the outcome bars
+are worked out from how many photos a model names and how often it is right), the Overview, the
+Sources page and the photo demo's disabled, rate-limited and asleep-service states. CI runs them on every push.

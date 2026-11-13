@@ -66,7 +66,10 @@ Six national parks, with boundaries from OpenStreetMap (`scripts/build_zone_seed
 5. **Knowledge** (cited findings and management options) loads from `db/seeds/knowledge.json`.
    Every claim comes from a peer-reviewed journal article and carries verbatim quotes from its
    abstract. `scripts/verify_citations.py` re-checks each paper in Crossref and OpenAlex and each
-   quote against the abstract ([evidence.md](evidence.md)).
+   quote against the abstract, and does the same for the paper's own references in
+   `db/seeds/paper_references.json` ([evidence.md](evidence.md)). `src/biodiv/knowledge/` holds the
+   rules: `verify.py` for the evidence base, `references.py` for the references and
+   `paper_text.py` for the paper's citations and numbers.
 6. **Photos** (`enrich_species`) attach one licensed photo to each recorded invasive species, with
    the owner's credit and a link back to the photo page.
 
