@@ -83,8 +83,8 @@ export function TryIt() {
         <label>
           Analyse
           <select value={task} onChange={(e) => setTask(e.target.value as Task)}>
-            <option value="plants">a plant (invasive or look-alike?)</option>
-            <option value="animals">a camera-trap photo (what animals?)</option>
+            <option value="plants">Plant photo</option>
+            <option value="animals">Camera-trap photo</option>
           </select>
         </label>
         <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" aria-label="Choose a photo" />

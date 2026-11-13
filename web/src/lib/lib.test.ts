@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fmtAgo, fmtCompact, fmtDate, fmtInt, fmtPct, fmtYear, humanise, pluralise } from "./format";
-import { binYears, clamp, linear, nearestIndex, niceTicks } from "./scale";
+import { groupSquares, labelIndices, labelIndicesAt, median, shareLabel, theilSenIntercept } from "./layout";
+import { binYears, clamp, coverTicks, linear, nearestIndex, niceTicks, yearTicks } from "./scale";
 
 describe("number formatting", () => {
   it("groups thousands and rounds", () => {
@@ -108,5 +109,121 @@ describe("binYears", () => {
   });
   it("has nothing to draw for no data", () => {
     expect(binYears([])).toEqual([]);
+  });
+});
+
+describe("labelIndices", () => {
+  it("always labels the first and last position when there is room for both", () => {
+    for (const count of [9, 77, 100]) {
+      const got = labelIndices(count, 500 / (count - 1), 28);
+      expect(got.has(0)).toBe(true);
+      expect(got.has(count - 1)).toBe(true);
+    }
+  });
+
+  it("keeps the first label, and skips the last, when no two labels can fit", () => {
+    expect([...labelIndices(2, 5, 28)]).toEqual([0]);
+  });
+
+  it("keeps labels at least a label's width and a gap apart", () => {
+    const slot = 6;
+    const got = [...labelIndices(100, slot, 28)].sort((a, b) => a - b);
+    for (let i = 1; i < got.length; i++) expect(((got[i] as number) - (got[i - 1] as number)) * slot).toBeGreaterThanOrEqual(28 + 28);
+  });
+
+  it("spaces labels by where they sit, so uneven steps do not make two touch", () => {
+    // The fifth position is 20px from the fourth, so the two cannot both be labelled.
+    const at = [0, 120, 260, 340, 360, 440];
+    const got = [...labelIndicesAt(at, 28)].sort((a, b) => a - b);
+    expect(got).toEqual([0, 1, 2, 3, 5]);
+    for (let i = 1; i < got.length; i++) expect((at[got[i] as number] as number) - (at[got[i - 1] as number] as number)).toBeGreaterThanOrEqual(56);
+  });
+
+  it("labels every position when there is room", () => {
+    expect(labelIndices(5, 200, 28).size).toBe(5);
+  });
+
+  it("drops the neighbour of the last label when the two would touch", () => {
+    const got = [...labelIndices(10, 10, 28)];
+    expect(got).toContain(9);
+    expect(got).not.toContain(8);
+  });
+});
+
+describe("median and theilSenIntercept", () => {
+  it("takes the middle value, or the mean of the two in the middle", () => {
+    expect(median([3, 1, 2])).toBe(2);
+    expect(median([4, 1, 3, 2])).toBe(2.5);
+    expect(median([])).toBeNaN();
+  });
+
+  it("finds the intercept that goes with a slope", () => {
+    const xs = [2000, 2001, 2002, 2003];
+    expect(theilSenIntercept(xs, xs.map((x) => 0.5 * x + 3), 0.5)).toBeCloseTo(3, 9);
+  });
+});
+
+describe("shareLabel", () => {
+  it("writes a share the way a person would", () => {
+    expect([0, 0.004, 0.034, 0.58].map(shareLabel)).toEqual(["0%", "0.4%", "3%", "58%"]);
+  });
+});
+
+describe("groupSquares", () => {
+  const sq = (share: number, richness = 9, invasive = share > 0 ? 3 : 0): [number, number, number] => [share, richness, invasive];
+
+  it("puts squares with no invasive records first, in a group of their own", () => {
+    const got = groupSquares([sq(0), sq(0), sq(0.1), sq(0.2)]);
+    expect(got[0]).toMatchObject({ key: "none", label: "None" });
+    expect(got[0]?.richness).toHaveLength(2);
+  });
+
+  it("makes one group of the rest when there are too few to split", () => {
+    const got = groupSquares([sq(0), sq(0.1), sq(0.2), sq(0.3)]);
+    expect(got.map((g) => g.label)).toEqual(["None", "Some"]);
+  });
+
+  it("splits many squares into groups of similar size, labelled by the shares in them", () => {
+    const shares = Array.from({ length: 12 }, (_, i) => (i + 1) / 100);
+    const got = groupSquares(shares.map((s) => sq(s)));
+    expect(got).toHaveLength(3);
+    expect(got.map((g) => g.richness.length)).toEqual([4, 4, 4]);
+    expect(got[0]?.label).toBe("1% to 4%");
+    expect(got[2]?.label).toBe("9% to 12%");
+  });
+
+  it("never splits squares that share the same value across two groups", () => {
+    const shares = [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2];
+    const got = groupSquares(shares.map((s) => sq(s)));
+    expect(got.flatMap((g) => g.richness)).toHaveLength(12);
+    for (const g of got) expect(new Set(g.invasive).size).toBeLessThanOrEqual(1);
+    expect(got.map((g) => g.label)).not.toContain("5% to 20%");
+  });
+
+  it("returns nothing for no squares, and keeps every square otherwise", () => {
+    expect(groupSquares([])).toEqual([]);
+    const pts = [sq(0), sq(0.01), sq(0.02), sq(0.5), sq(0.6), sq(0.7), sq(0.8)];
+    expect(groupSquares(pts).flatMap((g) => g.richness)).toHaveLength(pts.length);
+  });
+});
+
+describe("axes that cover the data", () => {
+  it("coverTicks reaches the tallest value, which niceTicks can stop short of", () => {
+    expect(niceTicks(0, 6500, 4).at(-1)).toBeLessThan(6500);
+    for (const max of [6500, 0.73, 1, 40, 2429, 0.004]) {
+      const ticks = coverTicks(max, 4);
+      expect(ticks[0]).toBe(0);
+      expect(ticks.at(-1)).toBeGreaterThanOrEqual(max);
+    }
+  });
+
+  it("coverTicks stays usable with nothing to draw", () => {
+    expect(coverTicks(0)).toEqual([0, 1]);
+  });
+
+  it("yearTicks sit on round years and never on a fraction of a year", () => {
+    expect(yearTicks(1925, 2026, 6)).toEqual([1940, 1960, 1980, 2000, 2020]);
+    expect(yearTicks(2018, 2021, 6)).toEqual([2018, 2019, 2020, 2021]);
+    for (const t of yearTicks(1881, 2026, 4)) expect(Number.isInteger(t)).toBe(true);
   });
 });

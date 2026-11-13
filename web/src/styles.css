@@ -707,7 +707,7 @@ blockquote {
 .chart {
   display: block;
   width: 100%;
-  max-width: 960px;
+  max-width: 100%;
   height: auto;
   overflow: visible;
 }
@@ -966,9 +966,7 @@ blockquote {
 }
 .species-row .names strong,
 .species-row .names em {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 .species-row .names .bar-track {
   display: block;
@@ -1108,7 +1106,7 @@ blockquote {
 
 .toolbar {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
   gap: 12px 16px;
   align-items: end;
   margin: 0 0 14px;
@@ -1187,6 +1185,29 @@ blockquote {
   stroke: var(--surface);
   stroke-width: 1.5;
 }
+.chart .dot-point.on {
+  fill-opacity: 0.95;
+  stroke: var(--ink);
+}
+.chart .trend-line {
+  stroke: var(--ink);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+}
+.chart .median-line {
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.chart .interval {
+  stroke: var(--series-1);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+.chart text.group-label {
+  fill: var(--ink-2);
+  font-weight: 500;
+}
 
 /* --------------------------------------------------------------- grids that fill the width */
 
@@ -1196,6 +1217,9 @@ blockquote {
 .grid.charts {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
   margin-top: 16px;
+}
+.grid.charts .wide {
+  grid-column: 1 / -1;
 }
 .grid.charts h2 {
   margin: 0 0 12px;
@@ -1288,9 +1312,8 @@ blockquote {
   box-shadow: inset 3px 0 0 var(--ink);
 }
 .species-index .primary {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: grid;
+  overflow-wrap: anywhere;
 }
 .dossier {
   min-width: 0;
@@ -1358,4 +1381,152 @@ blockquote {
     width: 48px;
     height: 48px;
   }
+}
+
+/* ---------------------------------------------------------------- model results */
+
+.chart .marker-line,
+.legend-key .marker-line {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 4;
+}
+.stack {
+  display: grid;
+  gap: 16px;
+}
+.stack .grid.stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+}
+.grid.figs {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  align-items: start;
+}
+.grid.figs .wide {
+  grid-column: 1 / -1;
+}
+.grid.figs > .card {
+  margin-top: 0;
+  min-width: 0;
+}
+.grid.figs .bar-row {
+  grid-template-columns: 1fr;
+  gap: 2px;
+  padding: 6px 0;
+}
+.figure h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+.seg-text {
+  padding: 1px 3px;
+  border-radius: 4px;
+}
+.tone-bad .seg-text {
+  background: var(--surface);
+}
+.share-list,
+.rate-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 16px;
+}
+.share-label {
+  margin-bottom: 6px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.share-bar {
+  display: flex;
+  height: 30px;
+  gap: 2px;
+  overflow: hidden;
+  border-radius: 6px;
+}
+.seg {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tone-good {
+  background: var(--series-1);
+  color: var(--on-ink);
+}
+.tone-bad {
+  background: repeating-linear-gradient(135deg, var(--series-1) 0 2px, var(--surface) 2px 6px);
+  color: var(--ink);
+}
+.tone-other {
+  background: var(--track);
+  color: var(--ink-2);
+}
+.seg.tone-bad {
+  outline: 1px solid var(--series-1);
+  outline-offset: -1px;
+}
+.share-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.share-key li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 3px;
+}
+.swatch.tone-bad {
+  outline: 1px solid var(--series-1);
+  outline-offset: -1px;
+}
+.rate-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+.rate-head strong {
+  font-variant-numeric: tabular-nums;
+}
+.rate-row .chart {
+  margin: 2px 0;
+}
+.rate-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+details.more {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+details.more > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 500;
+}
+details.more[open] > summary {
+  margin-bottom: 4px;
 }

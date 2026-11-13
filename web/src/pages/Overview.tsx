@@ -106,10 +106,6 @@ function ZoneOverview({
             max={Math.max(1, ...items.map((i) => i.value))}
           />
         </section>
-        <section className="card" aria-label="Invasive records by year">
-          <h2>By year</h2>
-          {byYear ? <ColumnChart data={byYear} caption="Invasive-species records by year, all parks" /> : <Loading what="years" />}
-        </section>
         <section className="card" aria-label="Most recorded invasive species">
           <h2>Most recorded species</h2>
           {reports ? (
@@ -117,6 +113,10 @@ function ZoneOverview({
           ) : (
             <Loading what="species" />
           )}
+        </section>
+        <section className="card wide" aria-label="Invasive records by year">
+          <h2>By year</h2>
+          {byYear ? <ColumnChart data={byYear} caption="Invasive-species records by year, all parks" /> : <Loading what="years" />}
         </section>
       </div>
     </>

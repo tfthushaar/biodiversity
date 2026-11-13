@@ -26,6 +26,7 @@ vi.mock("../components/HotspotMap", () => ({
 }));
 
 import { Impact } from "./Impact";
+import { Models } from "./Models";
 import { Alerts } from "./Alerts";
 import { Hotspots } from "./Hotspots";
 import { Overview, topSpecies } from "./Overview";
@@ -173,11 +174,11 @@ describe("Impact page", () => {
     });
     wrap(<Impact />);
     expect(await screen.findByText(/ρ = -0.31/)).toBeInTheDocument();
-    expect(screen.getByText(/-0.52 to -0.08/)).toBeInTheDocument();
+    expect(screen.getByText(/95% interval -0.52 to -0.08/)).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Native species richness against the invasive share/ })).toBeInTheDocument();
   });
 
-  it("draws the trend as a line chart beside its statistics", async () => {
+  it("draws the trend as yearly dots with a line, the observations behind them, and its statistics", async () => {
     const series = [2018, 2019, 2020, 2021, 2022, 2023].map((year, i) => ({
       year, observations: 50, invasive: i, native: 40 - i, invasive_per_observation: i / 50, native_per_observation: (40 - i) / 50,
     }));
@@ -193,7 +194,8 @@ describe("Impact page", () => {
       ],
     });
     wrap(<Impact />);
-    expect(await screen.findByRole("img", { name: /Records per observation by year/ })).toBeInTheDocument();
+    expect(await screen.findByRole("img", { name: /Invasive records per observation by year/ })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Observations in each year/ })).toBeInTheDocument();
     expect(screen.getByText("Invasive records per observation", { selector: "td" })).toBeInTheDocument();
   });
 });
@@ -333,7 +335,7 @@ describe("Hotspots page", () => {
     }));
     wrap(<Hotspots zone={null} />);
     await screen.findByRole("button", { name: "square of 45" });
-    await userEvent.selectOptions(screen.getByRole("combobox", { name: "Species" }), "Cuban tree frog (Osteopilus septentrionalis) · 17");
+    await userEvent.selectOptions(screen.getByRole("combobox", { name: "Species" }), "Cuban tree frog · 17");
     expect(await screen.findByRole("button", { name: "square of 5" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "square of 12" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "square of 45" })).not.toBeInTheDocument();
@@ -684,5 +686,74 @@ describe("Species page", () => {
     serve(routes({ "/rpc/species_profile": { ...profile, records: 0, first_year: null, last_year: null, by_park: [], by_year: [], by_source: [] } }));
     wrap(<SpeciesPage selected="Python bivittatus" />);
     expect(await screen.findByText(/Not recorded in these parks/)).toBeInTheDocument();
+  });
+});
+
+
+describe("Models page", () => {
+  const rate = (count: number, of: number, lo: number, hi: number) => ({ count, of, rate: count / of, ci95: [lo, hi] });
+  const plant = {
+    id: 1, name: "plants", task: "plant_classifier", weights_uri: null,
+    metrics: {
+      classes: ["a", "b", "other"], test_photos: 469, answered: 0.8, accuracy_when_answered: 0.9,
+      test_top1_without_threshold: 0.893, majority_class_baseline: 0.194, chosen: { threshold: 0.76, temperature: 1, C: 100 },
+      invasives_correctly_named: rate(225, 265, 0.801, 0.887),
+      dangerous_errors_by_kind: { native_lookalike: rate(0, 113, 0, 0.033), other: rate(6, 91, 0.031, 0.137) },
+      threshold_tradeoff_on_test: [
+        { threshold: 0.3, answered: 1, accuracy_when_answered: 0.89 },
+        { threshold: 0.76, answered: 0.8, accuracy_when_answered: 0.9 },
+      ],
+      caveats: ["A limit worth knowing."],
+    },
+  };
+  const detector = {
+    id: 3, name: "detector", task: "detector", weights_uri: null,
+    metrics: {
+      images: 1000,
+      image_level_by_threshold: [{ threshold: 0.2, precision: 0.9, recall: 0.8, false_alarm_rate: 0.2 }],
+    },
+  };
+
+  it("shows what happens to 100 photos, worked out from how many it names and how often it is right", async () => {
+    serve({ "/model_versions": [plant, detector] });
+    wrap(<Models />);
+    // 0.8 named and 0.9 right when named: 72% right, 8% wrong, 20% left as unknown.
+    const bar = await screen.findByRole("img", { name: "named correctly 72.0%, named wrongly 8.0%, left as “unknown” 20.0%" });
+    expect(bar).toBeInTheDocument();
+  });
+
+  it("shows how far each plant rate can be trusted, with the direction that is good", async () => {
+    serve({ "/model_versions": [plant, detector] });
+    wrap(<Models />);
+    const list = await screen.findByRole("list", { name: /Plant classifier: rates with their 95% intervals/ });
+    const items = within(list).getAllByRole("listitem");
+    expect(items).toHaveLength(3);
+    expect(items[0]).toHaveTextContent("225 of 265 photos of invasive plants");
+    expect(items[1]).toHaveTextContent("Lower is better.");
+  });
+
+  it("compares the classifier with always guessing the most common plant", async () => {
+    serve({ "/model_versions": [plant, detector] });
+    wrap(<Models />);
+    const list = await screen.findByRole("list", { name: /always guessing the most common class/ });
+    expect(list).toHaveTextContent("89.3%");
+    expect(list).toHaveTextContent("19.4%");
+  });
+
+  it("keeps the confidence-setting curves one click away, with the setting in use marked", async () => {
+    serve({ "/model_versions": [plant, detector] });
+    const { container } = wrap(<Models />);
+    const toggles = await screen.findAllByText("How the confidence setting changes this", { selector: "summary" });
+    expect(toggles).toHaveLength(2); // the plant classifier and the detector
+    for (const d of container.querySelectorAll("details.more")) expect(d).not.toHaveAttribute("open");
+    expect(container.querySelectorAll("line.marker-line").length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("shows what the detector does with photos that have an animal, photos it flags and empty photos", async () => {
+    serve({ "/model_versions": [plant, detector] });
+    wrap(<Models />);
+    expect(await screen.findByRole("img", { name: "found 80.0%, missed 20.0%" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "had an animal 90.0%, had none 10.0%" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "left alone 80.0%, flagged anyway 20.0%" })).toBeInTheDocument();
   });
 });

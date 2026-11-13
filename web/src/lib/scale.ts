@@ -22,6 +22,31 @@ export function niceTicks(min: number, max: number, target = 5): number[] {
   return out;
 }
 
+/**
+ * Round tick values from 0 that reach the top of the data. `niceTicks` stops at the last round
+ * value below the maximum, which leaves the tallest bar or highest dot above the axis.
+ */
+export function coverTicks(max: number, target = 5): number[] {
+  const ticks = niceTicks(0, max, target);
+  if (ticks.length < 2) return [0, 1];
+  const step = (ticks[1] as number) - (ticks[0] as number);
+  let last = ticks[ticks.length - 1] as number;
+  while (last < max - step * 1e-9) {
+    last = Number((last + step).toFixed(10));
+    ticks.push(last);
+  }
+  return ticks;
+}
+
+/** Tick years at round values (every 5, 10, 20 years), never a fraction of a year. */
+export function yearTicks(min: number, max: number, target = 6): number[] {
+  const rough = (max - min) / Math.max(1, target);
+  const step = [1, 2, 5, 10, 20, 25, 50, 100].find((s) => s >= rough) ?? 100;
+  const out: number[] = [];
+  for (let y = Math.ceil(min / step) * step; y <= max; y += step) out.push(y);
+  return out.length > 0 ? out : [min, max];
+}
+
 /** The index of the value in `xs` closest to `x`: what a crosshair snaps to. */
 export function nearestIndex(xs: number[], x: number): number {
   let best = 0;

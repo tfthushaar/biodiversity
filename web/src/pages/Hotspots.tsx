@@ -13,7 +13,7 @@ import { Empty, ErrorState, Loading } from "../components/basics";
 import { ColumnChart, TableTwin } from "../components/charts";
 import { HotspotMap } from "../components/HotspotMap";
 import { SpeciesList, type SpeciesLookup } from "../components/SpeciesCard";
-import { fmtInt, pluralise } from "../lib/format";
+import { fmtInt, pluralise, shortPark } from "../lib/format";
 import {
   HEAT_OPACITY,
   SIZES_KM,
@@ -158,7 +158,7 @@ export function Hotspots({ zone: zoneParam }: { zone: string | null }) {
                   <optgroup key={country} label={COUNTRY[country] ?? country}>
                     {list.map((f) => (
                       <option key={f.properties.slug} value={f.properties.slug}>
-                        {f.properties.name}
+                        {shortPark(f.properties.name)}
                       </option>
                     ))}
                   </optgroup>
@@ -171,7 +171,7 @@ export function Hotspots({ zone: zoneParam }: { zone: string | null }) {
                 <option value="">All invasive species</option>
                 {ranking.map((s) => (
                   <option key={s.name} value={s.name}>
-                    {s.common_name ? `${s.common_name} (${s.name})` : s.name} · {fmtInt(s.records)}
+                    {s.common_name ?? s.name} · {fmtInt(s.records)}
                   </option>
                 ))}
               </select>

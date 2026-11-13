@@ -3,7 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { ErrorState, Meter, QueryView, StatTile } from "./basics";
-import { BarList, ColumnChart, LineChart, ScatterPlot, type LineSeries } from "./charts";
+import { BarList, ColumnChart, GroupedDots, IntervalPlot, LineChart, RateRanges, ShareBars, TrendDots, type LineSeries } from "./charts";
 import { FindingCard, PlaybookCard } from "./cards";
 import { Citation } from "./evidence";
 import { safeUrl } from "./evidence";
@@ -282,27 +282,237 @@ describe("ColumnChart", () => {
   });
 });
 
-describe("ScatterPlot", () => {
-  it("draws one dot for each point, with a table of the same figures", () => {
-    const { container } = render(
-      <ScatterPlot
-        caption="Richness against share"
-        xLabel="Invasive share"
-        yLabel="Native species"
-        xFormat={(x) => `${Math.round(x * 100)}%`}
-        points={[{ x: 0.1, y: 8.2, note: "3 invasive records" }, { x: 0.5, y: 4 }]}
-      />,
-    );
-    expect(container.querySelectorAll("circle.dot-point")).toHaveLength(2);
-    const table = within(screen.getByRole("table"));
-    expect(table.getByText("10%")).toBeInTheDocument();
-    expect(table.getByText("8.2")).toBeInTheDocument();
-    expect(table.getByText("3 invasive records")).toBeInTheDocument();
+describe("TrendDots", () => {
+  const rows = [2018, 2019, 2020, 2021].map((year, i) => ({
+    x: year,
+    y: i / 10,
+    weight: (i + 1) * 20,
+    detail: [{ label: "Observations", value: String((i + 1) * 20) }],
+  }));
+  const props = {
+    rows,
+    xLabel: "Year",
+    yLabel: "Invasive share",
+    yFormat: (y: number) => `${Math.round(y * 100)}%`,
+    caption: "Invasive share by year",
+  };
+
+  it("draws a dot for each year, larger where the year rests on more observations", () => {
+    const { container } = render(<TrendDots {...props} />);
+    const radii = [...container.querySelectorAll("circle.dot-point")].map((c) => Number(c.getAttribute("r")));
+    expect(radii).toHaveLength(4);
+    expect(radii).toEqual([...radii].sort((a, b) => a - b));
+    expect(radii[3]).toBeGreaterThan(radii[0] as number);
   });
 
-  it("draws nothing for no points", () => {
-    const { container } = render(<ScatterPlot caption="x" xLabel="a" yLabel="b" xFormat={String} points={[]} />);
+  it("draws the trend line only when one is given", () => {
+    const { container, rerender } = render(<TrendDots {...props} />);
+    expect(container.querySelector("line.trend-line")).toBeNull();
+    rerender(<TrendDots {...props} line={{ slope: 0.1, intercept: -200 }} lineLabel="Theil-Sen trend" />);
+    expect(container.querySelector("line.trend-line")).not.toBeNull();
+    expect(screen.getByRole("list", { name: "Legend" })).toHaveTextContent("Theil-Sen trend");
+  });
+
+  it("reads a year out to the keyboard, with the observations behind it", async () => {
+    const { container } = render(<TrendDots {...props} />);
+    screen.getByRole("img", { name: /Invasive share by year/ }).focus();
+    await userEvent.keyboard("{ArrowRight}");
+    const tip = container.querySelector(".tooltip");
+    expect(tip).toHaveTextContent("Year: 2018");
+    expect(tip).toHaveTextContent("Observations20");
+    await userEvent.keyboard("{End}");
+    expect(container.querySelector(".tooltip")).toHaveTextContent("Year: 2021");
+  });
+
+  it("lists every year in the table view", () => {
+    render(<TrendDots {...props} />);
+    const table = within(screen.getByRole("table", { hidden: true }));
+    expect(table.getAllByRole("row", { hidden: true })).toHaveLength(5);
+    expect(table.getByText("30%", { exact: true })).toBeInTheDocument();
+  });
+
+  it("draws nothing for no rows", () => {
+    const { container } = render(<TrendDots {...props} rows={[]} />);
     expect(container.querySelector("svg")).toBeNull();
+  });
+});
+
+describe("GroupedDots", () => {
+  const groups = [
+    { key: "none", label: "None", values: [{ y: 9 }, { y: 10 }, { y: 8 }] },
+    { key: "some", label: "2% to 9%", values: [{ y: 7, note: "3 invasive records" }, { y: 9 }] },
+  ];
+  const props = { groups, xLabel: "Invasive share", yLabel: "Native species", caption: "Richness by invasive share" };
+
+  it("draws a dot for each square and marks the middle of each group", () => {
+    const { container } = render(<GroupedDots {...props} />);
+    expect(container.querySelectorAll("circle.dot-point")).toHaveLength(5);
+    expect(container.querySelectorAll("line.median-line")).toHaveLength(2);
+  });
+
+  it("names each group with its size, so a reader can see how much each rests on", () => {
+    const { container } = render(<GroupedDots {...props} />);
+    const text = [...container.querySelectorAll("svg text")].map((t) => t.textContent);
+    expect(text).toEqual(expect.arrayContaining(["None", "n = 3", "2% to 9%", "n = 2"]));
+  });
+
+  it("gives each group's count, median and range in the table view", () => {
+    render(<GroupedDots {...props} />);
+    const table = within(screen.getByRole("table", { hidden: true }));
+    const cells = table.getAllByRole("cell", { hidden: true }).map((c) => c.textContent);
+    expect(cells).toEqual(["None", "3", "9.0", "8.0", "10.0", "2% to 9%", "2", "8.0", "7.0", "9.0"]);
+  });
+
+  it("puts every dot in the same place each time it is drawn", () => {
+    const place = () =>
+      [...render(<GroupedDots {...props} />).container.querySelectorAll("circle.dot-point")].map((c) => c.getAttribute("cx"));
+    expect(place()).toEqual(place());
+  });
+
+  it("draws nothing without squares", () => {
+    const { container } = render(<GroupedDots {...props} groups={[{ key: "x", label: "x", values: [] }]} />);
+    expect(container.querySelector("svg")).toBeNull();
+  });
+});
+
+describe("IntervalPlot", () => {
+  const props = { value: 0.15, low: -0.1, high: 0.4, minNote: "lower where invaded", maxNote: "higher where invaded", caption: "Correlation 0.15" };
+
+  it("draws the estimate and its interval, and says what each end of the scale means", () => {
+    const { container } = render(<IntervalPlot {...props} />);
+    expect(screen.getByRole("img", { name: "Correlation 0.15" })).toBeInTheDocument();
+    expect(container.querySelector("line.interval")).not.toBeNull();
+    const text = [...container.querySelectorAll("svg text")].map((t) => t.textContent);
+    expect(text).toEqual(expect.arrayContaining(["-1", "0", "+1", "lower where invaded", "higher where invaded"]));
+  });
+
+  it("draws no interval when there is none", () => {
+    const { container } = render(<IntervalPlot {...props} low={null} high={null} />);
+    expect(container.querySelector("line.interval")).toBeNull();
+  });
+
+  it("stacks the two notes when they would not fit side by side", () => {
+    const long = "native richness is lower where invasive records are denser";
+    const { container } = render(<IntervalPlot {...props} minNote={long} maxNote={long.replace("lower", "higher")} />);
+    const ys = [...container.querySelectorAll("svg text")]
+      .filter((t) => /native richness/.test(t.textContent ?? ""))
+      .map((t) => t.getAttribute("y"));
+    expect(new Set(ys).size).toBe(2);
+  });
+});
+
+describe("ShareBars", () => {
+  const rows = [{
+    key: "photos",
+    label: "All test photos",
+    segments: [
+      { key: "right", label: "named correctly", share: 0.785, tone: "good" as const },
+      { key: "wrong", label: "named wrongly", share: 0.028, tone: "bad" as const },
+      { key: "unknown", label: "left as unknown", share: 0.187, tone: "other" as const },
+    ],
+  }];
+
+  it("states every figure in words beside the bar, so nothing depends on its colours", () => {
+    render(<ShareBars rows={rows} caption="Outcome of each photo" />);
+    const list = within(screen.getByRole("list", { name: "Outcome of each photo" }));
+    expect(list.getByText("78.5%", { selector: "strong" }).parentElement).toHaveTextContent("78.5% named correctly");
+    expect(list.getByText("2.8%", { selector: "strong" }).parentElement).toHaveTextContent("2.8% named wrongly");
+    expect(list.getByText("18.7%", { selector: "strong" }).parentElement).toHaveTextContent("18.7% left as unknown");
+  });
+
+  it("sizes each segment by its share and tells the fills apart", () => {
+    const { container } = render(<ShareBars rows={rows} caption="Outcome" />);
+    const segs = [...container.querySelectorAll(".seg")];
+    expect(segs.map((e) => (e as HTMLElement).style.flexBasis)).toEqual(["78.5%", "2.8%", "18.7%"]);
+    expect(segs.map((e) => e.className)).toEqual(["seg tone-good", "seg tone-bad", "seg tone-other"]);
+  });
+
+  it("writes a figure inside a segment only when the segment is wide enough to hold it", () => {
+    const { container } = render(<ShareBars rows={rows} caption="Outcome" />);
+    const inside = [...container.querySelectorAll(".seg .seg-text")].map((e) => e.textContent);
+    expect(inside).toEqual(["78.5%", "18.7%"]);
+  });
+
+  it("describes the whole bar to a screen reader", () => {
+    render(<ShareBars rows={rows} caption="Outcome" />);
+    expect(screen.getByRole("img", { name: "named correctly 78.5%, named wrongly 2.8%, left as unknown 18.7%" })).toBeInTheDocument();
+  });
+
+  it("leaves out a segment with nothing in it but still lists it", () => {
+    const none = [{ key: "a", label: "Group", segments: [
+      { key: "x", label: "found", share: 1, tone: "good" as const },
+      { key: "y", label: "missed", share: 0, tone: "bad" as const },
+    ] }];
+    const { container } = render(<ShareBars rows={none} caption="Outcome" />);
+    expect(container.querySelectorAll(".seg")).toHaveLength(1);
+    expect(screen.getByText("0.0%", { selector: "strong" }).parentElement).toHaveTextContent("0.0% missed");
+  });
+
+  it("gives each outcome, its share and its fill in the table view", () => {
+    render(<ShareBars rows={rows} caption="Outcome" />);
+    const cells = within(screen.getByRole("table", { hidden: true })).getAllByRole("cell", { hidden: true }).map((c) => c.textContent);
+    expect(cells.slice(0, 4)).toEqual(["All test photos", "named correctly", "78.5%", "solid"]);
+    expect(cells).toContain("hatched");
+  });
+});
+
+describe("RateRanges", () => {
+  const rows = [
+    { key: "inv", label: "Invasive plants correctly named", note: "225 of 265 photos", rate: 0.849, low: 0.801, high: 0.887, goal: "higher" as const },
+    { key: "look", label: "Native look-alikes called invasive", note: "0 of 113 photos", rate: 0, low: 0, high: 0.033, goal: "lower" as const },
+  ];
+
+  it("says for every rate which way is good", () => {
+    render(<RateRanges rows={rows} caption="Rates" />);
+    const items = within(screen.getByRole("list", { name: "Rates" })).getAllByRole("listitem");
+    expect(items[0]).toHaveTextContent("Higher is better.");
+    expect(items[1]).toHaveTextContent("Lower is better.");
+  });
+
+  it("gives the range the true value is likely to lie in, in words and as a drawn bar", () => {
+    const { container } = render(<RateRanges rows={rows} caption="Rates" />);
+    expect(screen.getByText(/likely between 80.1% and 88.7%/)).toBeInTheDocument();
+    const bars = [...container.querySelectorAll("line.interval")];
+    expect(bars).toHaveLength(2);
+    for (const b of bars) expect(Number(b.getAttribute("x2"))).toBeGreaterThan(Number(b.getAttribute("x1")));
+    // The wider range is the one drawn from the smaller sample.
+    const length = (b: Element) => Number(b.getAttribute("x2")) - Number(b.getAttribute("x1"));
+    expect(length(bars[0] as Element)).toBeGreaterThan(length(bars[1] as Element));
+  });
+
+  it("shares one 0 to 100% scale between the rows", () => {
+    const { container } = render(<RateRanges rows={rows} caption="Rates" />);
+    const text = [...container.querySelectorAll("svg text")].map((t) => t.textContent);
+    expect(text).toEqual(["0%", "25%", "50%", "75%", "100%"]);
+  });
+
+  it("lists each rate with its range in the table view", () => {
+    render(<RateRanges rows={rows} caption="Rates" />);
+    const cells = within(screen.getByRole("table", { hidden: true })).getAllByRole("cell", { hidden: true }).map((c) => c.textContent);
+    expect(cells.slice(0, 5)).toEqual(["Invasive plants correctly named", "84.9%", "80.1%", "88.7%", "higher"]);
+  });
+});
+
+describe("LineChart marker", () => {
+  const series: LineSeries[] = [
+    { id: "a", label: "Named", color: "var(--series-1)", points: [0.3, 0.5, 0.7, 0.9].map((x) => ({ x, y: 1 - x })) },
+  ];
+  const props = { series, caption: "Effect", xLabel: "Setting", xFormat: (x: number) => x.toFixed(1), yFormat: (y: number) => `${Math.round(y * 100)}%` };
+
+  it("draws a line at the setting in use and names it in the legend", () => {
+    const { container } = render(<LineChart {...props} marker={{ x: 0.5, label: "Setting in use (0.5)" }} />);
+    expect(container.querySelectorAll("svg.chart line.marker-line")).toHaveLength(1);
+    expect(screen.getByRole("list", { name: "Legend" })).toHaveTextContent("Setting in use (0.5)");
+  });
+
+  it("draws no line for a setting outside the chart", () => {
+    const { container } = render(<LineChart {...props} marker={{ x: 5, label: "Elsewhere" }} />);
+    expect(container.querySelectorAll("svg.chart line.marker-line")).toHaveLength(0);
+  });
+
+  it("adds no legend for one series without a marker", () => {
+    render(<LineChart {...props} />);
+    expect(screen.queryByRole("list", { name: "Legend" })).not.toBeInTheDocument();
   });
 });
 

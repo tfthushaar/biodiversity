@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useReports } from "../api/hooks";
 import type { LayerResult, ReportFinding, ZoneReport } from "../api/types";
 import { Empty, ErrorState, Loading, Meter } from "../components/basics";
-import { LineChart, ScatterPlot } from "../components/charts";
+import { ColumnChart, GroupedDots, IntervalPlot, TrendDots, type DotRow } from "../components/charts";
 import { FindingCard } from "../components/cards";
-import { fmtAgo, fmtInt, pluralise } from "../lib/format";
-import { linear } from "../lib/scale";
+import { fmtAgo, fmtInt, pluralise, shortPark } from "../lib/format";
+import { groupSquares, shareLabel, theilSenIntercept } from "../lib/layout";
 
 const num = (d: Record<string, unknown>, k: string): number => (typeof d[k] === "number" ? (d[k] as number) : 0);
 
@@ -47,7 +47,7 @@ export function Impact() {
               <select value={slug ?? ""} onChange={(e) => setSlug(e.target.value)}>
                 {rows.map((r) => (
                   <option key={r.zones.slug} value={r.zones.slug}>
-                    {r.zones.name}
+                    {shortPark(r.zones.name)}
                   </option>
                 ))}
               </select>
@@ -190,8 +190,8 @@ function CoResult({ detail }: { detail: Record<string, unknown> }) {
   const rho = num(detail, "spearman_rho");
   const ci = (detail.ci95 as [number, number] | null) ?? null;
   const cells = (detail.points as [number, number, number][] | undefined) ?? [];
-  const W = 520;
-  const x = linear([-1, 1], [24, W - 24]);
+  const groups = useMemo(() => groupSquares(cells), [cells]);
+  const interval = ci ? `${ci[0].toFixed(2)} to ${ci[1].toFixed(2)}` : "unavailable";
   return (
     <>
       <p>
@@ -200,35 +200,36 @@ function CoResult({ detail }: { detail: Record<string, unknown> }) {
         <strong>ρ = {rho.toFixed(2)}</strong>
         {ci && <> (95% interval {ci[0].toFixed(2)} to {ci[1].toFixed(2)})</>}.
       </p>
-      <svg className="chart" viewBox={`0 0 ${W} 64`} role="img" aria-label={`Correlation ${rho.toFixed(2)}, interval ${ci ? `${ci[0].toFixed(2)} to ${ci[1].toFixed(2)}` : "unavailable"}`}>
-        <line className="axis-line" x1={x(-1)} x2={x(1)} y1={34} y2={34} />
-        {[-1, 0, 1].map((t) => (
-          <g key={t}>
-            <line className="grid-line" x1={x(t)} x2={x(t)} y1={26} y2={42} />
-            <text x={x(t)} y={58} textAnchor="middle">{t}</text>
-          </g>
-        ))}
-        {ci && <line stroke="var(--series-1)" strokeWidth={4} strokeLinecap="round" x1={x(ci[0])} x2={x(ci[1])} y1={34} y2={34} />}
-        <circle className="ring" fill="var(--series-1)" r={5} cx={x(rho)} cy={34} />
-        <text x={x(-1)} y={18} textAnchor="start">fewer native species where invaded</text>
-        <text x={x(1)} y={18} textAnchor="end">more</text>
-      </svg>
-      {cells.length > 0 && (
+      <IntervalPlot
+        value={rho}
+        low={ci?.[0]}
+        high={ci?.[1]}
+        minNote="lower where invaded"
+        maxNote="higher where invaded"
+        caption={`Correlation ${rho.toFixed(2)}, interval ${interval}`}
+      />
+      {groups.length > 0 && (
         <>
-          <h3>The squares behind the number</h3>
+          <h3>Native richness, by how much of a square is invasive</h3>
           <p className="hint" style={{ marginTop: 0 }}>
-            One dot for each map square of about 5 km. Native richness is the number of native species in a
-            sample of {fmtInt(num(detail, "richness_compared_at"))} native records.
+            One dot for each map square of about 5 km, grouped by the share of its records that are invasive. Native
+            richness is the number of native species in a sample of {fmtInt(num(detail, "richness_compared_at"))}{" "}
+            native records. The bar marks the middle of each group.
           </p>
-          <ScatterPlot
-            caption="Native species richness against the invasive share of records, one dot per square"
-            xLabel="Invasive share of records"
+          <GroupedDots
+            caption="Native species richness against the invasive share of records, one dot per square, in groups of similar share"
+            xLabel="Invasive share of the square's records"
             yLabel="Native species per sample"
-            xFormat={(v) => `${Math.round(v * 100)}%`}
-            points={cells.map(([share, richness, invasive]) => ({
-              x: share,
-              y: richness,
-              note: `${fmtInt(invasive)} invasive ${invasive === 1 ? "record" : "records"}`,
+            groups={groups.map((g) => ({
+              key: g.key,
+              label: g.label,
+              values: g.richness.map((y, i) => ({
+                y,
+                note:
+                  (g.invasive[i] ?? 0) === 0
+                    ? "no invasive records"
+                    : `${fmtInt(g.invasive[i])} invasive ${g.invasive[i] === 1 ? "record" : "records"}`,
+              })),
             }))}
           />
         </>
@@ -246,12 +247,38 @@ interface YearRow {
   native_per_observation: number;
 }
 
+interface Trend {
+  tau: number;
+  p_value: number;
+  slope: number;
+}
+
 function TrendResult({ detail }: { detail: Record<string, unknown> }) {
   const series = (detail.series as YearRow[] | undefined) ?? [];
-  const top = Math.max(0.05, ...series.flatMap((r) => [r.invasive_per_observation, r.native_per_observation]));
-  const inv = detail.invasive_per_observation as { tau: number; p_value: number; slope: number } | null;
-  const nat = detail.native_per_observation as { tau: number; p_value: number; slope: number } | null;
-  const row = (label: string, r: typeof inv) =>
+  const inv = (detail.invasive_per_observation as Trend | null) ?? null;
+  const nat = (detail.native_per_observation as Trend | null) ?? null;
+  const fewest = num(detail, "required_records_per_year");
+  const rows: DotRow[] = series.map((r) => ({
+    x: r.year,
+    y: r.invasive_per_observation,
+    weight: r.observations,
+    detail: [
+      { label: "Invasive records", value: fmtInt(r.invasive) },
+      { label: "Observations", value: fmtInt(r.observations) },
+    ],
+  }));
+  const line =
+    inv && series.length > 1
+      ? {
+          slope: inv.slope,
+          intercept: theilSenIntercept(
+            series.map((r) => r.year),
+            series.map((r) => r.invasive_per_observation),
+            inv.slope,
+          ),
+        }
+      : null;
+  const row = (label: string, r: Trend | null) =>
     r && (
       <tr>
         <td>{label}</td>
@@ -263,40 +290,44 @@ function TrendResult({ detail }: { detail: Record<string, unknown> }) {
   return (
     <>
       {series.length > 0 && (
-        <LineChart
-          caption="Records per observation by year"
-          xLabel="Year"
-          xFormat={(x) => String(x)}
-          yFormat={(y) => y.toFixed(2)}
-          yDomain={[0, Math.ceil(top * 20) / 20]}
-          series={[
-            {
-              id: "inv",
-              label: "Invasive records per observation",
-              short: "Invasive",
-              color: "var(--series-1)",
-              points: series.map((r) => ({ x: r.year, y: r.invasive_per_observation })),
-            },
-            {
-              id: "nat",
-              label: "Native records per observation",
-              short: "Native",
-              color: "var(--series-2)",
-              dash: "6 4",
-              points: series.map((r) => ({ x: r.year, y: r.native_per_observation })),
-            },
-          ]}
-        />
+        <>
+          <h3>Invasive share of records, by year</h3>
+          <TrendDots
+            caption="Invasive records per observation by year"
+            xLabel="Year"
+            yLabel="Invasive share of records"
+            yFormat={shareLabel}
+            rows={rows}
+            line={line}
+            lineLabel="Theil-Sen trend"
+          />
+          <p className="hint">
+            The native share is not drawn: it moves against the invasive share because both are shares of the same
+            records. The table gives both tests.
+          </p>
+          <h3>How many observations each year rests on</h3>
+          <ColumnChart
+            data={series.map((r) => ({ year: r.year, records: r.observations }))}
+            caption="Observations in each year with enough data"
+            valueLabel="Observations"
+          />
+          {fewest > 0 && (
+            <p className="hint">
+              Years with fewer than {fmtInt(fewest)} observations are left out of the trend and of this chart. A sudden
+              change in this chart can produce a trend in the one above it.
+            </p>
+          )}
+        </>
       )}
-    <div className="table-wrap">
-      <table>
-        <caption>Mann-Kendall trend of records per observation, {(detail.years as number[] | undefined)?.join(" to ")}</caption>
-        <thead>
-          <tr><th>Measure</th><th className="num">Kendall τ</th><th className="num">p</th><th className="num">Theil-Sen slope</th></tr>
-        </thead>
-        <tbody>{row("Invasive records per observation", inv)}{row("Native records per observation", nat)}</tbody>
-      </table>
-    </div>
+      <div className="table-wrap">
+        <table>
+          <caption>Mann-Kendall trend of records per observation, {(detail.years as number[] | undefined)?.join(" to ")}</caption>
+          <thead>
+            <tr><th>Measure</th><th className="num">Kendall τ</th><th className="num">p</th><th className="num">Theil-Sen slope</th></tr>
+          </thead>
+          <tbody>{row("Invasive records per observation", inv)}{row("Native records per observation", nat)}</tbody>
+        </table>
+      </div>
     </>
   );
 }

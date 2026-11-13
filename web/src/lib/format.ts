@@ -62,3 +62,8 @@ export function humanise(token: string): string {
 export function pluralise(n: number, one: string, many = `${one}s`): string {
   return `${fmtInt(n)} ${n === 1 ? one : many}`;
 }
+
+/** "Great Smoky Mountains National Park" -> "Great Smoky Mountains": the form that fits a menu. */
+export function shortPark(name: string): string {
+  return name.replace(/ National Park$/, "");
+}
