@@ -1,0 +1,227 @@
+{
+  "_about": "The paper's own references: peer-reviewed articles that support a statement, give a method or describe the data, and the resources the study used. Same rule as knowledge.json: no preprints and nothing that cannot be looked up. scripts/verify_citations.py checks every article against Crossref and OpenAlex and every quote against the abstract.",
+  "_policy": {
+    "claim_min_year": 2014,
+    "blocked_venues": []
+  },
+  "articles": {
+    "seebens2017": {
+      "doi": "10.1038/ncomms14435",
+      "title": "No saturation in the accumulation of alien species worldwide",
+      "authors": "Seebens, H., Blackburn, T.M., Dyer, E.E., Genovesi, P., Hulme, P.E., Jeschke, J.M. et al.",
+      "year": 2017,
+      "journal": "Nature Communications",
+      "volume": "8",
+      "pages": "14435",
+      "role": "claim",
+      "quotes": [
+        "the increase in numbers of alien species does not show any sign of saturation"
+      ]
+    },
+    "pagad2018": {
+      "doi": "10.1038/sdata.2017.202",
+      "title": "Introducing the Global Register of Introduced and Invasive Species",
+      "authors": "Pagad, S., Genovesi, P., Carnevali, L., Schigel, D. and McGeoch, M.A.",
+      "year": 2018,
+      "journal": "Scientific Data",
+      "volume": "5",
+      "pages": "170202",
+      "role": "claim",
+      "quotes": [
+        "provides the first country-wise checklists of introduced (naturalised) and invasive species"
+      ]
+    },
+    "isaac2014": {
+      "doi": "10.1111/2041-210X.12254",
+      "title": "Statistics for citizen science: extracting signals of change from noisy ecological data",
+      "authors": "Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B.",
+      "year": 2014,
+      "journal": "Methods in Ecology and Evolution",
+      "volume": "5(10)",
+      "pages": "1052-1060",
+      "role": "claim",
+      "quotes": [
+        "opportunistic biological records are relatively unstructured but vast in quantity",
+        "employ data filtering criteria and/or correction factors to deal with variation in recorder activity"
+      ]
+    },
+    "fennell2022": {
+      "doi": "10.1016/j.gecco.2022.e02104",
+      "title": "Use of object detection in camera trap image identification: Assessing a method to rapidly and accurately classify human and animal detections for research and application in recreation ecology",
+      "authors": "Fennell, M., Beirne, C. and Burton, A.C.",
+      "year": 2022,
+      "journal": "Global Ecology and Conservation",
+      "volume": "35",
+      "pages": "e02104",
+      "role": "claim",
+      "quotes": [
+        "We applied an object detection model (MegaDetector) to camera trap data from a study of recreation ecology in British Columbia, Canada",
+        "We tested its performance in detecting humans and animals relative to manual image classifications"
+      ]
+    },
+    "velez2022": {
+      "doi": "10.1111/2041-210x.14044",
+      "title": "An evaluation of platforms for processing camera‐trap data using artificial intelligence",
+      "authors": "Vélez, J., McShea, W., Shamon, H., Castiblanco‐Camacho, P.J., Tabak, M.A., Chalmers, C. et al.",
+      "year": 2022,
+      "journal": "Methods in Ecology and Evolution",
+      "volume": "14(2)",
+      "pages": "459-477",
+      "role": "claim",
+      "quotes": [
+        "to automatically detect objects (e.g. animals, humans, vehicles) and to classify species"
+      ]
+    },
+    "norouzzadeh2018": {
+      "doi": "10.1073/pnas.1719367115",
+      "title": "Automatically identifying, counting, and describing wild animals in camera-trap images with deep learning",
+      "authors": "Norouzzadeh, M.S., Nguyen, A., Kosmala, M., Swanson, A., Palmer, M.S., Packer, C. et al.",
+      "year": 2018,
+      "journal": "Proceedings of the National Academy of Sciences",
+      "volume": "115(25)",
+      "role": "claim",
+      "quotes": [
+        "we show deep learning can automate animal identification for 99.3% of the 3.2 million-image Snapshot Serengeti dataset"
+      ]
+    },
+    "tabak2019": {
+      "doi": "10.1111/2041-210X.13120",
+      "title": "Machine learning to classify animal species in camera trap images: Applications in ecology",
+      "authors": "Tabak, M.A., Norouzzadeh, M.S., Wolfson, D.W., Sweeney, S.J., Vercauteren, K.C., Snow, N.P. et al.",
+      "year": 2019,
+      "journal": "Methods in Ecology and Evolution",
+      "volume": "10(4)",
+      "pages": "585-590",
+      "role": "claim",
+      "quotes": [
+        "We trained machine learning models using convolutional neural networks with the ResNet-18 architecture and 3,367,383 images to automatically classify wildlife species from camera trap images"
+      ]
+    },
+    "efron1979": {
+      "doi": "10.1214/aos/1176344552",
+      "title": "Bootstrap Methods: Another Look at the Jackknife",
+      "authors": "Efron, B.",
+      "year": 1979,
+      "journal": "The Annals of Statistics",
+      "volume": "7(1)",
+      "pages": "1-26",
+      "role": "method"
+    },
+    "hurlbert1971": {
+      "doi": "10.2307/1934145",
+      "title": "The Nonconcept of Species Diversity: A Critique and Alternative Parameters",
+      "authors": "Hurlbert, S.H.",
+      "year": 1971,
+      "journal": "Ecology",
+      "volume": "52(4)",
+      "pages": "577-586",
+      "role": "method"
+    },
+    "mann1945": {
+      "doi": "10.2307/1907187",
+      "title": "Nonparametric Tests Against Trend",
+      "authors": "Mann, H.B.",
+      "year": 1945,
+      "journal": "Econometrica",
+      "volume": "13(3)",
+      "role": "method"
+    },
+    "sen1968": {
+      "doi": "10.1080/01621459.1968.10480934",
+      "title": "Estimates of the Regression Coefficient Based on Kendall's Tau",
+      "authors": "Sen, P.K.",
+      "year": 1968,
+      "journal": "Journal of the American Statistical Association",
+      "volume": "63(324)",
+      "pages": "1379-1389",
+      "role": "method"
+    },
+    "wilson1927": {
+      "doi": "10.1080/01621459.1927.10502953",
+      "title": "Probable Inference, the Law of Succession, and Statistical Inference",
+      "authors": "Wilson, E.B.",
+      "year": 1927,
+      "journal": "Journal of the American Statistical Association",
+      "volume": "22(158)",
+      "pages": "209-212",
+      "role": "method"
+    },
+    "virtanen2020": {
+      "doi": "10.1038/s41592-019-0686-2",
+      "title": "SciPy 1.0: fundamental algorithms for scientific computing in Python",
+      "authors": "Virtanen, P., Gommers, R., Oliphant, T.E., Haberland, M., Reddy, T., Cournapeau, D. et al.",
+      "year": 2020,
+      "journal": "Nature Methods",
+      "volume": "17(3)",
+      "pages": "261-272",
+      "role": "method"
+    },
+    "beery2018": {
+      "doi": "10.1007/978-3-030-01270-0_28",
+      "title": "Recognition in Terra Incognita",
+      "authors": "Beery, S., Van Horn, G. and Perona, P.",
+      "year": 2018,
+      "journal": "Lecture Notes in Computer Science",
+      "pages": "472-489",
+      "role": "dataset"
+    }
+  },
+  "resources": {
+    "gbif": {
+      "name": "GBIF.org",
+      "mention": "GBIF",
+      "year": 2026,
+      "title": "GBIF Occurrence Data",
+      "url": "https://www.gbif.org",
+      "kind": "data"
+    },
+    "inaturalist": {
+      "name": "iNaturalist contributors",
+      "mention": "iNaturalist",
+      "year": 2026,
+      "title": "iNaturalist research-grade observations",
+      "url": "https://www.inaturalist.org",
+      "kind": "data"
+    },
+    "usgs_nas": {
+      "name": "U.S. Geological Survey",
+      "mention": "Nonindigenous Aquatic Species",
+      "year": 2026,
+      "title": "Nonindigenous Aquatic Species Database. Gainesville, Florida",
+      "url": "https://nas.er.usgs.gov",
+      "kind": "data"
+    },
+    "lila": {
+      "name": "LILA BC",
+      "mention": "LILA BC",
+      "year": 2026,
+      "title": "Labeled Information Library of Alexandria: Biology and Conservation",
+      "url": "https://lila.science",
+      "kind": "data"
+    },
+    "osm": {
+      "name": "OpenStreetMap contributors",
+      "mention": "OpenStreetMap",
+      "year": 2026,
+      "title": "OpenStreetMap, licensed under the Open Database Licence",
+      "url": "https://www.openstreetmap.org",
+      "kind": "data"
+    },
+    "megadetector": {
+      "name": "Miao, Z., Hernandez, A., Vargas, L.F., Chacon, I.D., Ruiz, D. et al.",
+      "mention": "MegaDetector V6",
+      "year": 2025,
+      "title": "Pytorch-Wildlife model weights (MegaDetector V6). Zenodo",
+      "url": "https://doi.org/10.5281/zenodo.15398270",
+      "kind": "model"
+    },
+    "dinov2": {
+      "name": "Meta AI Research",
+      "mention": "DINOv2",
+      "year": 2023,
+      "title": "DINOv2: model weights and code",
+      "url": "https://github.com/facebookresearch/dinov2",
+      "kind": "model"
+    }
+  }
+}

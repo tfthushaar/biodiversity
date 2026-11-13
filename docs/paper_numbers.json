@@ -1,0 +1,73 @@
+{
+  "_about": "Every number typed into the prose of docs/paper_template.md, and where it comes from. A number the build fills in from the data is a {{TOKEN}} and is not listed here. The build reads each origin and fails if the number is not there, so a figure cannot be typed from memory. An entry is one origin or a list of them. Origins: json (a file and the path inside it that holds the value), code (a constant in the package), doc (a file that states it, with the text to look for) and external (only for something no file holds, with the date it was checked and how). The 8 October USGS counts are now in docs/metrics/usgs_python_sources.json and filled in as data.",
+  "numbers": {
+    "10%": {"doc": "scripts/dataset_summary.py", "contains": "len(counts) * 0.1"},
+    "2": {"doc": "db/migrations/0022_hotspot_filters.sql", "contains": "coalesce(p_km, 2)"},
+    "95%": [
+      {"doc": "src/biodiv/analytics/stats.py", "contains": "level: float = 0.95"},
+      {"doc": "src/biodiv/training/metrics.py", "contains": "target: float = 0.95"}
+    ],
+    "5%": {"doc": "src/biodiv/training/metrics.py", "contains": "max_dangerous: float = 0.05"},
+    "0.05": {"code": "biodiv.analytics.impact:CELL_DEGREES"},
+    "5": [
+      {"code": "biodiv.analytics.impact:MIN_INVASIVE_CELLS"},
+      {"doc": "src/biodiv/analytics/impact.py", "contains": "# about 5 km"}
+    ],
+    "10": {"code": "biodiv.analytics.impact:RAREFY_TO"},
+    "20": {"code": "biodiv.analytics.impact:MIN_CELLS"},
+    "6": {"code": "biodiv.analytics.impact:MIN_YEARS"},
+    "15": {"code": "biodiv.analytics.impact:MIN_RECORDS_PER_YEAR"},
+    "30": [
+      {"code": "biodiv.analytics.impact:MIN_INVASIVE_RECORDS"},
+      {"json": "docs/metrics/megadetector_caltech.json", "path": "image_kinds"}
+    ],
+    "2,000": {"doc": "src/biodiv/analytics/stats.py", "contains": "n_boot: int = 2000"},
+    "0.03": {"doc": "tests/test_stats.py", "contains": "abs=0.03"},
+
+    "60": {"doc": "docs/models.md", "contains": "On 60 images"},
+    "1,000": {"json": "docs/metrics/megadetector_caltech.json", "path": "images"},
+    "720": {"json": "docs/metrics/megadetector_caltech.json", "path": "image_kinds"},
+    "250": {"json": "docs/metrics/megadetector_caltech.json", "path": "image_kinds"},
+    "768": {"doc": "docs/models.md", "contains": "768-number embedding"},
+    "1,407": {"json": "models/heads/plants.json", "path": "meta.photos"},
+    "469": {"json": "models/heads/plants.json", "path": "meta.photos"},
+    "1,732": {"json": "models/heads/animals.json", "path": "meta.photos"},
+    "565": {"json": "models/heads/animals.json", "path": "meta.photos"},
+    "13": {"json": "docs/metrics/animals.json", "path": "classes", "length": 13},
+    "16": {"doc": "docs/models.md", "contains": "16 camera locations absent from training"},
+
+    "0.2": {"json": "docs/metrics/megadetector_caltech.json", "path": "animal_image_level"},
+    "92.6%": {"json": "docs/metrics/megadetector_caltech.json", "path": "animal_image_level"},
+    "93.2%": {"json": "docs/metrics/megadetector_caltech.json", "path": "animal_image_level"},
+    "17.5%": {"json": "docs/metrics/megadetector_caltech.json", "path": "animal_image_level"},
+
+    "89.3%": {"json": "docs/metrics/plants.json", "path": "test_top1_without_threshold"},
+    "19%": {"json": "docs/metrics/plants.json", "path": "majority_class_baseline"},
+    "0.76": {"json": "docs/metrics/plants.json", "path": "chosen.threshold"},
+    "81.2%": {"json": "docs/metrics/plants.json", "path": "results.test.answered"},
+    "96.6%": {"json": "docs/metrics/plants.json", "path": "results.test.accuracy_when_answered"},
+    "84.9%": {"json": "docs/metrics/plants.json", "path": "results.test.invasives_correctly_named"},
+    "85%": {"json": "docs/metrics/plants.json", "path": "results.test.invasives_correctly_named"},
+    "225": {"json": "docs/metrics/plants.json", "path": "results.test.invasives_correctly_named"},
+    "265": {"json": "docs/metrics/plants.json", "path": "results.test.invasives_correctly_named"},
+    "80.1": {"json": "docs/metrics/plants.json", "path": "results.test.invasives_correctly_named"},
+    "88.7%": {"json": "docs/metrics/plants.json", "path": "results.test.invasives_correctly_named"},
+    "113": {"json": "docs/metrics/plants.json", "path": "results.test.dangerous_errors_by_kind.native_lookalike"},
+    "0": {"json": "docs/metrics/plants.json", "path": "results.test.dangerous_errors_by_kind.native_lookalike"},
+    "3.3%": {"json": "docs/metrics/plants.json", "path": "results.test.dangerous_errors_by_kind.native_lookalike"},
+    "91": {"json": "docs/metrics/plants.json", "path": "results.test.dangerous_errors_by_kind.other"},
+    "6.6%": {"json": "docs/metrics/plants.json", "path": "results.test.dangerous_errors_by_kind.other"},
+    "3.1": {"json": "docs/metrics/plants.json", "path": "results.test.dangerous_errors_by_kind.other"},
+    "13.7%": {"json": "docs/metrics/plants.json", "path": "results.test.dangerous_errors_by_kind.other"},
+    "88.1%": {"json": "docs/metrics/plants.json", "path": "results.test_india_only.invasives_correctly_named"},
+    "120": {"json": "docs/metrics/plants.json", "path": "results.test_india_only.dangerous_errors"},
+
+    "77.2%": {"json": "docs/metrics/animals.json", "path": "new_cameras_top1"},
+    "11%": {"json": "docs/metrics/animals.json", "path": "majority_class_baseline"},
+    "81.6%": {"json": "docs/metrics/animals.json", "path": "same_cameras_top1"},
+    "0.77": {"json": "docs/metrics/animals.json", "path": "chosen.threshold"},
+    "59%": {"json": "docs/metrics/animals.json", "path": "results.test.answered"},
+    "98.5%": {"json": "docs/metrics/animals.json", "path": "results.test.accuracy_when_answered"},
+    "4.4": {"json": "docs/metrics/animals.json", "path": "generalisation_gap"}
+  }
+}

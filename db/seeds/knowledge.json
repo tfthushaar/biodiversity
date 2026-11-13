@@ -6,7 +6,7 @@
       "EDIS"
     ]
   },
-  "verified_on": "2026-11-09",
+  "verified_on": "2026-11-13",
   "sources": {
     "willson2017": {
       "doi": "10.1111/1365-2664.12844",
@@ -307,7 +307,8 @@
       "source": "orzechowski2019",
       "quotes": [
         "we utilized environmental DNA (eDNA) analysis-a genetic tool which detects shed DNA in water samples and provides high detection probabilities",
-        "Burmese pythons (hereafter \"pythons\") are extremely cryptic and there has been no efficient way to detect them"
+        "Burmese pythons (hereafter \"pythons\") are extremely cryptic and there has been no efficient way to detect them",
+        "site-level python eDNA occupancy rates were higher at wading bird colonies (ψ = 0.88, 95% credible interval [0.59-1.00]) than at the control islands (ψ = 0.42 [0.16-0.80]) in April through June"
       ]
     },
     {
@@ -343,7 +344,8 @@
       "source": "negi2019",
       "quotes": [
         "tenacious resistance to cutting and burning",
-        "the cost of its control is estimated at US$ 70 per ha"
+        "the cost of its control is estimated at US$ 70 per ha",
+        "It has invaded most Indian pasture lands (13.2 million ha) besides forest and fallow areas"
       ]
     },
     {
@@ -390,7 +392,8 @@
       "source": "brewer2026",
       "quotes": [
         "The herbicide significantly reduced M. vimineum density in 2019.",
-        "The herbicide had immediate but short-lived negative effects on some native species recruiting from seed at the less productive site."
+        "The herbicide had immediate but short-lived negative effects on some native species recruiting from seed at the less productive site.",
+        "M. vimineum had not fully recovered from the preemergent treatment at either site by 2025"
       ]
     },
     {
@@ -439,7 +442,7 @@
       "quotes": [
         "We found native herbaceous plant richness and cover to be threefold (mean = 6 species) and sixfold (mean = 18% cover) higher, respectively, in the mechanical-removal treatment compared to the control",
         "mechanically removing Prosopis is costly, especially at larger scales",
-        "its removal involves complex trade-offs"
+        "Prosopis also has benefits varying with stakeholder groups, and its removal involves complex trade-offs"
       ]
     },
     {
@@ -474,7 +477,9 @@
       "source": "tipping2021",
       "quotes": [
         "there was a downward trend in their overall invasiveness at this site, with progressively smaller recruitment cohorts due to biological control agents",
-        "Land managers should prioritize removing large reproductive trees over treating recently recruited populations"
+        "Land managers should prioritize removing large reproductive trees over treating recently recruited populations",
+        "evaluated over a 13-yr period that included two wildfires and the introduction of biological control agents",
+        "96.5% fewer than after the 1998 fire"
       ]
     },
     {
@@ -486,7 +491,8 @@
       "source": "wheeler2024",
       "quotes": [
         "The results indicated that C. exotica is highly specific to the target weed, L. microphyllum and a congener that is also an exotic invasive, L. japonicum.",
-        "The release of C. exotica is expected to assist in the effort to manage the invasive weed Old World climbing fern."
+        "The release of C. exotica is expected to assist in the effort to manage the invasive weed Old World climbing fern.",
+        "A series of no-choice tests was conducted on 68 plant species from 45 genera, 33 plant families, and 18 orders"
       ]
     },
     {
@@ -541,7 +547,8 @@
       "source": "hoyer2017",
       "quotes": [
         "while blood meals from deer, raccoons and opossums decreased by 98.2%, reflecting precipitous declines in relative abundance of these larger mammals, attributed to python predation",
-        "although this was not tested in the current study"
+        "although this was not tested in the current study",
+        "increased dramatically (422.2%) from 1979 (14.7%) to 2016 (76.8%)"
       ]
     },
     {
@@ -554,8 +561,8 @@
       "region_note": "Tree islands in the central Everglades, April to June; 15 colony and control pairs.",
       "source": "orzechowski2019",
       "quotes": [
-        "site-level python eDNA occupancy rates were higher at wading bird colonies",
-        "Continued monitoring of wading bird colonies is warranted to determine the effect pythons are having on populations"
+        "Continued monitoring of wading bird colonies is warranted to determine the effect pythons are having on populations",
+        "site-level python eDNA occupancy rates were higher at wading bird colonies (ψ = 0.88, 95% credible interval [0.59-1.00]) than at the control islands (ψ = 0.42 [0.16-0.80]) in April through June"
       ]
     },
     {
@@ -582,7 +589,8 @@
       "source": "negi2019",
       "quotes": [
         "Lantana has invaded vast tracts of dry-moist forests and other culturable wastelands, and has potentially altered biodiversity, landscape ecology and ecosystem services",
-        "the positive impacts and economic uses of Lantana outweigh its negative impacts and require further studies on cost-benefit considerations for decision making for its eradication and management"
+        "the positive impacts and economic uses of Lantana outweigh its negative impacts and require further studies on cost-benefit considerations for decision making for its eradication and management",
+        "It has invaded most Indian pasture lands (13.2 million ha) besides forest and fallow areas"
       ]
     },
     {
@@ -651,7 +659,8 @@
       "source": "wei2017",
       "quotes": [
         "slight invasion did not alter or decreased the total and labile soil C and N fractions, and severe invasion significantly increased most of the total and labile soil C and N fractions",
-        "the impacts of invasion on soil C and N fractions could vary depending on invasion severity"
+        "the impacts of invasion on soil C and N fractions could vary depending on invasion severity",
+        "plots with slight (30%) or severe (100%) invasion"
       ]
     },
     {

@@ -13,6 +13,7 @@ from biodiv.knowledge.verify import (
     contains,
     find_problems,
     normalise,
+    numbers_in,
     validate_structure,
 )
 from helpers import finding_row, knowledge_file, paper, playbook_row
@@ -189,8 +190,8 @@ def test_a_matching_journal_article_passes():
 @pytest.mark.parametrize(
     ("crossref", "openalex", "fragment"),
     [
-        ({"type": "posted-content"}, OPENALEX, "not a journal article"),
-        ({"type": "report"}, OPENALEX, "not a journal article"),
+        ({"type": "posted-content"}, OPENALEX, "not one of"),
+        ({"type": "report"}, OPENALEX, "not one of"),
         ({"subtype": "preprint"}, OPENALEX, "preprint"),
         ({"container-title": ["EDIS"]}, OPENALEX, "not a research journal"),
         ({"ISSN": []}, OPENALEX, "no ISSN"),
@@ -210,6 +211,114 @@ def test_the_paper_check_rejects_what_is_not_a_published_matching_paper(
     crossref, openalex, fragment
 ):
     assert any(fragment in p for p in problems_with(crossref, openalex))
+
+
+# --------------------------------------------------------- numbers, preprints, agreement
+
+
+def test_numbers_are_compared_as_numbers_not_as_typography():
+    stated = numbers_in("3,367,383 images, 14.70% in 1979 and 1·5 times")
+    assert stated == {"3367383", "14.7", "1979", "1.5"}
+    assert numbers_in("a four-year study at two sites") == set()
+    assert numbers_in("a four-year study at two sites", words=True) == {"4", "2"}
+
+
+def structure_problems(**row):
+    k = sample()
+    k["playbooks"][0].update(row)
+    return [str(p) for p in validate_structure(k)]
+
+
+def test_a_number_in_a_summary_must_appear_in_a_quote():
+    bad = structure_problems(summary="Density fell by 40% in 2019.",
+                             quotes=["Hand pulling is suitable for small areas of infestation."])
+    assert any("which no quote contains" in p for p in bad)
+
+
+def test_a_summary_number_found_in_a_quote_passes():
+    quote = "Density fell by 40% in 2019 after the treatment began."
+    assert structure_problems(summary="Density fell by 40% in 2019.", quotes=[quote]) == []
+
+
+def test_a_number_word_in_a_quote_supports_the_digit_in_the_summary():
+    quote = "Removal on four sites in the park worked well here."
+    assert structure_problems(summary="Removal on 4 sites worked.", quotes=[quote]) == []
+
+
+def test_a_quote_must_be_a_real_sentence_fragment_and_not_repeated():
+    assert any("too short" in p for p in structure_problems(quotes=["only five words here ok"]))
+    twice = "Hand pulling is suitable for small areas of infestation."
+    repeated = structure_problems(quotes=[twice, twice.upper()])
+    assert any("same quote appears twice" in p for p in repeated)
+
+
+@pytest.mark.parametrize(
+    "over",
+    [
+        {"doi": "10.48550/arXiv.1706.04599"},   # arXiv
+        {"doi": "10.1101/2020.01.01.123456"},   # bioRxiv and medRxiv
+        {"doi": "10.2139/ssrn.5214911"},        # SSRN
+        {"doi": "10.5281/zenodo.15398270"},     # Zenodo
+        {"journal": "bioRxiv"},
+        {"journal": "Preprints.org"},
+        {"journal": "Research Square"},
+    ],
+)
+def test_a_preprint_server_is_not_peer_review(over):
+    k = sample()
+    k["sources"]["s"].update(over)
+    assert any("preprint server" in str(p) for p in validate_structure(k))
+
+
+def test_the_same_paper_cannot_be_listed_twice():
+    k = sample()
+    k["sources"]["again"] = paper()
+    k["playbooks"].append(playbook_row(source="again", summary="Another way of pulling it up."))
+    assert any("same doi" in str(p) for p in validate_structure(k))
+
+
+@pytest.mark.parametrize(
+    ("openalex", "fragment"),
+    [
+        (None, "OpenAlex has no record"),
+        ({**OPENALEX, "title": "A different paper altogether"}, "disagree on the title"),
+        ({**OPENALEX, "publication_year": 2016}, "OpenAlex dates it 2016"),
+        ({**OPENALEX, "doi": "https://doi.org/10.9999/other"}, "OpenAlex holds this doi as"),
+    ],
+)
+def test_the_two_indexes_must_describe_the_same_paper(openalex, fragment):
+    assert any(fragment in p for p in problems_with(openalex=openalex))
+
+
+def test_matching_records_in_both_indexes_pass():
+    agree = {**OPENALEX, "title": "Invasive plants in tropical forests", "publication_year": 2021,
+             "doi": "https://doi.org/10.1234/example.2021.001"}
+    assert problems_with(openalex=agree) == []
+
+
+def test_only_the_types_a_policy_allows_are_accepted():
+    chapter = {"type": "book-chapter"}
+    assert any("not one of" in p for p in problems_with(chapter))
+    allowed = {**POLICY, "types": ["journal-article", "book-chapter"]}
+    record = {**CROSSREF, **chapter}
+    assert [str(p) for p in check_paper("s", paper(), record, OPENALEX, allowed)] == []
+    preprint = {**CROSSREF, "type": "posted-content"}
+    rejected = check_paper("s", paper(), preprint, OPENALEX, allowed)
+    assert any("not one of" in str(p) for p in rejected)
+
+
+def test_numbers_in_the_summary_and_notes_must_also_be_in_the_abstract():
+    k = sample()
+    k["impact_findings"] = []
+    k["playbooks"][0].update(
+        summary="Pulling worked on 12 plots.", region_note="A forest; 12 plots in 2019.",
+        quotes=["Hand pulling is suitable for small areas of infestation on 12 plots"])
+    ok = {"s": ["Hand pulling is suitable for small areas of infestation on 12 plots in 2019."]}
+    assert find_problems(k, ok) == []
+    # The quote is in this abstract but the year in the region note is not.
+    short = {"s": ["Hand pulling is suitable for small areas of infestation on 12 plots."]}
+    problems = [str(p) for p in find_problems(k, short)]
+    assert problems and all("region_note states ['2019']" in p for p in problems)
 
 
 def test_a_doi_crossref_does_not_know_is_rejected():

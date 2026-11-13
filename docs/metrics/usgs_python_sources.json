@@ -1,0 +1,17 @@
+{
+  "species": "Python bivittatus",
+  "counties": [
+    "Miami-Dade, FL",
+    "Monroe, FL",
+    "Collier, FL"
+  ],
+  "queried_on": "2026-11-13",
+  "source": "https://nas.er.usgs.gov/api/v2/occurrence/search",
+  "total": 8294,
+  "by_record_type": {
+    "Literature": 7531,
+    "Specimen": 760,
+    "Personal communication": 2,
+    "NAS sighting report": 1
+  }
+}
